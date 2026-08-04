@@ -1,0 +1,7 @@
+ideas/
+skills/
+data/
+logs/
+__pycache__/
+*.pyc
+.venv/
