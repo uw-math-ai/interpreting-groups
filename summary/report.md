@@ -1,7 +1,7 @@
 # Learning and Interpreting Continuous Group Operations: SU(2) and its Quotient SO(3)
 
 **Status:** evolving working report for agent/collaborator handoff. Last updated 2026-08-05
-(after the four-run pilot). Single-seed results throughout — treat every number below as a
+(after the four-run pilot and the first causal analyses). Single-seed results throughout — treat every number below as a
 pilot observation pending the seed sweep (Task 1).
 
 ---
@@ -123,7 +123,84 @@ not yet identified; candidates include information loss and poor conditioning of
 even encoding near its fold locus, and the difference between the intrinsic geometries
 of S³ and RP³.
 
-## 4. Interpretation and limitations
+## 4. Causal and mechanistic evidence (added 2026-08-05; pilot checkpoints, one seed)
+
+We supplement the spectra with interventions on the trained models
+(`experiments/su2_causal.py`, results in `data/su2/<run>/causal_200000.json`). All
+interventions act on the argument-encoder activations z_a, z_b; the candidate encoder
+is left intact. We report three metrics on fresh Haar pairs: ranking accuracy against
+63 excluded Haar negatives ("task"); accuracy against 63 negatives at geodesic radius
+0.2 ("fine"); and center discrimination D_c = P[s(a,b,ab) > s(a,b,−ab)], i.e. whether
+the model prefers the true product to its antipode (chance 0.5).
+
+**Interventions** (f = 0.01 models; f = 0.002 results are qualitatively identical and
+recorded in the JSON files):
+
+| intervention | SU(2): task / fine / D_c | SO(3): task / fine / D_c |
+|---|---|---|
+| none | 1.000 / 0.596 / 1.000 | 1.000 / 0.612 / 0.500 |
+| even projection: z(g) ← (z(g)+z(−g))/2 | **0.021 / 0.000 / 0.498** | 1.000 / 0.612 / 0.500 |
+| odd projection: z(g) ← (z(g)−z(−g))/2 | 0.908 / 0.082 / 1.000 | 0.030 / 0.000 / 0.500 |
+| function-ablate spin-½ | **0.024 / 0.000 / 0.506** | 1.000 / 0.603 / 0.500 |
+| function-ablate spin-1 | 1.000 / 0.378 / 1.000 | **0.025 / 0.000 / 0.500** |
+| ablate 4 random directions | 1.000 / 0.540 / 1.000 | 1.000 / 0.578 / 0.500 |
+
+Here "function-ablate spin-j" subtracts from z the component linearly predictable from
+the D^j matrix coefficients of the input, fit on an independent probe set.
+
+The pattern is a double dissociation. For the SU(2) model, removing the spin-½
+component — by parity projection or by function ablation — reduces the task to chance
+(0.02 ≈ 1/64) and center discrimination to 0.5, while removing spin-1 leaves the task
+and D_c intact and costs only fine resolution (0.596 → 0.378): the spin-½ block is
+necessary for composition and for distinguishing ±g, and spin-1 contributes
+resolution. For the SO(3) model the roles transpose: ablating spin-1 is fatal, while
+ablating the (absent) spin-½ component is a no-op — as is the even projection, which
+is an exact no-op by construction and serves as a consistency check of the
+intervention machinery. Random rank-matched ablations leave all metrics essentially
+unchanged.
+
+Two methodological notes. (i) Subspace estimates of near-floor isotypic blocks are
+noise-dominated, and ablating them spuriously damages the model (e.g. the estimated
+"spin-½ subspace" of the SO(3) model overlaps its spin-1 directions); the
+function-space ablation does not have this failure mode and is the instrument we
+report. (ii) The odd projection also removes the mean and any j = 0 component, which
+shifts the interaction MLP off-distribution; its damage upper-bounds but does not
+isolate the contribution of even spin content (the per-spin function ablations do).
+
+**Score–character fit.** Regressing the trained scorer s(a,b,c) on the characters
+χ_j(ab c⁻¹) over triples with c at mixed distances from ab: for the SU(2) models,
+χ_{1/2} alone explains 97.6% (f = 0.01) and 87.7% (f = 0.002) of the score variance,
+with no measurable gain from adding any other character up to j = 3. For the SO(3)
+models, χ_{1/2} explains 0.0% and χ_1 brings the fit to 84.9% / 76.1%. The learned
+decision rule is, to good approximation, a single-character function of ab c⁻¹ — the
+form of the GCR logit of Chughtai et al. — built on the lowest faithful irrep of the
+respective group.
+
+**Composition test.** For the SU(2) models, ridge probes decode the quaternion from
+z (held-out R² = 0.997) and from the product locus h (R² = 0.988 for the product ab
+on fresh held-out pairs; pair-shuffled control R² = −1.03). Composing the element
+probes algebraically matches the truth — median cos(q̂(a)·q̂(b), ab) = 0.998 — and
+matches the independent h-probe (0.995); the shuffled control is at 0. The internal
+state h therefore carries the composed spin-½ representation, which a lookup-table
+account of the scorer does not predict. For the SO(3) models the h-probe decodes the
+product's spin-1 target (qqᵀ) at R² = 0.92 / 0.88 against a shuffled control of −0.9.
+
+## 5. Experiments in progress (launched 2026-08-05)
+
+A 26-run queue (concurrency 5, single T4) is executing:
+
+1. **Candidate-count sweep.** K ∈ {128, 256} × {SU(2), SO(3)} at f = 0.01, 60k steps.
+   The Bayes ceiling of the ranking task falls with K (0.951 / 0.936 / 0.922 for
+   K = 64 / 128 / 256, Monte-Carlo), while chance falls as 1/K; more and closer
+   negatives sharpen the discrimination the task demands, so the bandwidth
+   interpretation predicts a broader spin spectrum at larger K.
+2. **Training-fraction sweep at low f.** f ∈ {0.001, 0.0005, 0.0002} × both variants,
+   300k steps with a fine evaluation grid — a search for the delayed-generalization
+   regime and for the dependence of time-to-generalize on training fraction.
+3. **Seed replication.** Seeds 1–4 for the four pilot cells (100k steps), giving five
+   seeds per cell including the pilot.
+
+## 6. Interpretation and limitations
 
 - **One seed per condition.** The finite-group literature documents seed-dependent
   algorithm and irrep selection; every claim above requires the ≥5-seed replication
@@ -136,55 +213,54 @@ of S³ and RP³.
   group, followed by the next irreps in Casimir order. The designed causal version of
   the double-cover claim (ablate the spin-½ block; measure loss of ±q discrimination)
   is Task 2.
-- **The analysis is correlational.** FVE concentration and decode R² locate
-  information; they do not identify the algorithm. Stander et al. (arXiv:2312.06581)
-  showed for S_n that coset-based circuits produce the same isotypic signatures as
-  representation-composition (GCR) circuits; Wu et al. (arXiv:2410.07476) showed causal
-  patching can also fail to separate such hypotheses. The discriminating tests
-  (composition test, logit–character fit, per-argument equivariance) are Tasks 2–4.
+- **The spectra alone are correlational; Section 4 addresses this in part.** FVE
+  concentration locates information but does not identify the algorithm (Stander et
+  al., arXiv:2312.06581, showed coset circuits reproduce isotypic signatures; Wu et
+  al., arXiv:2410.07476, showed causal patching can also under-determine the
+  mechanism). The Section 4 results — necessity of the spin-½ block, sufficiency of a
+  single character to explain the scores, and the composition test with shuffled
+  controls — go substantially beyond spectra, but per-argument equivariance (Task 5)
+  and replication across seeds remain outstanding before mechanism-level claims are
+  made with confidence.
 - **Resolution is bounded by the training noise.** No model ranks accurately at
   r ≤ 0.05 (near chance); whether any training regime yields resolution below the
   target noise scale σ is open (Task 6).
 
-## 5. Task list (evolving)
+## 7. Task list (evolving)
 
 Standing policy: **every reported experiment uses ≥5 seeds**; pilot (1-seed) results
 must be labeled as such. Tasks are ordered roughly by priority; none is committed to a
 particular sweep — they are a menu for future runs.
 
-1. **Seed replication of the pilot.** 5–10 seeds × {SU(2), SO(3)} × f ∈ {0.002, 0.01};
-   report distributions of FVE spectra, T1/T2, and decode R². Establishes the pilot
-   findings as results.
-2. **Causal double-cover test.** Project the spin-½ isotypic block out of z (and,
-   separately, out of h) at inference; measure (i) overall ranking accuracy and
-   (ii) a targeted probe distinguishing candidates c vs −c. Prediction: ablating j=½
-   destroys ±q discrimination in SU(2) models while leaving qqᵀ-decodable structure
-   intact. Complement with restricted/excluded-loss curves per isotypic block (the
-   progress measures of Nanda et al., arXiv:2301.05217, transposed to spins).
-3. **Logit–character fit.** The Bayes-optimal scorer is log K_t(ab c⁻¹) with the known
-   character expansion Σ_j (2j+1) e^{−t j(j+1)} χ_j. Regress the trained scorer
-   s(a,b,c) on {χ_j(ab c⁻¹)}; report variance explained per j and compare fitted
-   coefficients against the analytic envelope. This is the continuous analogue of the
-   logit–character analysis in Chughtai et al. and in arXiv:2607.07066.
-4. **Composition test (mechanism, not just content).** Fit linear probes for
-   D^{1/2}(a), D^{1/2}(b) on the encoder outputs and for D^{1/2}(ab) on h; verify on
-   held-out pairs whether the probe predictions satisfy D̂(a)D̂(b) ≈ D̂(ab), and whether
-   the h-probe transfers under activation patching of the inputs. Distinguishes
-   representation-composition from lookup- or coset-style solutions.
+1. **Seed replication of the pilot.** *In progress (queue item 3).* Seeds 1–4 ×
+   {SU(2), SO(3)} × f ∈ {0.002, 0.01}; report distributions of FVE spectra, T1/T2,
+   and decode R². Establishes the pilot findings as results.
+2. **Causal double-cover test.** *Pilot complete (Section 4); repeat across seeds and
+   extend to h.* Remaining: ablations applied at the product locus h;
+   restricted/excluded-loss curves per isotypic block during training (the progress
+   measures of Nanda et al., arXiv:2301.05217, transposed to spins).
+3. **Logit–character fit.** *Pilot complete (Section 4).* Remaining: compare fitted
+   coefficients quantitatively against the heat-kernel envelope (2j+1)e^{−tj(j+1)},
+   and repeat at larger K and smaller σ where more characters should be needed.
+4. **Composition test.** *Pilot complete (Section 4).* Remaining: the patched
+   version (does the h-probe transfer under activation patching of one argument?),
+   and the SO(3) case with a proper rotation-matrix composition step.
 5. **Per-argument equivariance.** For fixed k, test whether a single linear map M_k on
    z-space satisfies "z(ka) at the a-slot ⇒ output shifts from ab to kab" across all a,
    and whether M_k M_{k'} ≈ M_{kk'} (a group action on the latent space; cf. Wu et al.).
 6. **Resolution/bandwidth sweep.** Vary σ (and the negative exclusion radius
    accordingly); measure the resulting FVE spectrum cutoff and T3 profile. Prediction:
    maximal represented spin scales as j_max ~ 1/σ, tracking the heat-kernel envelope.
+   *The candidate-count sweep (queue item 1) probes the same question through the
+   negative distribution.*
 7. **Pool-size sweep with exact finite subgroups.** N ∈ {120 (= 2I, exactly closed),
    512, 2048, 8192} at fixed pair count; connects the finite-group regime of
    `RESULTS.md` to the continuous regime, and tests whether the critical pair count is
    set by spectral content rather than pool size.
-8. **Delayed-generalization (grokking) search.** Lower f below the T2-failure point;
-   inflate initialization scale (Omnigrok, arXiv:2210.01117); replace the structured
-   encoding with a rougher kernel. Determines whether the memorization-first regime
-   exists for continuous group tasks.
+8. **Delayed-generalization (grokking) search.** *In progress (queue item 2:
+   f ∈ {0.001, 0.0005, 0.0002}).* Remaining: inflated initialization scale
+   (Omnigrok, arXiv:2210.01117) and rougher encoding kernels if the f-sweep alone
+   does not produce a delayed transition.
 9. **Encoding robustness.** Replicate the pilot with an independent observation map
    (e.g., the group acting on a generic function on S³, with an even function as the
    SO(3) control) to confirm the results are not artifacts of the landmark encoding.
