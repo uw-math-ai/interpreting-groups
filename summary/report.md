@@ -1,7 +1,7 @@
 # Learning and Interpreting Continuous Group Operations: SU(2) and its Quotient SO(3)
 
 **Status:** evolving working report for agent/collaborator handoff. Last updated 2026-08-05
-(after the four-run pilot and the first causal analyses). Single-seed results throughout — treat every number below as a
+(after the four-run pilot, the first causal analyses, and the candidate-count sweep). Single-seed results throughout — treat every number below as a
 pilot observation pending the seed sweep (Task 1).
 
 ---
@@ -185,20 +185,50 @@ state h therefore carries the composed spin-½ representation, which a lookup-ta
 account of the scorer does not predict. For the SO(3) models the h-probe decodes the
 product's spin-1 target (qqᵀ) at R² = 0.92 / 0.88 against a shuffled control of −0.9.
 
-## 5. Experiments in progress (launched 2026-08-05)
+## 5. Second wave of experiments (launched 2026-08-05)
 
-A 26-run queue (concurrency 5, single T4) is executing:
+A 26-run queue (concurrency 4, single T4) covers three batches: the candidate-count
+sweep (complete, below), a training-fraction sweep at low f (f ∈ {0.001, 0.0005,
+0.0002}, 300k steps, fine evaluation grid — the delayed-generalization search), and
+seed replication (seeds 1–4 for the four pilot cells, 100k steps).
 
-1. **Candidate-count sweep.** K ∈ {128, 256} × {SU(2), SO(3)} at f = 0.01, 60k steps.
-   The Bayes ceiling of the ranking task falls with K (0.951 / 0.936 / 0.922 for
-   K = 64 / 128 / 256, Monte-Carlo), while chance falls as 1/K; more and closer
-   negatives sharpen the discrimination the task demands, so the bandwidth
-   interpretation predicts a broader spin spectrum at larger K.
-2. **Training-fraction sweep at low f.** f ∈ {0.001, 0.0005, 0.0002} × both variants,
-   300k steps with a fine evaluation grid — a search for the delayed-generalization
-   regime and for the dependence of time-to-generalize on training fraction.
-3. **Seed replication.** Seeds 1–4 for the four pilot cells (100k steps), giving five
-   seeds per cell including the pilot.
+### 5.1 Candidate-count sweep (complete; one seed, 60k steps)
+
+K ∈ {64, 128, 256} at f = 0.01. The Bayes ceiling of the ranking task falls with K
+(0.951 / 0.936 / 0.922, Monte-Carlo), since more negatives give more chances that one
+falls closer to ab than the noisy positive. Caveat: the K = 256 runs used batch 2048
+(memory), the others 4096.
+
+| K | SU(2): T1 (× ceiling) / T3 r=0.2 / FVE j=½ / j=1 | SO(3): T1 (× ceiling) / T3 r=0.2 / FVE j=1 / j=2 |
+|---|---|---|
+| 64 | 0.921 (0.97) / 0.618 / 0.848 / 0.136 | 0.886 (0.93) / 0.609 / 0.927 / 0.068 |
+| 128 | 0.902 (0.96) / 0.743 / 0.865 / 0.120 | 0.843 (0.90) / 0.561 / 0.916 / 0.078 |
+| 256 | 0.884 (0.96) / 0.921 / **0.975** / 0.018 | 0.851 (0.92) / 0.793 / **0.949** / 0.046 |
+
+Three observations. (i) Held-out accuracy tracks the falling ceiling at a roughly
+constant fraction (~0.96 for SU(2)). (ii) Fine resolution improves markedly with K
+(SU(2), r = 0.2: 0.62 → 0.74 → 0.92; r = 0.1: 0.14 → 0.19 → 0.36). (iii) Contrary to
+the prediction recorded before the sweep, the spin spectrum **concentrates** rather
+than broadens: at K = 256 the SU(2) encoder holds 97.5% of its variance in spin-½,
+and the score–character fit rises to R² = 0.989 on χ_{1/2} alone (SO(3): 0.907 on
+χ_1). The concentration is not an artifact of the batch-size difference: at matched
+effective epochs the K = 64 model is already far broader (j=½ 0.893, j=1 0.095 at
+step 25k).
+
+This revises the interpretation of pilot observation (b). Because χ_{1/2}(ab c⁻¹) is
+monotone in the geodesic distance from c to ab, ranking by the fundamental character
+is Bayes-optimal at *any* resolution; fine resolution therefore does not require
+higher-spin content, and the models with the purest spin-½ representations in fact
+resolve best. The spin-1 content that accumulates at K = 64 coincides with slightly
+*declining* fine resolution over training, consistent with drift rather than with a
+resolution mechanism. The heat-kernel bandwidth argument applies to representing the
+score as a density (log K_t), not to ranking; a direct test of bandwidth selection
+should therefore use a regression or density objective (Task 6, revised).
+
+The causal suite replicates on the K = 256 checkpoints: function-ablating spin-½
+collapses the SU(2) model (task 1.000 → 0.027, D_c → 0.50) and is a no-op for the
+SO(3) model (1.000 → 1.000); the composition test strengthens (median cosine 0.999,
+h-probe agreement 0.998, shuffled controls at 0).
 
 ## 6. Interpretation and limitations
 
@@ -248,11 +278,13 @@ particular sweep — they are a menu for future runs.
 5. **Per-argument equivariance.** For fixed k, test whether a single linear map M_k on
    z-space satisfies "z(ka) at the a-slot ⇒ output shifts from ab to kab" across all a,
    and whether M_k M_{k'} ≈ M_{kk'} (a group action on the latent space; cf. Wu et al.).
-6. **Resolution/bandwidth sweep.** Vary σ (and the negative exclusion radius
-   accordingly); measure the resulting FVE spectrum cutoff and T3 profile. Prediction:
-   maximal represented spin scales as j_max ~ 1/σ, tracking the heat-kernel envelope.
-   *The candidate-count sweep (queue item 1) probes the same question through the
-   negative distribution.*
+6. **Resolution/bandwidth sweep (revised after Section 5.1).** The K sweep showed
+   that ranking resolution does not require higher spins (the fundamental character
+   is monotone in distance), so bandwidth selection must be tested with an objective
+   whose optimum genuinely contains higher spins — e.g. regressing the heat-kernel
+   density value K_t(ab c⁻¹) itself, or classification against *structured* (not
+   Haar) negative distributions whose Bayes scorer is non-monotone. Sweep t and
+   measure which characters the fitted score uses.
 7. **Pool-size sweep with exact finite subgroups.** N ∈ {120 (= 2I, exactly closed),
    512, 2048, 8192} at fixed pair count; connects the finite-group regime of
    `RESULTS.md` to the continuous regime, and tests whether the critical pair count is
