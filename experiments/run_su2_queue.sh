@@ -36,6 +36,6 @@ for s in 1 2 3 4; do
 done
 
 printf '%s\n' "${CMDS[@]}" > data/su2/queue_cmds.txt
-echo "queue: ${#CMDS[@]} runs, concurrency 5"
-printf '%s\n' "${CMDS[@]}" | xargs -P 5 -I CMD bash -c CMD
+echo "queue: ${#CMDS[@]} runs, concurrency 4"
+printf '%s\n' "${CMDS[@]}" | xargs -P 4 -I CMD bash -c CMD
 echo "QUEUE_DONE" > data/su2/QUEUE_DONE

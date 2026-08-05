@@ -117,7 +117,10 @@ class TorchEncoding:
 # --------------------------------- evaluation ---------------------------------
 
 @torch.no_grad()
-def ranking_accuracy(model, psi, pair_set, device, batch=8192):
+def ranking_accuracy(model, psi, pair_set, device, batch=None):
+    if batch is None:
+        # cap candidate encodes per chunk (~1GB peak); K is pair_set's dim 1
+        batch = max(512, 262144 // pair_set[2].shape[1])
     qa, qb, cands = pair_set
     n, correct = qa.shape[0], 0
     for i in range(0, n, batch):
