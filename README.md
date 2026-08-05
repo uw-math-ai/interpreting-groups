@@ -48,7 +48,7 @@ Full write-up: **[RESULTS.md](RESULTS.md)**.
 
 **New — continuous groups:** the same program extended past finite groups: train on
 (approximate) **SU(2) composition** with continuous encodings and a matched **SO(3)
-twin** (one `abs()` apart), and the network builds each group's own Peter–Weyl
+control** (one `abs()` apart), and the network builds each group's own Peter–Weyl
 representation theory — **half-integer spin sectors emerge only for the double
 cover**. Pilot write-up: **[RESULTS_SU2.md](RESULTS_SU2.md)**; code in
 `core/su2*.py`, `experiments/su2_train.py`.

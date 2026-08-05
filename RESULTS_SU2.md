@@ -18,10 +18,10 @@ Everything is continuous — no tokens, no finite vocabulary anywhere.
 
 - **Elements.** Haar-random unit quaternions q ∈ S³ ≅ SU(2).
 - **Observation map (frozen).** Ψ(q) = exp(α⟨q, hᵢ⟩), i = 1…32 fixed Haar landmarks
-  (α = 3, standardized). The **SO(3) twin** uses |⟨q, hᵢ⟩| — the *only* difference
+  (α = 3, standardized). The **SO(3) control** uses |⟨q, hᵢ⟩| — the *only* difference
   between the two conditions is this one absolute value, which makes Ψ even
   (Ψ(q) = Ψ(−q)), i.e. the data quotients to SO(3). Same landmarks, same dimension,
-  same everything else: a matched-pair experimental design where the manipulated
+  same everything else: a matched-pair design where the manipulated
   variable is exactly the double cover.
 - **Task (InfoNCE candidate scoring).** Given Ψ(a), Ψ(b) and K = 64 candidates, pick
   the product: the positive is (ab)·exp(ξ), ξ ~ 𝒩(0, σ²I₃) (σ = 0.2, a heat-kernel-like
@@ -53,28 +53,31 @@ construction, self-tested for homomorphism/unitarity/characters/center),
 | **SO(3)** f=0.002 | 1.000 | 0.834 | 0.827 | 0.002 | **0.980** | 0.000 | 0.013 | +1.000 | **+1.000** | −0.006 | 0.995 |
 | **SO(3)** f=0.01 | 0.999 | 0.885 | 0.884 | 0.002 | **0.909** | 0.001 | 0.084 | +1.000 | **+1.000** | −0.006 | 0.999 |
 
-### 1. The double-cover signature (headline)
+### 1. The double-cover signature
 
 The SU(2) models put **80–97% of encoder variance in the spin-½ spinor sector**: the
 representation is odd under the center (z(−g) ≈ −z(g)), transporting it around a 2π
 SO(3) rotation flips it (negative holonomy), and the quaternion — the j=½ matrix
-coefficients themselves — is linearly decodable at R² ≈ 0.998. The matched SO(3) twins
+coefficients themselves — is linearly decodable at R² ≈ 0.998. The matched SO(3) controls
 keep **every half-integer sector at the 0.2% measurement floor**, concentrate in j=1
-(the lowest faithful SO(3) irrep, with j=2 recruited next), are exactly even, return
+(the lowest faithful SO(3) irrep, with spin 2 next), are exactly even, return
 +1 holonomy, and cannot decode the quaternion (R² ≈ 0) while decoding the even qqᵀ at
 R² ≈ 0.995+. One `abs()` in the observation map decides which representation theory
 the network builds. This extends the repo's finite-group result — "grokked embeddings
 concentrate in the lowest faithful irrep" (RESULTS.md: 2O/2I spinors) — to the
 continuous group those binary groups sit inside.
 
-### 2. Casimir-order spectral recruitment
+### 2. Higher spins enter in order of Casimir eigenvalue
 
-Within each twin, spins are recruited along the group's own ladder, lowest Casimir
-first: SU(2) grows j=½ → j=1 → j=3/2 (1.7% by 200k); SO(3) grows j=1 → j=2 (8.4%),
-skipping the half-integers it cannot use. This matches the heat-kernel prediction that
-task precision t controls a spin cutoff via the e^{−tj(j+1)} envelope. More data
-(f=0.01 vs 0.002) → broader spectrum *and* better fine-scale precision (T3 at r=0.2:
-0.60 vs 0.42): higher spins buy resolution on the group manifold.
+In both conditions, variance appears in additional isotypic blocks over training, in
+order of Casimir eigenvalue: the SU(2) model adds spin-1 (2% → 18%) and then spin-3/2
+(→ 1.7%) content on top of the dominant spin-½ block; the SO(3) control adds spin-2
+(→ 8.4%) on top of spin-1, with half-integer blocks absent throughout. This is
+consistent with the heat-kernel structure of the task, where target precision t sets a
+spin cutoff through the e^{−tj(j+1)} envelope. The larger training fraction yields both
+a broader spectrum and better fine-scale resolution (T3 at r=0.2: 0.60 vs 0.42),
+consistent with a bandwidth interpretation: resolving the product at scale r requires
+irreps up to j ~ 1/r.
 
 ### 3. Late-phase dynamics depend on data budget
 
@@ -87,14 +90,14 @@ instead slowly broadened at flat accuracy.
 
 No delayed generalization ("grokking") occurred at these budgets — generalization was
 essentially immediate, consistent with the prediction that smooth structured input
-encodings suppress the grok delay (GrokTransfer). The SO(3) twin at f=0.002 sits in a
+encodings suppress the grok delay (GrokTransfer). The SO(3) control at f=0.002 sits in a
 persistent overfit state (train 1.000, T1 0.834) that 200k steps of weight decay never
 flipped. The classic grokking regime, if it exists here, is at lower f or larger init
 scale.
 
 ### 5. The quotient task is uniformly harder
 
-At matched budget the SO(3) twin generalizes 3–8 points worse than SU(2) (e.g. T1
+At matched budget the SO(3) control generalizes 3–8 points worse than SU(2) (e.g. T1
 0.834 vs 0.912 at f=0.002). Unexplained; candidate causes: information loss and
 conditioning of the |·| encoding near its fold, or the intrinsic harder geometry of
 RP³ vs S³.
@@ -104,11 +107,11 @@ RP³ vs S³.
 - **Single seed per cell.** Everything above is n=1 per condition; the finite-group
   literature (Clock/Pizza, irrep arbitrariness) says the claim must ultimately be
   distributional. Seed sweep is the first follow-up.
-- **The SO(3) twin's missing half-integers are partially by construction**: an even
+- **The SO(3) control's missing half-integers are partially by construction**: an even
   input forces an even encoder. The non-trivial content is (i) the SU(2) side — the
   model *could* have solved the task with integer spins plus sign bookkeeping
   elsewhere, but instead builds a dominant, clean spinor sector; and (ii) the exact
-  Peter–Weyl identity of what each twin builds (j=½ vs j=1, then j=3/2 vs j=2 —
+  Peter–Weyl identity of what each condition builds (j=½ vs j=1, then j=3/2 vs j=2 —
   each group's lowest faithful irreps, not arbitrary features). The deeper causal
   version (ablate the j=½ subspace, break U vs −U discrimination) is phase 2.
 - **Correlational, not yet mechanistic.** FVE concentration and decode R² say where
@@ -133,7 +136,7 @@ Logs (`log.jsonl`: per-1k-step accuracies; per-5k-step spectroscopy) and checkpo
 
 ## Next
 
-1. Seed sweep (5–10×) of the four pilot cells → distributional headline figure.
+1. Seed sweep (5–10×) of the four pilot cells → report distributions of all quantities.
 2. Scorer character fit against the analytic Bayes target log K_t, and the
    held-out composition test — first causal-depth items.
 3. N-sweep with the exact-closure 2I rung (N=120) and the σ (precision) sweep for the
