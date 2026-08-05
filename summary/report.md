@@ -1,7 +1,7 @@
 # Learning and Interpreting Continuous Group Operations: SU(2) and its Quotient SO(3)
 
 **Status:** evolving working report for agent/collaborator handoff. Last updated 2026-08-05
-(after the four-run pilot, the first causal analyses, and the candidate-count sweep). Single-seed results throughout — treat every number below as a
+(after the pilot, the causal analyses, the candidate-count sweep, and the training-fraction sweep). Single-seed results throughout — treat every number below as a
 pilot observation pending the seed sweep (Task 1).
 
 ---
@@ -229,6 +229,43 @@ The causal suite replicates on the K = 256 checkpoints: function-ablating spin-�
 collapses the SU(2) model (task 1.000 → 0.027, D_c → 0.50) and is a no-op for the
 SO(3) model (1.000 → 1.000); the composition test strengthens (median cosine 0.999,
 h-probe agreement 0.998, shuffled controls at 0).
+
+### 5.2 Training-fraction sweep (complete; one seed, 300k steps, evaluations every 500)
+
+f ∈ {0.0002, 0.0005, 0.001} joined with the pilot values {0.002, 0.01}. T2 below is
+the mean of the last ten evaluations; "gap" = train − T2; "steps to 90%" is the first
+step at which T2 reaches 90% of its final value.
+
+| f | pairs | SU(2): train / T2 / gap / steps to 90% | SO(3): train / T2 / gap / steps to 90% |
+|---|---|---|---|
+| 0.0002 | 839 | 1.000 / 0.726 / 0.27 / 500 | 1.000 / 0.636 / 0.36 / 500 |
+| 0.0005 | 2,097 | 1.000 / 0.826 / 0.17 / 500 | 1.000 / 0.702 / 0.30 / 500 |
+| 0.001 | 4,194 | 1.000 / 0.850 / 0.15 / 500 | 1.000 / 0.779 / 0.22 / 500 |
+| 0.002 | 8,389 | 0.996 / 0.905 / 0.09 / 1,000 | 1.000 / 0.834 / 0.17 / 1,000 |
+| 0.01 | 41,943 | 0.978 / 0.920 / 0.06 / 1,000 | 0.999 / 0.881 / 0.12 / 1,000 |
+
+Three conclusions. **(i) There is no delayed-generalization transition at any
+training fraction.** Every run reaches 90% of its final test accuracy within 500–1000
+steps and is statistically flat for the remaining ~300k steps; lowering f increases
+the size of the persistent train–test gap but does not produce a memorize-then-
+generalize dynamic. In the vocabulary of the grokking literature: the time to
+generalize is essentially independent of dataset size here, and only the *level* of
+generalization depends on it. **(ii) Memorization and the group-structured
+representation coexist rather than compete.** Even at f = 0.0002 — 839 pairs, train
+accuracy 1.000, a 0.27 generalization gap — the SU(2) encoder still holds 97.6% of
+its variance in the spin-½ block with quaternion decode R² = 0.993. The model fits
+the training set on top of, not instead of, the group representation; 300k steps of
+weight decay (1.0) neither removes the memorized component nor improves the test
+accuracy. This differs qualitatively from the circuit-competition picture used to
+explain grokking on finite algebraic tasks. **(iii) The quotient condition is more
+data-hungry at every f**, with the deficit widening from 4 points (f = 0.01) to 9
+points (f = 0.0002) of T2.
+
+We attribute the absence of a delayed transition to the smooth, structured input
+encoding: the encoder is a continuous function of the observation, so partial
+generalization is available immediately, unlike free per-token embeddings. Whether a
+delayed transition can be recovered by inflating the initialization scale or
+roughening the encoding kernel remains open (Task 8).
 
 ## 6. Interpretation and limitations
 
