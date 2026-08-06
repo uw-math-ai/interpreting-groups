@@ -1,8 +1,12 @@
 # Learning and Interpreting Continuous Group Operations: SU(2) and its Quotient SO(3)
 
-**Status:** evolving working report for agent/collaborator handoff. Last updated 2026-08-05
-(after the pilot, the causal analyses, the candidate-count sweep, and the training-fraction sweep). Single-seed results throughout — treat every number below as a
-pilot observation pending the seed sweep (Task 1).
+**Status:** evolving working report for agent/collaborator handoff. Last updated
+2026-08-06. The full second-wave queue is complete: candidate-count sweep, low
+training-fraction sweep, and the five-seed replication of the four principal cells,
+with the causal suite run on every checkpoint. The headline (Sections 3–4) and the
+causal double dissociation are now **replicated across 5 seeds per condition**
+(Section 5.3); Sections 5.1–5.2 results remain single-seed. `RESULTS_SU2.md` carries
+the public-facing summary; `summary/seed_summary.json` the per-seed numbers.
 
 ---
 
@@ -267,11 +271,37 @@ generalization is available immediately, unlike free per-token embeddings. Wheth
 delayed transition can be recovered by inflating the initialization scale or
 roughening the encoding kernel remains open (Task 8).
 
+### 5.3 Seed replication (complete; 5 seeds per cell, compared at step 100k)
+
+Seeds 1–4 replicate the pilot in each of the four principal cells; aggregates
+(mean ± sd; full table in `summary/seed_summary.json`):
+
+| quantity | SU(2) f=0.002 | SU(2) f=0.01 | SO(3) f=0.002 | SO(3) f=0.01 |
+|---|---|---|---|---|
+| T2 | 0.901 ± 0.006 | 0.921 ± 0.003 | 0.842 ± 0.015 | 0.883 ± 0.003 |
+| FVE j=½ | 0.964 ± 0.010 | 0.835 ± 0.010 | 0.0023 ± 0.0004 | 0.0023 ± 0.0004 |
+| FVE j=1 | 0.027 ± 0.009 | 0.148 ± 0.010 | 0.981 ± 0.001 | 0.917 ± 0.008 |
+| cos(z(g), z(−g)) | −0.95 ± 0.02 | −0.72 ± 0.02 | +1.000 | +1.000 |
+| R²(q) | 0.998 | 0.995 | −0.016 | −0.012 |
+| D_c (intact) | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 0.5000 | 0.5000 |
+| task acc, spin-½ ablated | 0.022 ± 0.002 | 0.026 ± 0.002 | 0.997 ± 0.002 | 1.000 ± 0.000 |
+| task acc, spin-1 ablated | 0.998 ± 0.001 | 1.000 ± 0.000 | 0.027 ± 0.002 | 0.027 ± 0.003 |
+| score–character R² | 0.894 ± 0.024 (χ_{1/2}) | 0.974 ± 0.006 (χ_{1/2}) | 0.747 ± 0.088 (χ_1) | 0.876 ± 0.014 (χ_1) |
+
+No seed deviates from the pattern in any cell: the spin spectra, the parity of the
+representation, the decodability asymmetry, and the full causal double dissociation
+reproduce with small variance. Unlike the finite-group setting — where seed-dependent
+irrep selection is the norm (Chughtai et al.) — irrep selection here is deterministic:
+every seed selects the lowest faithful irrep of its group. The plausible reason is
+that SU(2) has a unique irrep per dimension (no Galois-conjugate or equivalent-irrep
+multiplicity for the model to choose among), so the arbitrariness observed on finite
+groups has no room to appear.
+
 ## 6. Interpretation and limitations
 
-- **One seed per condition.** The finite-group literature documents seed-dependent
-  algorithm and irrep selection; every claim above requires the ≥5-seed replication
-  (Task 1) before it is more than a pilot observation.
+- **Seed replication complete for the principal cells** (Section 5.3): the headline
+  and causal results hold in 5/5 seeds per condition. The K sweep and the
+  training-fraction sweep remain single-seed.
 - **Evenness of the SO(3) control is by construction.** An even input forces an even
   learned representation, so the absence of half-integer blocks in the control is
   necessary, not discovered. The informative content is (i) on the SU(2) side — the
@@ -299,9 +329,8 @@ Standing policy: **every reported experiment uses ≥5 seeds**; pilot (1-seed) r
 must be labeled as such. Tasks are ordered roughly by priority; none is committed to a
 particular sweep — they are a menu for future runs.
 
-1. **Seed replication of the pilot.** *In progress (queue item 3).* Seeds 1–4 ×
-   {SU(2), SO(3)} × f ∈ {0.002, 0.01}; report distributions of FVE spectra, T1/T2,
-   and decode R². Establishes the pilot findings as results.
+1. **Seed replication of the pilot.** *Complete (Section 5.3).* Remaining: seeds for
+   the K sweep and the training-fraction sweep if those become load-bearing claims.
 2. **Causal double-cover test.** *Pilot complete (Section 4); repeat across seeds and
    extend to h.* Remaining: ablations applied at the product locus h;
    restricted/excluded-loss curves per isotypic block during training (the progress

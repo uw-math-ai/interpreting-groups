@@ -1,16 +1,18 @@
-# SU(2) vs SO(3): half-integer spin sectors emerge only for the double cover (pilot)
+# SU(2) vs SO(3): half-integer spin sectors emerge only for the double cover
 
 **Claim under test.** When a generic network learns the *composition law* of a compact
 continuous group, does it internalize the group's harmonic (Peter–Weyl) structure — and
 does it learn the group's **global topology**, not just its Lie algebra? SU(2) and SO(3)
 share the Lie algebra 𝔰𝔲(2) ≅ 𝔰𝔬(3) but differ globally: SU(2) is the double cover, and
-only SU(2) admits **half-integer spin** (spinor) representations. The signature to look
-for is therefore basis-independent and binary: *half-integer spin sectors in the learned
-representation exist iff the model was trained on the double cover.*
+only SU(2) admits half-integer spin (spinor) representations. The diagnostic is
+basis-independent and binary: *half-integer isotypic blocks appear in the learned
+representation iff the model was trained on the double cover.*
 
-**Pilot verdict (4 runs, single seed): confirmed, cleanly.**
+**Status: confirmed across 5 seeds per condition, with causal evidence** (ablations,
+score–character fits, and a composition test). Working details and the full task list
+live in `summary/report.md`.
 
-![pilot summary](gallery/su2/su2_pilot_summary.png)
+![summary figure](gallery/su2/su2_pilot_summary.png)
 
 ## Setup
 
@@ -18,128 +20,123 @@ Everything is continuous — no tokens, no finite vocabulary anywhere.
 
 - **Elements.** Haar-random unit quaternions q ∈ S³ ≅ SU(2).
 - **Observation map (frozen).** Ψ(q) = exp(α⟨q, hᵢ⟩), i = 1…32 fixed Haar landmarks
-  (α = 3, standardized). The **SO(3) control** uses |⟨q, hᵢ⟩| — the *only* difference
-  between the two conditions is this one absolute value, which makes Ψ even
-  (Ψ(q) = Ψ(−q)), i.e. the data quotients to SO(3). Same landmarks, same dimension,
-  same everything else: a matched-pair design where the manipulated
-  variable is exactly the double cover.
-- **Task (InfoNCE candidate scoring).** Given Ψ(a), Ψ(b) and K = 64 candidates, pick
-  the product: the positive is (ab)·exp(ξ), ξ ~ 𝒩(0, σ²I₃) (σ = 0.2, a heat-kernel-like
-  soft target whose Bayes-optimal scorer is analytically log K_t ≈ Σⱼ(2j+1)e^{−tj(j+1)}χⱼ);
-  63 frozen Haar negatives (≥ 0.5 rad from the positive class). Data = fixed pool of
-  N = 2048 elements, training on a frozen fraction f of the N² ordered pairs.
-- **Model (~0.3M params).** Encoder-factorized triple scorer:
-  z_a = E(Ψ(a)), z_b = E(Ψ(b)); h = MLP([z_a, z_b]); score = ⟨h, E_c(Ψ(c))⟩.
-  E's activations z(g) are the analysis object (the continuous analog of the embedding
-  table). AdamW, lr 1e-3, weight decay 1.0, batch 4096, 200k steps.
-- **Eval tiers.** T1 = held-out pairs of pool elements; T2 = fresh Haar pairs (elements
-  never seen); T3 = exact product vs 63 negatives at fixed geodesic radius r.
-- **Spectroscopy.** FVE of z(g) onto sampled, jointly-orthonormalized Wigner-D bases
-  per spin j ∈ {0, ½, 1, 3/2, 2} over a fixed 2048-element Haar probe (cross-spin
-  leakage floor ~r_j/N ≈ 0.2%); cosine of z(g) vs z(−g); holonomy of a 2π SO(3)
-  rotation; ridge decode of z to the quaternion (odd, j=½) and to qqᵀ (even, j=1),
-  both with held-out 80/20 splits.
+  (α = 3, standardized). The **SO(3) control** uses |⟨q, hᵢ⟩| — the only difference
+  between conditions is this absolute value, which makes Ψ even (Ψ(q) = Ψ(−q)), i.e.
+  the data determine elements only up to sign: the same task on the quotient group.
+- **Task (candidate ranking).** Given Ψ(a), Ψ(b) and K = 64 candidates, identify the
+  product: the positive is (ab)·exp(ξ), ξ ~ 𝒩(0, σ²I₃) (σ = 0.2); 63 frozen Haar
+  negatives at ≥ 0.5 rad from the positive class; cross-entropy over the K scores.
+  The Bayes-optimal rule ranks by geodesic distance to ab; its accuracy (the noise
+  ceiling) is 0.951.
+- **Model (~0.3M params).** Encoder-factorized scorer: z_a = E(Ψ(a)), z_b = E(Ψ(b));
+  h = MLP([z_a, z_b]); score = ⟨h, E_c(Ψ(c))⟩. The encoder activations z(g) play the
+  role of the embedding matrix in the finite-group analyses. AdamW, lr 1e-3, weight
+  decay 1.0.
+- **Data.** Pool of N = 2048 Haar elements; training on a frozen fraction f of the N²
+  ordered pairs. **Evaluation:** T1 = held-out pairs of pool elements; T2 = fresh
+  pairs of never-seen elements; T3 = exact product vs negatives at fixed geodesic
+  radius r.
+- **Analysis.** FVE of z onto sampled, jointly-orthonormalized Wigner-D bases per spin
+  (measurement floor ≈ 0.2%); z(g) vs z(−g); 2π-rotation holonomy; held-out ridge
+  decodes to q (odd, spin-½) and qqᵀ (even, spin-1); interventions, character fits and
+  composition tests (`experiments/su2_causal.py`).
 
-Code: `core/su2.py` (exact half-integer Wigner-D via the homogeneous-polynomial
-construction, self-tested for homomorphism/unitarity/characters/center),
-`core/su2_model.py`, `experiments/su2_train.py`, `experiments/run_su2_pilot.sh`.
+## Results (5 seeds per condition, mean ± sd at step 100k, N=2048)
 
-## Results (step 200k, N=2048, seed 0)
+| condition | T2 | FVE j=½ | FVE j=1 | cos(z(g),z(−g)) | R²(q) | R²(qqᵀ) |
+|---|---|---|---|---|---|---|
+| **SU(2)** f=0.002 | 0.901 ± 0.006 | **0.964 ± 0.010** | 0.027 ± 0.009 | −0.95 ± 0.02 | 0.998 | 0.984 |
+| **SU(2)** f=0.01 | 0.921 ± 0.003 | **0.835 ± 0.010** | 0.148 ± 0.010 | −0.72 ± 0.02 | 0.995 | 0.896 |
+| **SO(3)** f=0.002 | 0.842 ± 0.015 | 0.0023 ± 0.0004 | **0.981 ± 0.001** | +1.000 ± 0.000 | −0.016 | 0.997 |
+| **SO(3)** f=0.01 | 0.883 ± 0.003 | 0.0023 ± 0.0004 | **0.917 ± 0.008** | +1.000 ± 0.000 | −0.012 | 0.999 |
 
-| run | train | T1 | T2 | FVE j=½ | j=1 | j=3/2 | j=2 | cos(z(g),z(−g)) | 2π-holonomy | R²→q | R²→qqᵀ |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| **SU(2)** f=0.002 | 0.996 | 0.912 | 0.907 | **0.968** | 0.023 | 0.007 | 0.002 | −0.96 | **−0.63** | **0.998** | 0.987 |
-| **SU(2)** f=0.01 | 0.978 | 0.926 | 0.924 | **0.797** | 0.182 | 0.017 | 0.002 | −0.66 | **−0.39** | **0.995** | 0.912 |
-| **SO(3)** f=0.002 | 1.000 | 0.834 | 0.827 | 0.002 | **0.980** | 0.000 | 0.013 | +1.000 | **+1.000** | −0.006 | 0.995 |
-| **SO(3)** f=0.01 | 0.999 | 0.885 | 0.884 | 0.002 | **0.909** | 0.001 | 0.084 | +1.000 | **+1.000** | −0.006 | 0.999 |
+### 1. The double-cover signature (replicated)
 
-### 1. The double-cover signature
+In every seed, the SU(2) models concentrate encoder variance in the spin-½ spinor
+block: the representation is odd under the center, reverses sign under a 2π rotation
+(negative holonomy), and the quaternion is linearly decodable (R² = 0.998). In every
+seed of the SO(3) control, all half-integer blocks sit at the 0.2% measurement floor,
+variance concentrates in spin 1 (then spin 2), the representation is exactly even, and
+the quaternion is not decodable while qqᵀ is. Each condition builds the
+lowest-dimensional faithful irrep of its own group — the continuous counterpart of the
+finite-group result in `RESULTS.md` (2O/2I spinor irreps).
 
-The SU(2) models put **80–97% of encoder variance in the spin-½ spinor sector**: the
-representation is odd under the center (z(−g) ≈ −z(g)), transporting it around a 2π
-SO(3) rotation flips it (negative holonomy), and the quaternion — the j=½ matrix
-coefficients themselves — is linearly decodable at R² ≈ 0.998. The matched SO(3) controls
-keep **every half-integer sector at the 0.2% measurement floor**, concentrate in j=1
-(the lowest faithful SO(3) irrep, with spin 2 next), are exactly even, return
-+1 holonomy, and cannot decode the quaternion (R² ≈ 0) while decoding the even qqᵀ at
-R² ≈ 0.995+. One `abs()` in the observation map decides which representation theory
-the network builds. This extends the repo's finite-group result — "grokked embeddings
-concentrate in the lowest faithful irrep" (RESULTS.md: 2O/2I spinors) — to the
-continuous group those binary groups sit inside.
+### 2. Causal evidence (5 seeds; `experiments/su2_causal.py`)
 
-### 2. Higher spins enter in order of Casimir eigenvalue
+Interventions on the argument encoders, with D_c = P[s(a,b,ab) > s(a,b,−ab)] the
+center-discrimination probability:
 
-In both conditions, variance appears in additional isotypic blocks over training, in
-order of Casimir eigenvalue: the SU(2) model adds spin-1 (2% → 18%) and then spin-3/2
-(→ 1.7%) content on top of the dominant spin-½ block; the SO(3) control adds spin-2
-(→ 8.4%) on top of spin-1, with half-integer blocks absent throughout. This is
-consistent with the heat-kernel structure of the task, where target precision t sets a
-spin cutoff through the e^{−tj(j+1)} envelope. The larger training fraction yields both
-a broader spectrum and better fine-scale resolution (T3 at r=0.2: 0.60 vs 0.42),
-consistent with a bandwidth interpretation: resolving the product at scale r requires
-irreps up to j ~ 1/r.
+| metric (mean ± sd over seeds) | SU(2) f=0.01 | SO(3) f=0.01 |
+|---|---|---|
+| D_c, intact | **1.0000 ± 0.0000** | 0.5000 ± 0.0000 |
+| D_c, spin-½ ablated | 0.503 ± 0.006 | 0.500 |
+| task acc, spin-½ ablated | **0.026 ± 0.002** (chance 0.016) | 1.000 ± 0.000 (no-op) |
+| task acc, spin-1 ablated | 1.000 ± 0.000 | **0.027 ± 0.003** |
+| score–character fit R² | 0.974 ± 0.006 on **χ_{1/2}** | 0.876 ± 0.014 on **χ_1** |
 
-### 3. Late-phase dynamics depend on data budget
+A double dissociation, with zero seed variance in its sign: ablating the spin-½
+component (by parity projection or by subtracting the component of z predictable from
+D^{1/2}) is fatal for the SU(2) model and a no-op for the SO(3) control; ablating
+spin-1 transposes the pattern. The trained scorer is, to good approximation, a single
+character function of ab c⁻¹ — the logit form of Group Composition via Representations
+(Chughtai et al., 2023) built on each group's lowest faithful irrep. A **composition
+test** goes beyond location-of-information claims: ridge probes for the quaternion fit
+on z compose algebraically to match both the true product and an independent probe on
+h (median cosine 0.998 / 0.995; pair-shuffled controls at 0) — the internal product
+state carries the *composed* representation, which lookup-table accounts do not
+predict.
 
-At f=0.002 the SU(2) run kept improving late (T1 0.907 → 0.922 between 100k and 150k)
-while its spectrum *re-purified* toward 97% spin-½ — weight-decay purification, the
-continuous analog of the I_h purification effect in RESULTS.md. At f=0.01 the spectrum
-instead slowly broadened at flat accuracy.
+### 3. No delayed generalization at any training fraction
 
-### 4. The memorization boundary is nearby but uncrossed
+f ∈ {0.0002, …, 0.01} (839 – 41,943 pairs; 300k steps; evaluations every 500 steps):
+every run reaches 90% of its final test accuracy within 500–1000 steps and is flat
+thereafter. Lowering f widens a *persistent* train–test gap (SU(2): 0.06 → 0.27;
+SO(3): 0.12 → 0.36) but never produces a memorize-then-generalize transition. Notably,
+even at f = 0.0002 with train accuracy 1.000 and a 0.27 gap, the SU(2) encoder keeps
+97.6% of variance in spin-½ with R²(q) = 0.993 — **memorization coexists with the
+group-structured representation rather than competing with it**, in contrast to the
+circuit-competition account of grokking on finite algebraic tasks. We attribute the
+absence of the delay to the smooth structured encoding (a continuous encoder
+generalizes partially from the first steps, unlike free token embeddings).
 
-No delayed generalization ("grokking") occurred at these budgets — generalization was
-essentially immediate, consistent with the prediction that smooth structured input
-encodings suppress the grok delay (GrokTransfer). The SO(3) control at f=0.002 sits in a
-persistent overfit state (train 1.000, T1 0.834) that 200k steps of weight decay never
-flipped. The classic grokking regime, if it exists here, is at lower f or larger init
-scale.
+### 4. Candidate count concentrates the spectrum and sharpens resolution
+
+K ∈ {64, 128, 256} at f = 0.01 (one seed): held-out accuracy tracks the falling Bayes
+ceiling (0.951 / 0.936 / 0.922) at ~0.96 of ceiling; fine resolution improves
+substantially (T3 at r = 0.2: 0.62 → 0.74 → 0.92); and the spin spectrum
+**concentrates** (FVE j=½: 0.85 → 0.87 → 0.975, score–χ_{1/2} fit R² = 0.989).
+Because χ_{1/2}(ab c⁻¹) is monotone in geodesic distance, ranking by the fundamental
+character is Bayes-optimal at any resolution — higher spins are not required for
+resolution, and the models with the purest spin-½ representations resolve best.
 
 ### 5. The quotient task is uniformly harder
 
-At matched budget the SO(3) control generalizes 3–8 points worse than SU(2) (e.g. T1
-0.834 vs 0.912 at f=0.002). Unexplained; candidate causes: information loss and
-conditioning of the |·| encoding near its fold, or the intrinsic harder geometry of
-RP³ vs S³.
+The SO(3) control generalizes below SU(2) at every f, with the deficit widening from 4
+points (f = 0.01) to 9 points (f = 0.0002) of T2. Cause not yet identified (candidate
+explanations: conditioning of the even encoding near its fold; the geometry of RP³
+vs S³).
 
-## Honest caveats
+## Caveats
 
-- **Single seed per cell.** Everything above is n=1 per condition; the finite-group
-  literature (Clock/Pizza, irrep arbitrariness) says the claim must ultimately be
-  distributional. Seed sweep is the first follow-up.
-- **The SO(3) control's missing half-integers are partially by construction**: an even
-  input forces an even encoder. The non-trivial content is (i) the SU(2) side — the
-  model *could* have solved the task with integer spins plus sign bookkeeping
-  elsewhere, but instead builds a dominant, clean spinor sector; and (ii) the exact
-  Peter–Weyl identity of what each condition builds (j=½ vs j=1, then j=3/2 vs j=2 —
-  each group's lowest faithful irreps, not arbitrary features). The deeper causal
-  version (ablate the j=½ subspace, break U vs −U discrimination) is phase 2.
-- **Correlational, not yet mechanistic.** FVE concentration and decode R² say where
-  the information lives, not what algorithm uses it (the Chughtai-vs-Stander lesson).
-  The composition test (does a probe's D̂ satisfy D̂(g)D̂(h) ≈ D̂(gh) on held-out pairs,
-  under patching) and the scorer-vs-log K_t character fit are the planned upgrades.
-- T3 accuracy at r ≤ 0.05 is near chance for all runs — no model resolves products
-  much below the training noise scale σ; "beating the information floor" remains open.
+- The absence of half-integer blocks in the SO(3) control is partially by
+  construction (an even input forces an even representation). The informative content
+  is the SU(2) side — nothing forces a dominant, clean spinor block, yet it appears in
+  every seed — and the Peter–Weyl identity of what each condition builds.
+- Remaining mechanism-level gaps: the patched composition test, per-argument
+  equivariance (a fixed linear M_k with M_k M_{k'} ≈ M_{kk'}), and quantitative
+  comparison of fitted character coefficients to the heat-kernel envelope. See
+  `summary/report.md` Task list.
+- K-sweep results are single-seed; the K = 256 runs used batch 2048 (memory), others
+  4096.
 
 ## Reproduce
 
 ```bash
-uv run python -m core.su2                 # self-tests: Wigner-D, FVE, encodings
-bash experiments/run_su2_pilot.sh         # 4 runs, ~8h total on a T4
-# single run:
-uv run python -m experiments.su2_train --variant su2 --N 2048 --frac 0.01 \
-    --seed 0 --save_dir data/su2/su2_N2048_f0.01_s0        # --resume to continue
+uv run python -m core.su2                      # self-tests
+bash experiments/run_su2_queue.sh              # 26-run sweep (K, f, seeds)
+uv run python -m experiments.su2_causal --run_dir data/su2/su2_N2048_f0.01_s0
+uv run python -m experiments.su2_seed_summary  # aggregate across seeds
 ```
 
-Logs (`log.jsonl`: per-1k-step accuracies; per-5k-step spectroscopy) and checkpoints
-(with optimizer state) land in `data/su2/<run>/` (not in git).
-
-## Next
-
-1. Seed sweep (5–10×) of the four pilot cells → report distributions of all quantities.
-2. Scorer character fit against the analytic Bayes target log K_t, and the
-   held-out composition test — first causal-depth items.
-3. N-sweep with the exact-closure 2I rung (N=120) and the σ (precision) sweep for the
-   full spectral-curriculum curve.
-4. Grokking hunt: lower f, inflated init norm; does delayed generalization exist for
-   continuous group tasks at all?
+Logs, checkpoints and per-run causal JSONs land in `data/su2/<run>/` (not in git);
+seed aggregates in `summary/seed_summary.json`.
