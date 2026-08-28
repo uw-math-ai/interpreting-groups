@@ -314,8 +314,18 @@ class FuncValEncoding:
             return torch.cos(y @ P["W"] + P["ph"]) @ P["c"]
 
         def fn(q):
-            x = (raw(q) + raw(-q)) / 2 if self.variant == "so3" else raw(q)
-            return (x - P["mean"]) / P["std"]
+            # The encoding is frozen (no parameters, constant w.r.t. the model),
+            # so compute without autograd and in chunks: the [.., m, n_freq]
+            # intermediate would otherwise dominate GPU memory.
+            with torch.no_grad():
+                flat = q.reshape(-1, 4)
+                outs = []
+                for i in range(0, flat.shape[0], 16384):
+                    ch = flat[i:i + 16384]
+                    x = ((raw(ch) + raw(-ch)) / 2 if self.variant == "so3"
+                         else raw(ch))
+                    outs.append((x - P["mean"]) / P["std"])
+                return torch.cat(outs).reshape(*q.shape[:-1], self.m)
         return fn
 
 
