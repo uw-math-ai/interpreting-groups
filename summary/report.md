@@ -1,9 +1,11 @@
 # Learning and Interpreting Continuous Group Operations: SU(2) and its Quotient SO(3)
 
 **Status:** evolving working report for agent/collaborator handoff. Last updated
-2026-08-06. The full second-wave queue is complete: candidate-count sweep, low
-training-fraction sweep, and the five-seed replication of the four principal cells,
-with the causal suite run on every checkpoint. The headline (Sections 3–4) and the
+2026-08-28. Complete so far: the pilot; the causal suite on every checkpoint; the
+candidate-count and training-fraction sweeps; five-seed replication of the four
+principal cells; and the mechanistic loop closure (Section 5.4: latent group action,
+product-state steering, cross-seed intertwiners). Running: queue v3 (Section 5.5 —
+observation-map robustness, heat-kernel bandwidth, SU(3)/PSU(3) pilot). The headline (Sections 3–4) and the
 causal double dissociation are now **replicated across 5 seeds per condition**
 (Section 5.3); Sections 5.1–5.2 results remain single-seed. `RESULTS_SU2.md` carries
 the public-facing summary; `summary/seed_summary.json` the per-seed numbers.
@@ -297,6 +299,74 @@ that SU(2) has a unique irrep per dimension (no Galois-conjugate or equivalent-i
 multiplicity for the model to choose among), so the arbitrariness observed on finite
 groups has no room to appear.
 
+## 5.4 Mechanistic loop closure (added 2026-08-28; 5 seeds per cell)
+
+Following the research plan of 2026-08-09 (archived in
+`ideas/research_plan_2026-08-09.md`), three analyses close the remaining gap
+between "the information lives in the spin-j block" and "the network computes with
+a representation" (`experiments/su2_mechanism.py`; per-run JSONs
+`mechanism_*.json`). All numbers are mean ± sd over seeds.
+
+**(a) The latent space carries a genuine group action (plan A1).** For Haar-random
+k we fit affine maps T_k with z(kg) ≈ T_k(z(g)) on a probe set and evaluate held
+out. The activations concentrate on a low-dimensional subspace (99.9% of variance
+in 9–14 PCA dimensions), and the dominant isotypic block has *exactly* the
+dimension of the realified fundamental irrep in every seed: 4 (SU(2)) and
+9 (SO(3)). On that block the fitted translation operators match the irrep
+matrices up to a fixed change of basis, measured basis-invariantly:
+tr W̃_k versus d_j·χ_j(k) has correlation 1.0000 ± 0.0000 (relative error
+1.1 ± 0.1%), and the eigenvalue phases of W̃_k match those of d_j copies of
+D^j(k) to 0.0014 ± 0.0001 rad (SU(2)) and 0.012–0.021 rad (SO(3)). Globally,
+held-out equivariance R² is 0.90–0.98, the homomorphism defect
+||T_k∘T_h − T_{kh}|| is 0.04–0.16 (relative), T_e recovers the identity to
+numerical precision, and inverse defects are ~0.25. The latent space does not
+merely correlate with representation coordinates; left translation acts on it by
+the representation.
+
+**(b) The product state is the composed representation, and it steers the model
+(plan A2).** The interaction output h(a, b), analyzed as a function of the product
+ab, has 89 ± 1% of its variance in the spin-½ block (SU(2); 73–75% in spin-1 for
+SO(3)) with ~10–27% residual dependence beyond the product. Function-ablating the
+D^j(ab)-predictable component of h collapses the task to chance for the model's
+own irrep and leaves the other condition's models untouched. The strongest
+result is the patching test: replacing h(a, b) by its *ridge reconstruction from
+D^{1/2}(a′b′) alone* redirects the model to select a′b′ with probability
+0.996–0.999 in every seed — as well as or better than patching the full
+activation h(a′, b′) (0.92–0.98) — while the wrong-irrep reconstruction control
+redirects at chance (0.016 ± 0.008). The eight realified spin-½ coefficients of
+the product are causally sufficient to control the model's output.
+
+**(c) Seeds differ by an intertwiner (plan A4).** Affine stitches between seeds
+achieve held-out R² 0.96–0.99, and the stitch approximately intertwines the
+fitted group actions (relative defect 0.07–0.15): seed universality is a
+statement about a shared representation up to gauge.
+
+## 5.5 Experiments in progress (queue v3, launched 2026-08-28)
+
+1. **Observation-map robustness (plan A3).** Two new frozen encodings — a random
+   two-layer tanh MLP of the raw quaternion, and values f(g·xᵢ) of a fixed
+   random Fourier function at translated probe points — each with a
+   center-symmetrized quotient control (the orbit average, the generic quotient
+   construction). If the fundamental-irrep selection is task/group driven, the
+   spectra should reproduce; if it is landmark-map driven, they should not.
+2. **Heat-kernel regression (plan D1).** MSE regression of s(a,b,c) onto the
+   standardized heat-kernel value K_t(ab c⁻¹) for t ∈ {0.3, 0.1, 0.05}
+   (`--loss heatkernel`). Unlike ranking — where the fundamental character is
+   monotone in distance and Bayes-optimal at any resolution (Section 5.1) — this
+   target provably requires spectral content up to the e^{−t j(j+1)} envelope.
+   Hypothesis (recorded before results): the encoder spectrum broadens with
+   1/t, acquiring spins in Casimir order with amplitudes tracking the envelope.
+3. **SU(3) vs PSU(3) pilot (plan B).** New machinery in `core/su3.py` (exact
+   matrix coefficients for (p,q) ∈ {(0,0), (1,0), (0,1), (1,1), (2,0), (0,2),
+   (3,0), (0,3)}, self-tested for homomorphism/unitarity/center characters/
+   Schur orthogonality) and `experiments/su3_train.py`. The PSU(3) control uses
+   the center-orbit-averaged observation map. Since real activations cannot
+   distinguish an irrep from its conjugate, spectroscopy tracks conjugate-pair
+   sectors 3⊕3̄, 8, 6⊕6̄, 10⊕10̄. Hypothesis (recorded before results): SU(3)
+   concentrates in the fundamental pair 3⊕3̄ (center-charged); PSU(3) suppresses
+   all charged sectors and selects a center-trivial carrier, plausibly the
+   adjoint 8 — but the selection itself is the science and will not be forced.
+
 ## 6. Interpretation and limitations
 
 - **Seed replication complete for the principal cells** (Section 5.3): the headline
@@ -331,19 +401,17 @@ particular sweep — they are a menu for future runs.
 
 1. **Seed replication of the pilot.** *Complete (Section 5.3).* Remaining: seeds for
    the K sweep and the training-fraction sweep if those become load-bearing claims.
-2. **Causal double-cover test.** *Pilot complete (Section 4); repeat across seeds and
-   extend to h.* Remaining: ablations applied at the product locus h;
-   restricted/excluded-loss curves per isotypic block during training (the progress
-   measures of Nanda et al., arXiv:2301.05217, transposed to spins).
-3. **Logit–character fit.** *Pilot complete (Section 4).* Remaining: compare fitted
-   coefficients quantitatively against the heat-kernel envelope (2j+1)e^{−tj(j+1)},
-   and repeat at larger K and smaller σ where more characters should be needed.
-4. **Composition test.** *Pilot complete (Section 4).* Remaining: the patched
-   version (does the h-probe transfer under activation patching of one argument?),
-   and the SO(3) case with a proper rotation-matrix composition step.
-5. **Per-argument equivariance.** For fixed k, test whether a single linear map M_k on
-   z-space satisfies "z(ka) at the a-slot ⇒ output shifts from ab to kab" across all a,
-   and whether M_k M_{k'} ≈ M_{kk'} (a group action on the latent space; cf. Wu et al.).
+2. **Causal double-cover test.** *Complete, including the product locus
+   (Sections 4 and 5.4b).*
+3. **Logit–character fit.** *Complete for ranking (Section 4).* Remaining:
+   quantitative comparison of fitted coefficients against the heat-kernel envelope,
+   now part of the D1 analysis (queue v3).
+4. **Composition test.** *Complete, including the patched/steering version
+   (Section 5.4b).* Remaining: the SO(3) case with a rotation-matrix composition
+   step (low priority; the D^1 fit-patch already covers the causal content).
+5. **Per-argument equivariance / latent group action.** *Complete (Section 5.4a):
+   translation operators fitted, homomorphism verified, and matched to the irrep
+   matrices basis-invariantly.*
 6. **Resolution/bandwidth sweep (revised after Section 5.1).** The K sweep showed
    that ranking resolution does not require higher spins (the fundamental character
    is monotone in distance), so bandwidth selection must be tested with an objective

@@ -32,8 +32,8 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from core.su2 import (LandmarkEncoding, expmap, haar, qmul, spin_basis,
-                      spin_fve)
+from core.su2 import (LandmarkEncoding, expmap, get_encoding, haar,
+                      heat_kernel, qconj, qmul, spin_basis, spin_fve)
 from core.su2_model import TripleScorer
 
 
@@ -75,12 +75,25 @@ def build_data(args, rng):
     n_eval = args.n_eval
     idx = rng.choice(n_pairs, size=M + n_eval, replace=False)
     tr, t1 = idx[:M], idx[M:]
-    train = make_pair_set(pool[tr // args.N], pool[tr % args.N], args.K,
-                          args.sigma, args.excl_radius, args.variant, rng)
-    T1 = make_pair_set(pool[t1 // args.N], pool[t1 % args.N], args.K,
-                       args.sigma, args.excl_radius, args.variant, rng)
-    T2 = make_pair_set(haar(n_eval, rng), haar(n_eval, rng), args.K,
-                       args.sigma, args.excl_radius, args.variant, rng)
+    if args.loss == "heatkernel":
+        train = make_hk_set(pool[tr // args.N], pool[tr % args.N], args.K,
+                            args.hk_t, rng)
+        T1 = make_hk_set(pool[t1 // args.N], pool[t1 % args.N], args.K,
+                         args.hk_t, rng)
+        T2 = make_hk_set(haar(n_eval, rng), haar(n_eval, rng), args.K,
+                         args.hk_t, rng)
+        # standardize targets with train-set statistics
+        mu, sd = train[3].mean(), train[3].std() + 1e-8
+        train = train[:3] + (((train[3] - mu) / sd).astype(np.float32),)
+        T1 = T1[:3] + (((T1[3] - mu) / sd).astype(np.float32),)
+        T2 = T2[:3] + (((T2[3] - mu) / sd).astype(np.float32),)
+    else:
+        train = make_pair_set(pool[tr // args.N], pool[tr % args.N], args.K,
+                              args.sigma, args.excl_radius, args.variant, rng)
+        T1 = make_pair_set(pool[t1 // args.N], pool[t1 % args.N], args.K,
+                           args.sigma, args.excl_radius, args.variant, rng)
+        T2 = make_pair_set(haar(n_eval, rng), haar(n_eval, rng), args.K,
+                           args.sigma, args.excl_radius, args.variant, rng)
     # T3: exact positive, negatives at fixed radius r (no noise on positive)
     T3 = {}
     qa3, qb3 = haar(n_eval, rng), haar(n_eval, rng)
@@ -95,23 +108,24 @@ def build_data(args, rng):
     return pool, train, T1, T2, T3
 
 
-# ------------------------------ torch-side encoding ---------------------------
+# --------------------------- heat-kernel regression data ----------------------
 
-class TorchEncoding:
-    """GPU mirror of core.su2.LandmarkEncoding (verified identical at setup)."""
-
-    def __init__(self, enc: LandmarkEncoding, device):
-        self.alpha = enc.alpha
-        self.variant = enc.variant
-        self.L = torch.tensor(enc.landmarks.T, dtype=torch.float32, device=device)
-        self.mean = torch.tensor(enc.mean, dtype=torch.float32, device=device)
-        self.std = torch.tensor(enc.std, dtype=torch.float32, device=device)
-
-    def __call__(self, q):
-        x = q @ self.L
-        if self.variant == "so3":
-            x = x.abs()
-        return (torch.exp(self.alpha * x) - self.mean) / self.std
+def make_hk_set(qa, qb, K, t, rng):
+    """Candidates covering the kernel support (half near the product at uniform
+    radius in (0, pi/2), half Haar) with targets y = K_t(ab c^-1)."""
+    n = qa.shape[0]
+    prod = qmul(qa, qb)
+    r = rng.uniform(0.0, np.pi / 2, size=(n, K, 1))
+    u = rng.standard_normal((n, K, 3))
+    u = u / np.linalg.norm(u, axis=-1, keepdims=True)
+    near = qmul(prod[:, None, :], expmap(r * u))
+    far = haar(n * K, rng).reshape(n, K, 4)
+    pick = rng.random((n, K, 1)) < 0.5
+    c = np.where(pick, near, far)
+    y = heat_kernel(qmul(prod[:, None, :], qconj(c)).reshape(-1, 4), t
+                    ).reshape(n, K)
+    return (qa.astype(np.float32), qb.astype(np.float32),
+            c.astype(np.float32), y.astype(np.float32))
 
 
 # --------------------------------- evaluation ---------------------------------
@@ -121,7 +135,7 @@ def ranking_accuracy(model, psi, pair_set, device, batch=None):
     if batch is None:
         # cap candidate encodes per chunk (~1GB peak); K is pair_set's dim 1
         batch = max(512, 262144 // pair_set[2].shape[1])
-    qa, qb, cands = pair_set
+    qa, qb, cands = pair_set[:3]
     n, correct = qa.shape[0], 0
     for i in range(0, n, batch):
         a = torch.tensor(qa[i:i + batch], device=device)
@@ -130,6 +144,22 @@ def ranking_accuracy(model, psi, pair_set, device, batch=None):
         logits = model(psi(a), psi(b), psi(c))
         correct += (logits.argmax(dim=1) == 0).sum().item()
     return correct / n
+
+
+@torch.no_grad()
+def regression_mse(model, psi, hk_set, device, batch=None):
+    qa, qb, cands, y = hk_set
+    if batch is None:
+        batch = max(512, 262144 // cands.shape[1])
+    n, se = qa.shape[0], 0.0
+    for i in range(0, n, batch):
+        a = torch.tensor(qa[i:i + batch], device=device)
+        b = torch.tensor(qb[i:i + batch], device=device)
+        c = torch.tensor(cands[i:i + batch], device=device)
+        pred = model(psi(a), psi(b), psi(c))
+        se += ((pred - torch.tensor(y[i:i + batch], device=device)) ** 2
+               ).sum().item()
+    return se / (n * cands.shape[1])
 
 
 def ridge_r2(Z, Y, lams=(1e-3, 1e-2, 1e-1, 1.0, 10.0, 100.0)):
@@ -157,6 +187,8 @@ def spectroscopy(model, psi, probe_q, bases, device):
     z = model.embed(psi(q)).cpu().numpy()
     z_neg = model.embed(psi(-q)).cpu().numpy()
     out = {f"fve_{j}": v for j, v in spin_fve(z, bases).items()}
+    zc = model.enc_c(psi(q)).cpu().numpy()
+    out.update({f"fve_c_{j}": v for j, v in spin_fve(zc, bases).items()})
     zc = z - z.mean(0)
     znc = z_neg - z_neg.mean(0)
     cos = (zc * znc).sum(1) / (np.linalg.norm(zc, axis=1)
@@ -182,6 +214,14 @@ def main():
     p.add_argument("--alpha", type=float, default=3.0)
     p.add_argument("--enc_seed", type=int, default=0,
                    help="landmark seed, shared across variants (matched control)")
+    p.add_argument("--encoding", choices=["landmark", "randmlp", "funcval"],
+                   default="landmark")
+    p.add_argument("--loss", choices=["infonce", "heatkernel"],
+                   default="infonce")
+    p.add_argument("--hk_t", type=float, default=0.05,
+                   help="heat-kernel temperature for --loss heatkernel")
+    p.add_argument("--spec_jmax", type=float, default=2.0,
+                   help="largest spin tracked by the FVE spectroscopy")
     p.add_argument("--activation", choices=["gelu", "quadratic"], default="gelu")
     p.add_argument("--steps", type=int, default=200_000)
     p.add_argument("--batch", type=int, default=4096)
@@ -210,9 +250,12 @@ def main():
     torch.manual_seed(args.seed)
     device = torch.device(args.device)
 
-    enc = LandmarkEncoding(m=args.m, alpha=args.alpha, variant=args.variant,
-                           seed=args.enc_seed)
-    psi = TorchEncoding(enc, device)
+    if args.loss == "heatkernel":
+        assert args.variant == "su2", "heat-kernel target is defined on SU(2)"
+
+    enc = get_encoding(args.encoding, args.variant, m=args.m, alpha=args.alpha,
+                       seed=args.enc_seed)
+    psi = enc.torch_fn(device)
 
     print(f"[{args.save_dir}] building data ...", flush=True)
     pool, train, T1, T2, T3 = build_data(args, rng)
@@ -221,16 +264,19 @@ def main():
 
     # frozen training subset for the memorization curve
     sub = slice(0, min(args.n_eval, M))
-    train_sub = (train[0][sub], train[1][sub], train[2][sub])
+    train_sub = tuple(x[sub] for x in train)
 
     # spectroscopy probe (fresh Haar, fixed) + orthonormal spin bases
     probe_q = haar(2048, np.random.default_rng(args.seed + 777))
-    bases = spin_basis(probe_q)
+    bases = spin_basis(probe_q, j_list=tuple(
+        np.arange(0, args.spec_jmax + 0.25, 0.5)))
 
     # training tensors on GPU
     qa = torch.tensor(train[0], device=device)
     qb = torch.tensor(train[1], device=device)
     qc = torch.tensor(train[2], device=device)
+    qy = (torch.tensor(train[3], device=device)
+          if args.loss == "heatkernel" else None)
 
     model = TripleScorer(m=args.m, activation=args.activation).to(device)
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr,
@@ -261,18 +307,30 @@ def main():
         ptr += args.batch
 
         logits = model(psi(qa[idx]), psi(qb[idx]), psi(qc[idx]))
-        loss = F.cross_entropy(
-            logits, torch.zeros(len(idx), dtype=torch.long, device=device))
+        if args.loss == "heatkernel":
+            loss = F.mse_loss(logits, qy[idx])
+        else:
+            loss = F.cross_entropy(
+                logits, torch.zeros(len(idx), dtype=torch.long, device=device))
         opt.zero_grad(set_to_none=True)
         loss.backward()
         opt.step()
 
         if step % args.eval_every == 0 or step == 1:
             model.eval()
-            rec = {"step": step, "loss": float(loss.item()),
-                   "acc_train": ranking_accuracy(model, psi, train_sub, device),
-                   "acc_T1": ranking_accuracy(model, psi, T1, device),
-                   "acc_T2": ranking_accuracy(model, psi, T2, device)}
+            rec = {"step": step, "loss": float(loss.item())}
+            if args.loss == "heatkernel":
+                rec["mse_train"] = regression_mse(model, psi, train_sub, device)
+                rec["mse_T1"] = regression_mse(model, psi, T1, device)
+                rec["mse_T2"] = regression_mse(model, psi, T2, device)
+                head = (f"mse train {rec['mse_train']:.4f}  "
+                        f"T1 {rec['mse_T1']:.4f}  T2 {rec['mse_T2']:.4f}")
+            else:
+                rec["acc_train"] = ranking_accuracy(model, psi, train_sub, device)
+                rec["acc_T1"] = ranking_accuracy(model, psi, T1, device)
+                rec["acc_T2"] = ranking_accuracy(model, psi, T2, device)
+                head = (f"train {rec['acc_train']:.3f}  T1 {rec['acc_T1']:.3f}  "
+                        f"T2 {rec['acc_T2']:.3f}")
             for r, ps in T3.items():
                 rec[f"acc_T3_r{r}"] = ranking_accuracy(model, psi, ps, device)
             if step % args.spec_every == 0 or step == 1:
@@ -280,9 +338,7 @@ def main():
             rec["wall_s"] = round(time.time() - t0, 1)
             log_f.write(json.dumps(rec) + "\n")
             log_f.flush()
-            print(f"step {step:>7d}  loss {rec['loss']:.4f}  "
-                  f"train {rec['acc_train']:.3f}  T1 {rec['acc_T1']:.3f}  "
-                  f"T2 {rec['acc_T2']:.3f}", flush=True)
+            print(f"step {step:>7d}  loss {rec['loss']:.4f}  {head}", flush=True)
             model.train()
 
         if step % args.ckpt_every == 0 or step == args.steps:

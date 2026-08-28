@@ -39,8 +39,8 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from core.su2 import (LandmarkEncoding, expmap, haar, qmul, spin_basis,
-                      wigner_character)
+from core.su2 import (LandmarkEncoding, expmap, get_encoding, haar, qmul,
+                      spin_basis, wigner_character)
 from core.su2_model import TripleScorer
 
 
@@ -58,8 +58,8 @@ def load_model(run_dir, ckpt_name=None, device="cpu"):
     model = TripleScorer(m=cfg["m"], activation=cfg.get("activation", "gelu"))
     model.load_state_dict(state["model"])
     model.to(device).eval()
-    enc = LandmarkEncoding(m=cfg["m"], alpha=cfg["alpha"],
-                           variant=cfg["variant"], seed=cfg["enc_seed"])
+    enc = get_encoding(cfg.get("encoding", "landmark"), cfg["variant"],
+                       m=cfg["m"], alpha=cfg["alpha"], seed=cfg["enc_seed"])
     return model, enc, cfg, state["step"]
 
 

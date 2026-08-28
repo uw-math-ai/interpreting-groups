@@ -203,6 +203,149 @@ class LandmarkEncoding:
     def __call__(self, q):
         return ((self._raw(q) - self.mean) / self.std).astype(np.float32)
 
+    def torch_fn(self, device):
+        import torch
+        L = torch.tensor(self.landmarks.T, dtype=torch.float32, device=device)
+        mean = torch.tensor(self.mean, dtype=torch.float32, device=device)
+        std = torch.tensor(self.std, dtype=torch.float32, device=device)
+
+        def fn(q):
+            x = q @ L
+            if self.variant == "so3":
+                x = x.abs()
+            return (torch.exp(self.alpha * x) - mean) / std
+        return fn
+
+
+class RandMLPEncoding:
+    """Frozen random two-layer tanh MLP on the raw quaternion (plan item A3).
+
+    variant "su2": Psi(q) = tanh(W2 tanh(W1 q + b1) + b2).
+    variant "so3": the center-symmetrized map (Psi(q) + Psi(-q)) / 2 -- the
+    generic quotient construction (average over the center orbit).
+    """
+
+    def __init__(self, m=32, hidden=64, variant="su2", seed=0, alpha=None):
+        assert variant in ("su2", "so3")
+        self.m, self.variant = m, variant
+        rng = np.random.default_rng(seed + 10)
+        self.W1 = rng.standard_normal((4, hidden)) * 1.5
+        self.b1 = rng.standard_normal(hidden) * 0.5
+        self.W2 = rng.standard_normal((hidden, m)) * (1.5 / np.sqrt(hidden))
+        self.b2 = rng.standard_normal(m) * 0.5
+        probe = haar(65536, np.random.default_rng(seed + 11))
+        raw = self._sym(probe)
+        self.mean, self.std = raw.mean(0), raw.std(0) + 1e-8
+
+    def _raw(self, q):
+        return np.tanh(np.tanh(q @ self.W1 + self.b1) @ self.W2 + self.b2)
+
+    def _sym(self, q):
+        if self.variant == "so3":
+            return (self._raw(q) + self._raw(-q)) / 2
+        return self._raw(q)
+
+    def __call__(self, q):
+        return ((self._sym(q) - self.mean) / self.std).astype(np.float32)
+
+    def torch_fn(self, device):
+        import torch
+        P = {k: torch.tensor(np.asarray(v), dtype=torch.float32, device=device)
+             for k, v in [("W1", self.W1), ("b1", self.b1), ("W2", self.W2),
+                          ("b2", self.b2), ("mean", self.mean), ("std", self.std)]}
+
+        def raw(q):
+            return torch.tanh(torch.tanh(q @ P["W1"] + P["b1"]) @ P["W2"] + P["b2"])
+
+        def fn(q):
+            x = (raw(q) + raw(-q)) / 2 if self.variant == "so3" else raw(q)
+            return (x - P["mean"]) / P["std"]
+        return fn
+
+
+class FuncValEncoding:
+    """Psi(g)_i = f(g * x_i): values of a fixed generic function f on S^3 at
+    translates of fixed probe points (plan item A3 -- 'the group is observed
+    only through its action on an object'). f = random Fourier features.
+    variant "so3": center-symmetrized."""
+
+    def __init__(self, m=32, n_freq=64, bandwidth=2.0, variant="su2", seed=0,
+                 alpha=None):
+        assert variant in ("su2", "so3")
+        self.m, self.variant = m, variant
+        rng = np.random.default_rng(seed + 20)
+        self.X = haar(m, rng)                              # probe points on S^3
+        self.W = rng.standard_normal((4, n_freq)) * bandwidth
+        self.phase = rng.uniform(0, 2 * np.pi, n_freq)
+        self.c = rng.standard_normal(n_freq) / np.sqrt(n_freq)
+        probe = haar(65536, np.random.default_rng(seed + 21))
+        raw = self._sym(probe)
+        self.mean, self.std = raw.mean(0), raw.std(0) + 1e-8
+
+    def _raw(self, q):
+        y = qmul(q[:, None, :], self.X[None, :, :])        # [n, m, 4]
+        return np.cos(y @ self.W + self.phase) @ self.c    # [n, m]
+
+    def _sym(self, q):
+        if self.variant == "so3":
+            return (self._raw(q) + self._raw(-q)) / 2
+        return self._raw(q)
+
+    def __call__(self, q):
+        return ((self._sym(q) - self.mean) / self.std).astype(np.float32)
+
+    def torch_fn(self, device):
+        import torch
+        P = {k: torch.tensor(np.asarray(v), dtype=torch.float32, device=device)
+             for k, v in [("X", self.X), ("W", self.W), ("ph", self.phase),
+                          ("c", self.c), ("mean", self.mean), ("std", self.std)]}
+
+        def tqmul(p, q):
+            pw, px, py, pz = p.unbind(-1)
+            qw, qx, qy, qz = q.unbind(-1)
+            return torch.stack([
+                pw * qw - px * qx - py * qy - pz * qz,
+                pw * qx + px * qw + py * qz - pz * qy,
+                pw * qy - px * qz + py * qw + pz * qx,
+                pw * qz + px * qy - py * qx + pz * qw], dim=-1)
+
+        def raw(q):
+            y = tqmul(q[:, None, :], P["X"][None, :, :])
+            return torch.cos(y @ P["W"] + P["ph"]) @ P["c"]
+
+        def fn(q):
+            x = (raw(q) + raw(-q)) / 2 if self.variant == "so3" else raw(q)
+            return (x - P["mean"]) / P["std"]
+        return fn
+
+
+def get_encoding(name, variant, m=32, alpha=3.0, seed=0):
+    if name == "landmark":
+        return LandmarkEncoding(m=m, alpha=alpha, variant=variant, seed=seed)
+    if name == "randmlp":
+        return RandMLPEncoding(m=m, variant=variant, seed=seed)
+    if name == "funcval":
+        return FuncValEncoding(m=m, variant=variant, seed=seed)
+    raise ValueError(name)
+
+
+def heat_kernel(q, t, log=False, tol=1e-7):
+    """Heat kernel K_t on SU(2) at group elements q (relative to identity):
+    K_t(g) = sum_j (2j+1) e^{-t j(j+1)} chi_j(g), j = 0, 1/2, 1, ...
+
+    Truncated when the weight (2j+1)e^{-t j(j+1)} falls below tol; values are
+    positive up to O(tol) truncation error (the tail near theta = pi is
+    exponentially small and the alternating series can dip slightly below 0)."""
+    out = np.zeros(np.atleast_2d(q).shape[0] if q.ndim > 1 else 1)
+    j = 0.0
+    while True:
+        w = (2 * j + 1) * np.exp(-t * j * (j + 1))
+        if w < tol and j > 0:
+            break
+        out = out + w * wigner_character(j, q)
+        j += 0.5
+    return np.log(np.maximum(out, 1e-30)) if log else out
+
 
 # --------------------------------- self test ----------------------------------
 
@@ -229,12 +372,21 @@ def _self_test():
     # cross-spin leakage floor is ~r_j/N (finite Monte-Carlo sample), here ~2e-3
     assert fve[1.0] > 0.995 and fve[0.5] < 5e-3 and fve[2.0] < 5e-3, fve
     # encodings: so3 variant is even, su2 variant is not (and is well-conditioned at +-q)
-    enc_su2 = LandmarkEncoding(variant="su2")
-    enc_so3 = LandmarkEncoding(variant="so3")
     qs = haar(512, rng)
-    assert np.abs(enc_so3(qs) - enc_so3(-qs)).max() < 1e-5
-    gap = np.linalg.norm(enc_su2(qs) - enc_su2(-qs), axis=1)
-    assert gap.min() > 1.0, gap.min()
+    for name in ("landmark", "randmlp", "funcval"):
+        e_su2 = get_encoding(name, "su2")
+        e_so3 = get_encoding(name, "so3")
+        assert np.abs(e_so3(qs) - e_so3(-qs)).max() < 1e-5, name
+        gap = np.linalg.norm(e_su2(qs) - e_su2(-qs), axis=1)
+        assert gap.min() > 0.5, (name, gap.min())
+        # torch mirror agrees with numpy
+        import torch
+        tv = e_su2.torch_fn("cpu")(torch.tensor(qs, dtype=torch.float32)).numpy()
+        assert np.abs(tv - e_su2(qs)).max() < 1e-4, name
+    # heat kernel: positive, peaked at identity, class function (depends on w)
+    K = heat_kernel(qs, t=0.1)
+    assert K.min() > -1e-4          # positive up to truncation error
+    assert heat_kernel(np.array([[1.0, 0, 0, 0]]), t=0.1)[0] > K.max()
     print("core.su2 self-test OK")
 
 
