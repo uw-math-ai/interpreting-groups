@@ -283,8 +283,8 @@ class FuncValEncoding:
         self.mean, self.std = raw.mean(0), raw.std(0) + 1e-8
 
     def _raw(self, q):
-        y = qmul(q[:, None, :], self.X[None, :, :])        # [n, m, 4]
-        return np.cos(y @ self.W + self.phase) @ self.c    # [n, m]
+        y = qmul(q[..., None, :], self.X)                  # [..., m, 4]
+        return np.cos(y @ self.W + self.phase) @ self.c    # [..., m]
 
     def _sym(self, q):
         if self.variant == "so3":
@@ -310,7 +310,7 @@ class FuncValEncoding:
                 pw * qz + px * qy - py * qx + pz * qw], dim=-1)
 
         def raw(q):
-            y = tqmul(q[:, None, :], P["X"][None, :, :])
+            y = tqmul(q[..., None, :], P["X"])
             return torch.cos(y @ P["W"] + P["ph"]) @ P["c"]
 
         def fn(q):
