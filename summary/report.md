@@ -353,9 +353,12 @@ SU(2)/SO(3) result reproduces at 60k steps: SU(2) places 89.8% of encoder varian
 in spin-½ (quaternion decode R² 0.993, cos(z(g), z(−g)) = −0.83); the symmetrized
 control pins spin-½ at the 0.2% floor and concentrates in spin-1 (87.6%, plus
 spin-2 at 9.8%). The function-value encoding f(g·xᵢ) (random Fourier f, fixed
-probe points) shows the same pattern in its interim spectra (runs still
-finishing). The selected irrep is therefore driven by the task and group, not by
-the observation map.
+probe points; 60k steps) reproduces the pattern as well, with somewhat more
+integer-spin admixture on the SU(2) side: spin-½ 69.1% + spin-1 21.4%, with
+quaternion decode R² 0.990 and cos(z(g), z(−g)) = −0.52; the symmetrized control
+has spin-½ at the floor with spin-1 82.5% + spin-2 15.8%. Across three
+qualitatively different observation maps, the selected irrep is therefore driven
+by the task and group, not by the observation map.
 
 ### (b) Heat-kernel regression (plan D1) — bandwidth is forced, and allocated
 bottom-up in Casimir order
