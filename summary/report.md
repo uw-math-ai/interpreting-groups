@@ -488,6 +488,51 @@ of the represented sectors: it concentrates on the specific Clebsch–Gordan
 contraction that implements the group product — the network's internal algebra
 follows the representation ring.
 
+## 5.7 Spin(4) and its central quotients: the selection principle (added 2026-08-29)
+
+Spin(4) = SU(2) × SU(2) has center Z₂ × Z₂ and, because that center is not
+cyclic, **no faithful irrep**: any model must carry a direct sum. Its three
+central quotients realize different global forms with the same Lie algebra.
+Machinery: `core/spin4.py` (pair-quaternion operations, (j_L, j_R) sector
+spectroscopy, descent rules, orbit-averaged encodings; self-tested);
+`experiments/spin4_train.py`. Competing minimal-carrier hypotheses were
+recorded in the module docstring before running; for two conditions the
+minimal-total-dimension choice and the minimal-block-count choice disagree,
+making them discovery runs. Results (one seed, 100k steps, N = 2048, f = 0.01):
+
+| condition (group) | T2 | learned sectors (FVE) | competing hypothesis (FVE) |
+|---|---|---|---|
+| spin4 (Spin(4)) | 0.945 | **(½,0) 0.50 + (0,½) 0.48** | — (sum forced; no faithful irrep) |
+| so4 (SO(4)) | 0.962 | **(½,½) 0.97** (vector rep) | — |
+| leftq (SO(3)×SU(2)) | 0.968 | **(0,½) 0.73 + (1,0) 0.25** [5 dims] | (1,½) [6 dims]: 0.007 |
+| pso4 (PSO(4)) | 0.969 | **(1,0) 0.50 + (0,1) 0.48** [6 dims] | (1,1) [9 dims]: 0.011 |
+
+All center-orbit cosines match the representation-theoretic predictions
+(e.g. leftq: L-flip invariant at +1.0, R-flip at −0.48 ≈ 0.25 − 0.73; pso4 all
++1.0). In the so4 condition the observations do distinguish (q_L, q_R) from
+(−q_L, q_R), yet single-factor content is absent (R²(q_L) ≈ 0): nothing but
+the task's own group is represented.
+
+**Selection principle (answers plan G1's "which carrier?").** In both
+discovery conditions optimization chose the smaller-dimensional reducible sum
+over the single faithful irrep. Combined with the earlier conditions, all
+eight tested group forms are consistent with one statement:
+
+> *Trained on composition in a compact group G (observed through a generic
+> Z-invariant map), the encoder concentrates on a **minimal-total-dimension
+> faithful representation of G/Z**, reducible when necessary — and the
+> single-irrep concentration seen for SU(2), SO(3), SU(3), PSU(3), and SO(4)
+> is the special case where that minimal representation happens to be
+> irreducible.*
+
+(Case check: for SU(2), SO(3), SU(3), SO(4) the minimal faithful
+representation is irreducible; for PSU(3), a simple group, every nontrivial
+rep is faithful and the adjoint 8 is the smallest; for Spin(4), SO(3)×SU(2)
+and PSO(4) the minimal faithful representation is a two-block sum, and that is
+what is learned.) Remaining to make this production-grade: seeds for the four
+Spin(4) conditions, and the causal suite (per-block ablations should kill
+exactly the discrimination carried by each block's central character).
+
 ## 6. Interpretation and limitations
 
 - **Seed replication complete for the principal cells** (Section 5.3): the headline
