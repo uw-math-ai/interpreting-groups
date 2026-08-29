@@ -453,6 +453,28 @@ t = 0.05 — a 2×-width model and a 2×-length default-width control — to
 determine whether the heat-kernel spectral cutoff is capacity- or
 optimization-limited.
 
+## 5.6 Representation-ring / fusion analysis (plan E; added 2026-08-29)
+
+Functions on G×G decompose into (j_a, j_b) sectors under the two-sided action
+(basis: products D^{j_a}(a)_{mk} D^{j_b}(b)_{ln}); `experiments/su2_fusion.py`
+computes the two-variable spectroscopy of the interaction MLP's hidden layer
+and output h, plus a fusion-selectivity statistic: within the diagonal (j, j)
+sector, the composed representation D^j(a)D^j(b) = D^j(ab) spans only the
+(2j+1)²-dimensional matrix-product contraction subspace of the full
+2(2j+1)⁴-dimensional realified bilinear space.
+
+Results (f = 0.01 pilot checkpoints; seed batch running): for SU(2), h places
+87.7% of its variance in the (½, ½) sector, and **97.7% of that sector's energy
+lies in the 4-of-16-dimensional contraction subspace**; the hidden layer
+occupies exactly the channels tensor-generated from the encoder content —
+pass-through (½, 0) and (0, ½) at ≈ 25% each, the bilinear (½, ½) at 22%, and
+small (1, 0)/(0, 1) — with all other channels at or near the floor. For SO(3):
+h has 77.1% in (1, 1) with 93.3% of it in the 9-of-81-dimensional contraction
+subspace. The interaction layer is therefore not an arbitrary bilinear coupling
+of the represented sectors: it concentrates on the specific Clebsch–Gordan
+contraction that implements the group product — the network's internal algebra
+follows the representation ring.
+
 ## 6. Interpretation and limitations
 
 - **Seed replication complete for the principal cells** (Section 5.3): the headline
