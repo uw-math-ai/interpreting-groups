@@ -417,17 +417,17 @@ pattern: **the learned representation identifies the global form of the group �
 the smallest faithful irrep of G, and the smallest faithful irrep of G/Z when
 the observations are Z-invariant.**
 
-**Causal evidence (plan B3/B4; `experiments/su3_causal.py`, one seed).** With
-D_ω = P[s(a,b,ab) beats both s(a,b,ω^k ab)] (tie-aware; chance 1/3):
+**Causal evidence (plan B3/B4; `experiments/su3_causal.py`; now 5 seeds,
+mean ± sd).** With D_ω = P[s(a,b,ab) beats both s(a,b,ω^k ab)] (tie-aware;
+chance 1/3):
 
 | intervention on z_a, z_b | SU(3): task / D_ω | PSU(3): task / D_ω |
 |---|---|---|
-| none | 0.997 / 1.000 | 0.737 / 0.333 |
-| center projection (orbit average) | **0.016 / 0.338** | 0.737 / 0.333 (exact no-op) |
-| charged projection (remove invariant part) | 0.998 / 1.000 | **0.014 / 0.333** |
-| function-ablate 3⊕3̄ | **0.017 / 0.335** | 0.735 / 0.333 (no-op) |
-| function-ablate adjoint 8 | 0.996 / 1.000 | **0.014 / 0.333** |
-| 18 random directions | 0.992 / 1.000 | 0.650 / 0.333 |
+| none | 0.998 ± 0.001 / 1.000 | 0.739 ± 0.019 / 0.333 |
+| center projection (orbit average) | **0.016 ± 0.001 / 0.337 ± 0.008** | 0.739 / 0.333 (exact no-op) |
+| charged projection (remove invariant part) | 0.998 / 1.000 | **0.015 ± 0.001 / 0.333** |
+| function-ablate 3⊕3̄ | **0.018 ± 0.002** | 0.733 (no-op) |
+| function-ablate adjoint 8 | 0.997 (no-op) | **0.014 ± 0.003** |
 
 The Z₃ analogue of the SU(2) double dissociation, in both directions. The
 composition test transfers: SU(3) fundamental probes compose algebraically
