@@ -396,12 +396,18 @@ fundamental pair 3⊕3̄** (adjoint 0.6%, 6⊕6̄ 0.7%, 10⊕10̄ 0.2%); charged
 fraction 0.993; mean cos(z(U), z(ωU)) = −0.489 against the exact triality-1
 prediction of cos(2π/3) = −0.5; fundamental entries decode at R² 0.988.
 
-**PSU(3)** (interim, 5k steps at last check): train 0.988 with T2 0.576 and
-climbing (the quotient task is again the harder one); **93% of encoder variance
-in the adjoint 8** — the smallest faithful center-trivial irrep — with charged
-sectors at the floor (3⊕3̄ 0.6%, 6⊕6̄ 0.2%), 10⊕10̄ at 2.9%, charged fraction
-exactly 0 (as the invariant encoding forces), and the adjoint matrix decodable
-(R² 0.70 at 5k). Final numbers when the run completes.
+**PSU(3)** (100k steps, complete): train 1.000, T1 0.779, T2 0.682 — the
+quotient task is again the substantially harder one, now with a persistent
+generalization gap at this budget (the SO(3)-versus-SU(2) hardness pattern,
+amplified for the larger center and group). The representation is unambiguous
+and stable from early training: **93.7% of encoder variance in the adjoint 8**
+(candidate encoder: 96.1%) — the smallest faithful center-trivial irrep — with
+the charged sectors at the floor (3⊕3̄ 0.6%, 6⊕6̄ 0.1%), 10⊕10̄ at 2.6%,
+charged-energy fraction exactly 0, and the adjoint matrix decodable at R² 0.69.
+Optimization thus selects the adjoint when the fundamental is forbidden, as
+hypothesized — with the caveat that the model solves the quotient task only
+partially at this budget, so the selection statement is about the representation
+it builds, not yet about a fully solved task.
 
 Together with SU(2)/SO(3), this is the second instance of the central-quotient
 pattern: **the learned representation identifies the global form of the group —
