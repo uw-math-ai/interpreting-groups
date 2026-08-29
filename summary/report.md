@@ -447,11 +447,23 @@ invariant sectors; a fit restricted to descending sectors is the clean version
 0.4 sits at both models' resolution floor (the training noise scale) and reads
 ≈ 0 everywhere; larger radii should be used next time.
 
-**Queue v4 (launched 2026-08-29, running):** seeds 1–4 for SU(3) and PSU(3)
-(five seeds per condition including the pilots), and two D1 capacity probes at
-t = 0.05 — a 2×-width model and a 2×-length default-width control — to
-determine whether the heat-kernel spectral cutoff is capacity- or
-optimization-limited.
+**Seed replication (queue v4).** Five seeds per condition (the last PSU(3) seed
+evaluated at its 65k interim; all others at 100k), with every seed conforming:
+
+| quantity | SU(3) | PSU(3) |
+|---|---|---|
+| T2 | 0.994 ± 0.001 | 0.685 ± 0.020 |
+| FVE 3⊕3̄ | **0.971 ± 0.009** | 0.0059 ± 0.0004 |
+| FVE adjoint 8 | 0.009 ± 0.003 | **0.934 ± 0.007** |
+| FVE 10⊕10̄ | 0.002 | 0.027 ± 0.003 |
+| cos(z(U), z(ωU)) | −0.484 ± 0.005 (pred. −0.5) | +1.000 |
+| charged-energy fraction | 0.989 ± 0.005 | 0.0000 ± 0.0000 |
+| R²(fundamental) | 0.978 ± 0.006 | −0.021 |
+| R²(adjoint) | 0.46 ± 0.09 | 0.699 ± 0.012 |
+
+As in the SU(2)/SO(3) pair, irrep selection is deterministic across seeds. The
+two D1 capacity probes at t = 0.05 (2×-width model; 2×-length default-width
+control) are still training.
 
 ## 5.6 Representation-ring / fusion analysis (plan E; added 2026-08-29)
 
