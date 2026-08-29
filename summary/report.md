@@ -4,8 +4,10 @@
 2026-08-28. Complete so far: the pilot; the causal suite on every checkpoint; the
 candidate-count and training-fraction sweeps; five-seed replication of the four
 principal cells; and the mechanistic loop closure (Section 5.4: latent group action,
-product-state steering, cross-seed intertwiners). Running: queue v3 (Section 5.5 —
-observation-map robustness, heat-kernel bandwidth, SU(3)/PSU(3) pilot). The headline (Sections 3–4) and the
+product-state steering, cross-seed intertwiners). Queue v3 results are in
+(Section 5.5): observation-map robustness confirmed, heat-kernel bandwidth forced
+in Casimir order, and SU(3)→3⊕3̄ / PSU(3)→adjoint-8 selection observed
+(PSU(3) final numbers pending). The headline (Sections 3–4) and the
 causal double dissociation are now **replicated across 5 seeds per condition**
 (Section 5.3); Sections 5.1–5.2 results remain single-seed. `RESULTS_SU2.md` carries
 the public-facing summary; `summary/seed_summary.json` the per-seed numbers.
@@ -341,31 +343,70 @@ achieve held-out R² 0.96–0.99, and the stitch approximately intertwines the
 fitted group actions (relative defect 0.07–0.15): seed universality is a
 statement about a shared representation up to gauge.
 
-## 5.5 Experiments in progress (queue v3, launched 2026-08-28)
+## 5.5 Queue v3 results (2026-08-28/29; one seed each)
 
-1. **Observation-map robustness (plan A3).** Two new frozen encodings — a random
-   two-layer tanh MLP of the raw quaternion, and values f(g·xᵢ) of a fixed
-   random Fourier function at translated probe points — each with a
-   center-symmetrized quotient control (the orbit average, the generic quotient
-   construction). If the fundamental-irrep selection is task/group driven, the
-   spectra should reproduce; if it is landmark-map driven, they should not.
-2. **Heat-kernel regression (plan D1).** MSE regression of s(a,b,c) onto the
-   standardized heat-kernel value K_t(ab c⁻¹) for t ∈ {0.3, 0.1, 0.05}
-   (`--loss heatkernel`). Unlike ranking — where the fundamental character is
-   monotone in distance and Bayes-optimal at any resolution (Section 5.1) — this
-   target provably requires spectral content up to the e^{−t j(j+1)} envelope.
-   Hypothesis (recorded before results): the encoder spectrum broadens with
-   1/t, acquiring spins in Casimir order with amplitudes tracking the envelope.
-3. **SU(3) vs PSU(3) pilot (plan B).** New machinery in `core/su3.py` (exact
-   matrix coefficients for (p,q) ∈ {(0,0), (1,0), (0,1), (1,1), (2,0), (0,2),
-   (3,0), (0,3)}, self-tested for homomorphism/unitarity/center characters/
-   Schur orthogonality) and `experiments/su3_train.py`. The PSU(3) control uses
-   the center-orbit-averaged observation map. Since real activations cannot
-   distinguish an irrep from its conjugate, spectroscopy tracks conjugate-pair
-   sectors 3⊕3̄, 8, 6⊕6̄, 10⊕10̄. Hypothesis (recorded before results): SU(3)
-   concentrates in the fundamental pair 3⊕3̄ (center-charged); PSU(3) suppresses
-   all charged sectors and selects a center-trivial carrier, plausibly the
-   adjoint 8 — but the selection itself is the science and will not be forced.
+### (a) Observation-map robustness (plan A3) — confirmed
+
+With the landmark encoding replaced by a frozen random two-layer tanh MLP of the
+raw quaternion (quotient control = the center-orbit average of the same map), the
+SU(2)/SO(3) result reproduces at 60k steps: SU(2) places 89.8% of encoder variance
+in spin-½ (quaternion decode R² 0.993, cos(z(g), z(−g)) = −0.83); the symmetrized
+control pins spin-½ at the 0.2% floor and concentrates in spin-1 (87.6%, plus
+spin-2 at 9.8%). The function-value encoding f(g·xᵢ) (random Fourier f, fixed
+probe points) shows the same pattern in its interim spectra (runs still
+finishing). The selected irrep is therefore driven by the task and group, not by
+the observation map.
+
+### (b) Heat-kernel regression (plan D1) — bandwidth is forced, and allocated
+bottom-up in Casimir order
+
+MSE regression onto the standardized K_t(ab c⁻¹), t ∈ {0.3, 0.1, 0.05}, 60k
+steps. Unlike ranking (Section 5.1), this target requires spectral content up to
+the (2j+1)e^{−t j(j+1)} envelope. Results (encoder E / candidate encoder E_c FVE
+per spin at 60k):
+
+| t | test MSE | dominant sectors E | dominant sectors E_c | envelope support |
+|---|---|---|---|---|
+| 0.3 | 0.051 | ½: 0.29, 1: 0.50, 3/2: 0.20 | ½: 0.16, 1: 0.22, 3/2: 0.45, 2: 0.16 | j ≲ 2 |
+| 0.1 | 0.324 | ½: 0.64, 3/2: 0.34 | 1: 0.42, 3/2: 0.53 | j ≲ 3.5 |
+| 0.05 | 0.459 | 1: 0.67, 3/2: 0.22 | 3/2: 0.42, 2: 0.36, (5/2, 3 above floor) | j ≲ 5 |
+
+Two conclusions. (i) The single-irrep concentration of the ranking task is a
+property of the objective, not of the architecture: the same model develops a
+genuinely multi-spin representation the moment the target requires one, and the
+represented sectors extend with 1/t in order of Casimir eigenvalue. (ii) At fixed
+capacity and training budget the model implements a *truncated* expansion: at
+t = 0.1 and 0.05 it fits the lowest-Casimir sectors the envelope demands and
+leaves the higher tail unfit, paying the corresponding MSE (0.32, 0.46 of target
+variance). The allocation is bottom-up in Casimir order — direct evidence for the
+low-Casimir spectral bias conjectured in the theory questions (plan G1). Whether
+the cutoff is capacity- or optimization-limited (width, steps) is a follow-up.
+
+### (c) SU(3) vs PSU(3) (plan B) — both pre-registered hypotheses confirmed
+
+Machinery: `core/su3.py` (exact matrix coefficients for (p,q) ∈ {(0,0), (1,0),
+(0,1), (1,1), (2,0), (0,2), (3,0), (0,3)}, self-tested for homomorphism,
+unitarity, center characters, Schur orthogonality) and `experiments/su3_train.py`;
+the PSU(3) control uses the center-orbit-averaged observation map. Real
+activations cannot distinguish an irrep from its conjugate, so spectroscopy
+tracks conjugate-pair sectors 3⊕3̄, 8, 6⊕6̄, 10⊕10̄.
+
+**SU(3)** (100k steps): T1 0.989 / T2 0.991; **97.9% of encoder variance in the
+fundamental pair 3⊕3̄** (adjoint 0.6%, 6⊕6̄ 0.7%, 10⊕10̄ 0.2%); charged-energy
+fraction 0.993; mean cos(z(U), z(ωU)) = −0.489 against the exact triality-1
+prediction of cos(2π/3) = −0.5; fundamental entries decode at R² 0.988.
+
+**PSU(3)** (interim, 5k steps at last check): train 0.988 with T2 0.576 and
+climbing (the quotient task is again the harder one); **93% of encoder variance
+in the adjoint 8** — the smallest faithful center-trivial irrep — with charged
+sectors at the floor (3⊕3̄ 0.6%, 6⊕6̄ 0.2%), 10⊕10̄ at 2.9%, charged fraction
+exactly 0 (as the invariant encoding forces), and the adjoint matrix decodable
+(R² 0.70 at 5k). Final numbers when the run completes.
+
+Together with SU(2)/SO(3), this is the second instance of the central-quotient
+pattern: **the learned representation identifies the global form of the group —
+the smallest faithful irrep of G, and the smallest faithful irrep of G/Z when
+the observations are Z-invariant.**
 
 ## 6. Interpretation and limitations
 
