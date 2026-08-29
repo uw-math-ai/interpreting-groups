@@ -55,7 +55,10 @@ def load_model(run_dir, ckpt_name=None, device="cpu"):
         ckpt_name = ckpts[-1].name
     state = torch.load(run_dir / ckpt_name, map_location=device,
                        weights_only=False)
-    model = TripleScorer(m=cfg["m"], activation=cfg.get("activation", "gelu"))
+    model = TripleScorer(m=cfg["m"], d_enc=cfg.get("d_enc", 128),
+                         enc_hidden=cfg.get("enc_hidden", 256),
+                         mlp_hidden=cfg.get("mlp_hidden", 512),
+                         activation=cfg.get("activation", "gelu"))
     model.load_state_dict(state["model"])
     model.to(device).eval()
     enc = get_encoding(cfg.get("encoding", "landmark"), cfg["variant"],

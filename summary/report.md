@@ -417,6 +417,42 @@ pattern: **the learned representation identifies the global form of the group �
 the smallest faithful irrep of G, and the smallest faithful irrep of G/Z when
 the observations are Z-invariant.**
 
+**Causal evidence (plan B3/B4; `experiments/su3_causal.py`, one seed).** With
+D_ω = P[s(a,b,ab) beats both s(a,b,ω^k ab)] (tie-aware; chance 1/3):
+
+| intervention on z_a, z_b | SU(3): task / D_ω | PSU(3): task / D_ω |
+|---|---|---|
+| none | 0.997 / 1.000 | 0.737 / 0.333 |
+| center projection (orbit average) | **0.016 / 0.338** | 0.737 / 0.333 (exact no-op) |
+| charged projection (remove invariant part) | 0.998 / 1.000 | **0.014 / 0.333** |
+| function-ablate 3⊕3̄ | **0.017 / 0.335** | 0.735 / 0.333 (no-op) |
+| function-ablate adjoint 8 | 0.996 / 1.000 | **0.014 / 0.333** |
+| 18 random directions | 0.992 / 1.000 | 0.650 / 0.333 |
+
+The Z₃ analogue of the SU(2) double dissociation, in both directions. The
+composition test transfers: SU(3) fundamental probes compose algebraically
+(median cosine of D̂(a)D̂(b) against D(ab): 0.977; shuffled −0.02); PSU(3)
+adjoint probes compose at 0.70 (shuffled −0.02; the weaker probe R² ≈ 0.69
+compounds in the product). Character fit (B4): for SU(3), the realified
+fundamental character explains 70% of the score variance with no gain from any
+higher sector — consistent with a single-character rule read through a
+nonlinearity (Re χ_{(1,0)}(g) = (6 − ||I − g||²_F)/2 is exactly the chordal
+distance statistic, so a monotone function of it is Bayes-reasonable); a
+quantitative nonlinear fit is future work. For PSU(3) the cumulative fit is
+confounded at the first step: the regression sample is concentrated near the
+identity, where charged and invariant characters correlate (Schur orthogonality
+holds only under Haar), so the (1,0) row absorbs variance that belongs to the
+invariant sectors; a fit restricted to descending sectors is the clean version
+(future work). One metric limitation: the "fine" evaluation at algebra radius
+0.4 sits at both models' resolution floor (the training noise scale) and reads
+≈ 0 everywhere; larger radii should be used next time.
+
+**Queue v4 (launched 2026-08-29, running):** seeds 1–4 for SU(3) and PSU(3)
+(five seeds per condition including the pilots), and two D1 capacity probes at
+t = 0.05 — a 2×-width model and a 2×-length default-width control — to
+determine whether the heat-kernel spectral cutoff is capacity- or
+optimization-limited.
+
 ## 6. Interpretation and limitations
 
 - **Seed replication complete for the principal cells** (Section 5.3): the headline

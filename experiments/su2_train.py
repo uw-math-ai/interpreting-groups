@@ -223,6 +223,9 @@ def main():
     p.add_argument("--spec_jmax", type=float, default=2.0,
                    help="largest spin tracked by the FVE spectroscopy")
     p.add_argument("--activation", choices=["gelu", "quadratic"], default="gelu")
+    p.add_argument("--d_enc", type=int, default=128)
+    p.add_argument("--enc_hidden", type=int, default=256)
+    p.add_argument("--mlp_hidden", type=int, default=512)
     p.add_argument("--steps", type=int, default=200_000)
     p.add_argument("--batch", type=int, default=4096)
     p.add_argument("--lr", type=float, default=1e-3)
@@ -278,7 +281,9 @@ def main():
     qy = (torch.tensor(train[3], device=device)
           if args.loss == "heatkernel" else None)
 
-    model = TripleScorer(m=args.m, activation=args.activation).to(device)
+    model = TripleScorer(m=args.m, d_enc=args.d_enc, enc_hidden=args.enc_hidden,
+                         mlp_hidden=args.mlp_hidden,
+                         activation=args.activation).to(device)
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr,
                             weight_decay=args.wd)
 
