@@ -461,9 +461,18 @@ evaluated at its 65k interim; all others at 100k), with every seed conforming:
 | R²(fundamental) | 0.978 ± 0.006 | −0.021 |
 | R²(adjoint) | 0.46 ± 0.09 | 0.699 ± 0.012 |
 
-As in the SU(2)/SO(3) pair, irrep selection is deterministic across seeds. The
-two D1 capacity probes at t = 0.05 (2×-width model; 2×-length default-width
-control) are still training.
+As in the SU(2)/SO(3) pair, irrep selection is deterministic across seeds.
+
+**D1 capacity probes (t = 0.05, complete).** The 2×-length default-width run
+improved test MSE from 0.459 (60k) to 0.383 (120k) while its candidate-encoder
+spectrum extended to j = 2 at 60% with j = 5/2 and j = 3 above floor — the
+spectral cutoff is at least partly optimization-limited, and the allocation
+remains bottom-up in Casimir order throughout. The 2×-width model at unchanged
+hyperparameters never escaped the mean predictor (MSE 0.997 through 120k):
+its encoders formed low-spin content but the score head never coupled to it.
+Widening therefore did not buy bandwidth at this temperature; it destabilized
+optimization (a learning-rate/weight-decay retune for the wider model is the
+obvious follow-up before drawing capacity conclusions).
 
 ## 5.6 Representation-ring / fusion analysis (plan E; added 2026-08-29)
 
