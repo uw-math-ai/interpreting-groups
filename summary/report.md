@@ -463,14 +463,15 @@ sector, the composed representation D^j(a)D^j(b) = D^j(ab) spans only the
 (2j+1)²-dimensional matrix-product contraction subspace of the full
 2(2j+1)⁴-dimensional realified bilinear space.
 
-Results (f = 0.01 pilot checkpoints; seed batch running): for SU(2), h places
-87.7% of its variance in the (½, ½) sector, and **97.7% of that sector's energy
-lies in the 4-of-16-dimensional contraction subspace**; the hidden layer
+Results (f = 0.01, now 5 seeds per condition): for SU(2), h places
+89.9 ± 1.4% of its variance in the (½, ½) sector, and **98.2 ± 0.3% of that
+sector's energy lies in the 4-of-16-dimensional contraction subspace**; the
+hidden layer
 occupies exactly the channels tensor-generated from the encoder content —
 pass-through (½, 0) and (0, ½) at ≈ 25% each, the bilinear (½, ½) at 22%, and
 small (1, 0)/(0, 1) — with all other channels at or near the floor. For SO(3):
-h has 77.1% in (1, 1) with 93.3% of it in the 9-of-81-dimensional contraction
-subspace. The interaction layer is therefore not an arbitrary bilinear coupling
+h has 77.5 ± 1.6% in (1, 1) with 93.9 ± 0.9% of it in the
+9-of-81-dimensional contraction subspace. The interaction layer is therefore not an arbitrary bilinear coupling
 of the represented sectors: it concentrates on the specific Clebsch–Gordan
 contraction that implements the group product — the network's internal algebra
 follows the representation ring.
