@@ -537,9 +537,26 @@ eight tested group forms are consistent with one statement:
 representation is irreducible; for PSU(3), a simple group, every nontrivial
 rep is faithful and the adjoint 8 is the smallest; for Spin(4), SO(3)×SU(2)
 and PSO(4) the minimal faithful representation is a two-block sum, and that is
-what is learned.) Remaining to make this production-grade: seeds for the four
-Spin(4) conditions, and the causal suite (per-block ablations should kill
-exactly the discrimination carried by each block's central character).
+what is learned.)
+
+**Block-resolved causal map (`experiments/spin4_causal.py`; one seed).** With
+tie-aware center discriminations D_L, D_R, D_LR for the three center flips
+(chance/tie 0.5), every intervention lands where the central characters place
+it. spin4: removing the (−,+) character component — equivalently
+function-ablating the (½,0) block — collapses D_L to 0.512 while D_R stays at
+1.000, and mirror for (+,−)/(0,½); D_LR survives either single ablation (the
+remaining block still sees the joint flip); the unused (½,½), (1,0), (0,1)
+ablations are no-ops. so4: only the (½,½) removal matters (task 1.000 → 0.017,
+both single-flip D's → 0.48); D_LR is an exact tie as the quotient requires.
+leftq: the two blocks separate causally — ablating (0,½) kills D_R, D_LR and
+most of the task (→ 0.555), while ablating (1,0) costs task accuracy
+(1.000 → 0.862) with all center discriminations intact: one block carries the
+SO(3)-factor geometry, the other the center charge. pso4: all D's at tie;
+each learned block carries one factor (ablations → 0.807 / 0.806,
+symmetric); everything else no-op. Each isotypic block is causally necessary
+for exactly the task component and center discrimination that representation
+theory assigns to its central character. Seeds for the four conditions are
+running (queue v6).
 
 ## 6. Interpretation and limitations
 
