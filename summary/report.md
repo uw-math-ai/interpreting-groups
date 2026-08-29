@@ -1,16 +1,15 @@
 # Learning and Interpreting Continuous Group Operations: SU(2) and its Quotient SO(3)
 
 **Status:** evolving working report for agent/collaborator handoff. Last updated
-2026-08-28. Complete so far: the pilot; the causal suite on every checkpoint; the
-candidate-count and training-fraction sweeps; five-seed replication of the four
-principal cells; and the mechanistic loop closure (Section 5.4: latent group action,
-product-state steering, cross-seed intertwiners). Queue v3 results are in
-(Section 5.5): observation-map robustness confirmed, heat-kernel bandwidth forced
-in Casimir order, and SU(3)→3⊕3̄ / PSU(3)→adjoint-8 selection observed
-(PSU(3) final numbers pending). The headline (Sections 3–4) and the
-causal double dissociation are now **replicated across 5 seeds per condition**
-(Section 5.3); Sections 5.1–5.2 results remain single-seed. `RESULTS_SU2.md` carries
-the public-facing summary; `summary/seed_summary.json` the per-seed numbers.
+2026-08-29. Complete: SU(2)/SO(3) headline + causal double dissociation (5 seeds,
+Sections 3–5.3); mechanistic loop closure (Section 5.4); observation-map
+robustness, heat-kernel bandwidth in Casimir order with the capacity verdict, and
+SU(3)/PSU(3) with the Z₃ causal dissociation, all seed-replicated
+(Section 5.5); the representation-ring/fusion result (Section 5.6, 5 seeds);
+and the Spin(4) central-quotient pilot with the minimal-dimension selection
+principle (Section 5.7, one seed; seed queue v6 running). `RESULTS_SU2.md`
+carries the public-facing SU(2) summary; `summary/seed_summary.json` the
+per-seed numbers; the task list at the end tracks what remains.
 
 ---
 
