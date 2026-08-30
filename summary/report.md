@@ -572,6 +572,27 @@ factor carrier (1,0): task 0.853 ± 0.036 with center discriminations intact;
 pso4, per-factor ablations: task 0.809 ± 0.016. T2 = 0.965–0.970 (± 0.003–0.021)
 across conditions.
 
+## 5.8 Spin(5) / SO(5) (added 2026-08-30; one seed)
+
+The fifth group of the central-quotient program: Spin(5) = Sp(2) (2×2
+quaternionic unitaries; machinery in `core/spin5.py`, self-tested), with the
+carrier-cost search's pre-registered predictions of spinor 4 vs vector 5.
+
+**spin5** (100k steps): T2 0.969; **97.1% of encoder variance in the spinor 4**
+(vector 0.3%, adjoint 1.1%), cos(z(U), z(−U)) = −0.97, spinor coefficients
+decode at R² 0.983 — as pre-registered.
+
+**so5** (100k): T2 0.605 — the largest quotient-hardness gap yet — with the
+spinor at the 0.5% floor and the carrier split **vector-5 at 68.7% + adjoint-10
+at 22.1%**. The admixture is stable, not drift: the encoding's initialization
+spectrum (5: 29%, 10: 56%) is inverted by step 15k and constant thereafter.
+The minimal carrier is strongly preferred but not purified at this budget; the
+known concentrating manipulations (larger K, smaller f) are the natural
+follow-up before treating the admixture as a qualification of the selection
+principle. Both faithful sectors being present is consistent with Lemma 1
+(any faithful carrier ranks); the principle's claim concerns the minimum-norm
+solution, which the partially-solved task (T2 0.605) has plausibly not reached.
+
 ## 6. Interpretation and limitations
 
 - **Seed replication complete for the principal cells** (Section 5.3): the headline
