@@ -49,12 +49,21 @@ Both are minimized by the same carrier in every condition run so far
 experiments to date **cannot distinguish the two cost models**. A
 discriminating experiment needs a group form whose minimal-Σd and minimal-Σd²
 faithful carriers differ, i.e. faithful options {a ⊕ b} vs {c} with
-a + b > c but a² + b² < c² (e.g. dimensions 5 ⊕ 5 vs 8). Candidate
-constructions: products of higher-rank groups and their diagonal-center
-quotients, where fundamental-pair sums compete with a single mixed-weight
-irrep; enumerating (G, Z) pairs with this property is the next theory-driven
-design task. Until then the principle should be stated as "minimal-dimension"
-with the cost functional unresolved.
+a + b > c but a² + b² < c² (e.g. dimensions 5 ⊕ 5 vs 8). An exhaustive computational search
+(`experiments/carrier_search.py`: simple groups SU(2), SU(3), SU(4),
+Sp(2), Spin(7), G2 with real-form-aware costs, all central quotients, all
+two-factor products with cyclic and full-center amalgamations, carriers of up
+to three summands) **finds no instance**: on every catalogued group form the
+two cost functionals select the same minimal faithful carrier, and the search
+reproduces all six experimentally observed selections exactly. The reasons are
+structural — in simple groups the generating-character irreps are the smallest
+irreps outright, and in products, sums dominate single irreps under both
+functionals since d₁d₂ ≥ d₁ + d₂. The selection principle is therefore
+robustly statable as "minimal faithful carrier" with the two cost functionals
+empirically indistinguishable on natural families; deciding between them is a
+theory question (open lemma 2), not an experimental one, unless a group form
+outside this catalog (three factors, exceptional centers, carriers with
+multiplicity) produces an inversion.
 
 ## 4. Two regimes, one bias
 
