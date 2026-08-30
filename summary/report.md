@@ -593,6 +593,22 @@ principle. Both faithful sectors being present is consistent with Lemma 1
 (any faithful carrier ranks); the principle's claim concerns the minimum-norm
 solution, which the partially-solved task (T2 0.605) has plausibly not reached.
 
+### 5.8a Wide-model retune verdict (t = 0.05, complete)
+
+At weight decay 0.1 the 2×-width model trains normally (the wd = 1.0 collapse
+was a regularization pathology, not a capacity limit), and its candidate-
+encoder spectrum extends beyond any default-width run — j = 5/2 and j = 3 at
+3–7%, above the floor. But both learning rates land in a memorization regime:
+train MSE 0.24 / 0.18 against test 0.56 / 0.63, versus 0.383 test for the
+default-width model trained 120k steps. The three-way conclusion for the
+heat-kernel task at this data budget: the spectral cutoff is not a hard
+capacity limit (width extends the representable spectrum) and not purely an
+optimization limit (longer default-width training keeps improving), but a
+data/regularization trade-off — extra capacity is spent memorizing the frozen
+training targets rather than sharpening the generalizing expansion. The
+natural follow-up, if the bandwidth frontier matters, is more training data
+(larger f) with the wide model.
+
 ## 6. Interpretation and limitations
 
 - **Seed replication complete for the principal cells** (Section 5.3): the headline
