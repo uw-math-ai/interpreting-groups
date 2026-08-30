@@ -94,7 +94,18 @@ converse finding: observations that do distinguish single-factor signs still
 produce no single-factor content, because the task's positive class does not
 require it. Task symmetry, not observation symmetry, sets the carrier.
 
-## 6. Open lemmas (ordered by expected difficulty)
+## 6. Resolution of the cost-model question (2026-08-30)
+
+Writing out the architecture's requirements resolves Section 3 from the theory
+side: the score needs Hilbert–Schmidt pairings of matrix blocks, so the carrier
+must be realized by full matrix coefficients — the canonical cost is the
+realified coefficient count r(V) = Σ rᵢ — and the A1 block-dimension
+measurements (exactly d² in every seed) confirm the models use this
+realization. See `summary/selection_theorem.md` for the lemmas (faithful-
+character ranking and necessity of faithfulness, both proved), the selection
+conjecture, and the NTK-Casimir remark for the regression regime.
+
+## 7. Open lemmas (ordered by expected difficulty)
 
 1. **Faithful-character ranking lemma** (formalize Section 2; elementary).
 2. **Carrier cost lower bound:** in the factorized architecture with weight
