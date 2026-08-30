@@ -506,7 +506,9 @@ spectroscopy, descent rules, orbit-averaged encodings; self-tested);
 `experiments/spin4_train.py`. Competing minimal-carrier hypotheses were
 recorded in the module docstring before running; for two conditions the
 minimal-total-dimension choice and the minimal-block-count choice disagree,
-making them discovery runs. Results (one seed, 100k steps, N = 2048, f = 0.01):
+making them discovery runs. Results (now 5 seeds per condition, 100k steps,
+N = 2048, f = 0.01; the table shows the seed-0 spectra, with distributions
+below):
 
 | condition (group) | T2 | learned sectors (FVE) | competing hypothesis (FVE) |
 |---|---|---|---|
@@ -555,8 +557,18 @@ SO(3)-factor geometry, the other the center charge. pso4: all D's at tie;
 each learned block carries one factor (ablations → 0.807 / 0.806,
 symmetric); everything else no-op. Each isotypic block is causally necessary
 for exactly the task component and center discrimination that representation
-theory assigns to its central character. Seeds for the four conditions are
-running (queue v6).
+theory assigns to its central character.
+
+**Seed replication (5 seeds per condition).** Selection is deterministic here
+as well: the learned carrier holds 0.973–0.984 (± 0.002) of encoder variance
+in every condition, and the rejected larger faithful irreps sit at
+0.0076 ± 0.0002 (leftq) and 0.0094 ± 0.0011 (pso4) in every seed. The
+load-bearing causal cells replicate with near-zero variance: spin4, ablating
+(½,0): D_L 0.507 ± 0.007 with D_R 1.000 ± 0.000; so4, ablating (½,½): task
+0.017 ± 0.001; leftq, ablating (0,½): D_R 0.493 ± 0.006, and ablating the
+factor carrier (1,0): task 0.853 ± 0.036 with center discriminations intact;
+pso4, per-factor ablations: task 0.809 ± 0.016. T2 = 0.965–0.970 (± 0.003–0.021)
+across conditions.
 
 ## 6. Interpretation and limitations
 
