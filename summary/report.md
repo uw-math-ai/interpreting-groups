@@ -666,6 +666,31 @@ has precisely the structural property that full coefficient blocks possess and
 cheaper one-sided frames lack. Whether that property is *why* full blocks are
 selected is the P1B question (frame-vs-block matched training, running).
 
+## 5.9a P1B: frame-versus-block matched training (added 2026-08-31; 5 seeds per arm)
+
+The decisive v2 retraining experiment: identical architecture and task
+(SO(3) condition, f = 0.01, 60k steps), with the observation replaced by exact
+representation features — the 6-dimensional faithful two-column frame versus
+the 9-dimensional full coefficient block (both even, standardized; encoder
+still trainable, so the frame arm is free to reconstruct the missing column
+nonlinearly — the question is what that costs).
+
+| features | T2 | margin (T2) | total param norm | margin / norm |
+|---|---|---|---|---|
+| frame, 6 dims | 0.8914 ± 0.0023 | 6.49 ± 0.05 | 26.71 ± 0.10 | 0.243 ± 0.002 |
+| block, 9 dims | 0.8891 ± 0.0027 | **7.29 ± 0.16** | **22.89 ± 0.07** | **0.319 ± 0.008** |
+
+At statistically matched accuracy, the block mechanism attains a larger
+margin at 17% lower total parameter norm — cheaper in every module (encoder
+16.7 vs 19.6, interaction 9.8 vs 11.9, scorer 12.2 vs 13.7) — i.e. 31% more
+margin per unit norm, with non-overlapping seed distributions. The plan's
+first fork fires: **the full block is the cheaper end-to-end mechanism
+despite more input coordinates**; the frame's saved storage is repaid with
+interest by the composition cost its one-sided closure forces. Together with
+P1A this gives the mechanistic explanation of full-block emergence: two-sided
+linear closure → bilinear composition and linear scoring → lower regularized
+cost at fixed margin → weight decay selects the block.
+
 ## 5.10 P4: score-level spectral recovery (added 2026-08-31; existing checkpoints)
 
 `experiments/hk_analysis.py` regresses the learned score and the exact target
@@ -691,9 +716,25 @@ filling in Casimir order**: the t = 0.05 long run's j = 2 recovery climbs
 j ≤ 3/2 relaxes (1.81 → 1.55) and j ≥ 5/2 stays at 0; likewise t = 0.3's
 j = 3/2 fills from 0.13 to 1.00 after the lower sectors. (iii) The score–
 character fit R² is 0.92–0.99 throughout: the learned score genuinely lives
-in the character algebra. Remaining for P4: the band-limited calibration run
-(known support {1, 2} — verifies support recovery and forbidden-channel
-floors) and seed replication, both in queue v8.
+in the character algebra.
+
+**Band-limited calibration (target χ₁ + ½χ₂, known support {1, 2}; 60k, wd 1.0).**
+Support recovery is exact where it should be: every out-of-support sector
+(half-integers and j ≥ 5/2) sits at a 0.0000 floor, and — a bonus
+quotient-selection check — because the target is a central-even class
+function, the model on the SU(2)-faithful encoding builds an integer-spin
+representation only (encoder FVE: spin-1 at 98.7%, spin-½ at 1%): the
+*target's* central character, not the encoding's, determines the parity
+content. The instructive deviation: the orthogonal χ₂ remainder carries 12.6%
+of target variance, and the trained model **prunes it** — partial spin-2
+recovery at 25–50k (0.33–0.44) is removed by 60k, the final test MSE (0.131)
+matching the abandoned variance almost exactly, with encoder spin-2 content
+at 0.07%. The truncation frontier is therefore not a hard bandwidth but a
+**cost/benefit boundary set by regularization**: under weight decay 1.0 the
+25-real-dimensional spin-2 block costs more norm than its 12.6% variance
+contribution is worth. Falsifiable corollary (run launched): at weight decay
+0.1 the same target should retain its spin-2 sector. Remaining for P4: that
+run, plus hk seed replication (in queue).
 
 ## 6. Interpretation and limitations
 
