@@ -732,9 +732,15 @@ matching the abandoned variance almost exactly, with encoder spin-2 content
 at 0.07%. The truncation frontier is therefore not a hard bandwidth but a
 **cost/benefit boundary set by regularization**: under weight decay 1.0 the
 25-real-dimensional spin-2 block costs more norm than its 12.6% variance
-contribution is worth. Falsifiable corollary (run launched): at weight decay
-0.1 the same target should retain its spin-2 sector. Remaining for P4: that
-run, plus hk seed replication (in queue).
+contribution is worth. The falsifiable corollary was run and confirmed: at
+weight decay 0.1 on the same target, test MSE drops 0.131 → 0.004 and the
+recovery profile is essentially exact — (1.00, 1.01, 0.94, 0.95) across the
+four orthogonalized sectors with every out-of-support floor at 0.0000 and the
+score–character fit at R² 0.997. Calibration verdict: the analysis pipeline
+recovers support and amplitudes exactly when the model retains them, and the
+truncation observed at strong regularization is a real property of the
+learned solution, not of the instrument. Remaining for P4: hk seed
+replication (in queue).
 
 ## 6. Interpretation and limitations
 
