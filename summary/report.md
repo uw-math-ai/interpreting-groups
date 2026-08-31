@@ -742,6 +742,52 @@ truncation observed at strong regularization is a real property of the
 learned solution, not of the instrument. Remaining for P4: hk seed
 replication (in queue).
 
+## 5.11 P2 verdict: the SO(5) mixture survives — the selection observation is revised (2026-08-31; queue v8 complete)
+
+The full stress test under the precommitted decision rule. Spin(5) replicates
+perfectly (5 seeds: spinor-4 at 0.964–0.973, T2 0.969–0.989). For SO(5), the
+vector+adjoint mixture is **stable in every condition tried**:
+
+| condition | T2 | FVE vector-5 | FVE adjoint-10 |
+|---|---|---|---|
+| f = 0.01, seeds 0–4 | 0.55–0.64 | 0.680–0.695 | 0.211–0.233 |
+| 200k extension (s0) | 0.620 | 0.688 | 0.214 |
+| K = 256 | 0.469 | 0.664 | 0.224 |
+| wd = 0.1 | 0.518 | 0.660 | 0.240 |
+| f = 0.03 | **0.731** | 0.707 | **0.173** |
+
+Per the rule — "do not explain away the mixture because vector-5 was
+expected" — the minimal-carrier statement is **revised**: it holds in nine of
+ten tested group forms and fails as stated for SO(5), where the learned
+carrier is a reproducible vector ⊕ adjoint mixture at every achievable
+budget. The one systematic trend is that the adjoint fraction falls as the
+task gets solved (0.23 at T2 0.55 → 0.17 at T2 0.73 under more data, the only
+manipulation that improved generalization; K and weight decay changed neither
+performance nor mixture in the helpful direction). Two hypotheses remain
+live, and the current data cannot separate them: (a) asymptotic purification
+tracking task completion — the mixture is a transient of an unsolved task;
+(b) a genuinely mixed minimum-cost end-to-end mechanism for SO(5) — which
+the v2 cost framing makes respectable, since P1B showed the selected object
+is the cheapest complete mechanism, not the smallest carrier. Deciding
+between them requires a condition that actually solves SO(5) (larger f, or a
+better-conditioned quotient encoding); the conditioning-matching diagnostics
+(Gram/Fisher spectra, candidate-hardness matching) remain to be run and are
+the other open P2 item.
+
+## 5.12 P5 first pass: multi-spin fusion structure (2026-08-31; pilot)
+
+On the multi-spin heat-kernel model (t = 0.3), the two-variable fusion
+analysis extends the Section 5.6 result: the product state h concentrates on
+the **diagonal** (j, j) sectors of the spins the score requires —
+(3/2, 3/2): 0.33, (1, 1): 0.31, (½, ½): 0.16, off-diagonal contamination
+≤ 0.03 per channel — and within (½, ½) the matrix-product contraction again
+carries 98.1%. The hidden layer occupies the tensor-generating channels
+((0,1), (1,0), (1,1), (0,3/2), (3/2,0), (3/2,3/2)). The literal
+Clebsch–Gordan test with controlled bilinearity (quadratic-activation
+interaction, where the channel decomposition is exact) is training
+(`su2hk_t0.3_quad`); the per-channel allowed/forbidden-J verdicts and channel
+ablations belong to that run's analysis.
+
 ## 6. Interpretation and limitations
 
 - **Replication status.** The SU(2)/SO(3), SU(3)/PSU(3), Spin(4)-family and fusion
