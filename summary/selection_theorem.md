@@ -60,9 +60,6 @@ implies no positive error bound — the v2 plan's caveat, adopted here. The
 causal suites verify the contrapositive block by block: ablating a block
 erases exactly the discriminations its central character sees.
 
-The causal suites verify the contrapositive block by block: ablating a block
-erases exactly the discriminations (center flips) its central character sees.
-
 ## Lemma 3 (two-sided Peter–Weyl block; complex and real forms)
 
 *Complex form. For an irreducible unitary ρ: G → U(V), the coefficient space

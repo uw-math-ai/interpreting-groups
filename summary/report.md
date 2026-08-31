@@ -666,6 +666,35 @@ has precisely the structural property that full coefficient blocks possess and
 cheaper one-sided frames lack. Whether that property is *why* full blocks are
 selected is the P1B question (frame-vs-block matched training, running).
 
+## 5.10 P4: score-level spectral recovery (added 2026-08-31; existing checkpoints)
+
+`experiments/hk_analysis.py` regresses the learned score and the exact target
+on a **sequentially orthogonalized** character design (Casimir order; raw
+character columns are near-collinear under the sampling distribution, so
+individual betas are unidentifiable — the identifiable object is the
+incremental variance per sector, which is also the natural learning-order
+statistic). "Recovery" = model's variance fraction in a sector / target's
+fraction; 1.0 = the sector carries its required relative weight.
+
+| model | recovery (j = ½, 1, 3/2, 2) | beyond |
+|---|---|---|
+| t = 0.3, 60k | 1.05, 1.05, 1.01, 0.07 | 0.000 |
+| t = 0.1, 60k | 1.47, 1.39, 1.43, 0.00 | 0.000 |
+| t = 0.05, 120k (long) | 1.58, 1.55, 1.46, **1.20** | 0.000 |
+
+Three findings. (i) **A sharp truncation frontier**: recovered sectors sit at
+ratio ≈ 1 (or above, compensating), sectors beyond the frontier at exactly 0 —
+the score is a Casimir-truncated character expansion, now measured at the
+score level rather than inferred from activations. (ii) **Sector-by-sector
+filling in Casimir order**: the t = 0.05 long run's j = 2 recovery climbs
+0.12 → 0.25 → 0.83 → 1.20 across 50k → 120k steps while the over-weighting of
+j ≤ 3/2 relaxes (1.81 → 1.55) and j ≥ 5/2 stays at 0; likewise t = 0.3's
+j = 3/2 fills from 0.13 to 1.00 after the lower sectors. (iii) The score–
+character fit R² is 0.92–0.99 throughout: the learned score genuinely lives
+in the character algebra. Remaining for P4: the band-limited calibration run
+(known support {1, 2} — verifies support recovery and forbidden-channel
+floors) and seed replication, both in queue v8.
+
 ## 6. Interpretation and limitations
 
 - **Replication status.** The SU(2)/SO(3), SU(3)/PSU(3), Spin(4)-family and fusion
