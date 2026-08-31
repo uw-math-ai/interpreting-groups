@@ -329,6 +329,65 @@ class FuncValEncoding:
         return fn
 
 
+class ExplicitFeatureEncoding:
+    """P1B: exact representation features as the observation (no scramble).
+
+    name "so3frame": two columns of R(q), 6 real dims -- a faithful frame,
+    left-linear but not right-linear-closed. name "so3block": all 9 entries of
+    R(q) -- the full real coefficient block. Both are even in q (SO(3)
+    features). Standardized with Haar statistics.
+    """
+
+    def __init__(self, name, seed=0):
+        assert name in ("so3frame", "so3block")
+        self.name = name
+        self.m = 6 if name == "so3frame" else 9
+        probe = haar(65536, np.random.default_rng(seed + 90))
+        raw = self._raw(probe)
+        self.mean, self.std = raw.mean(0), raw.std(0) + 1e-8
+
+    @staticmethod
+    def _rot(q):
+        w, x, y, z = q[..., 0], q[..., 1], q[..., 2], q[..., 3]
+        return np.stack([
+            np.stack([1 - 2 * (y * y + z * z), 2 * (x * y - z * w),
+                      2 * (x * z + y * w)], -1),
+            np.stack([2 * (x * y + z * w), 1 - 2 * (x * x + z * z),
+                      2 * (y * z - x * w)], -1),
+            np.stack([2 * (x * z - y * w), 2 * (y * z + x * w),
+                      1 - 2 * (x * x + y * y)], -1)], -2)
+
+    def _raw(self, q):
+        R = self._rot(q)
+        if self.name == "so3frame":
+            return R[..., :, :2].reshape(*q.shape[:-1], 6)
+        return R.reshape(*q.shape[:-1], 9)
+
+    def __call__(self, q):
+        return ((self._raw(q) - self.mean) / self.std).astype(np.float32)
+
+    def torch_fn(self, device):
+        import torch
+        mean = torch.tensor(self.mean, dtype=torch.float32, device=device)
+        std = torch.tensor(self.std, dtype=torch.float32, device=device)
+
+        def fn(q):
+            w, x, y, z = q.unbind(-1)
+            R = torch.stack([
+                torch.stack([1 - 2 * (y * y + z * z), 2 * (x * y - z * w),
+                             2 * (x * z + y * w)], -1),
+                torch.stack([2 * (x * y + z * w), 1 - 2 * (x * x + z * z),
+                             2 * (y * z - x * w)], -1),
+                torch.stack([2 * (x * z - y * w), 2 * (y * z + x * w),
+                             1 - 2 * (x * x + y * y)], -1)], -2)
+            if self.name == "so3frame":
+                raw = R[..., :, :2].reshape(*q.shape[:-1], 6)
+            else:
+                raw = R.reshape(*q.shape[:-1], 9)
+            return (raw - mean) / std
+        return fn
+
+
 def get_encoding(name, variant, m=32, alpha=3.0, seed=0):
     if name == "landmark":
         return LandmarkEncoding(m=m, alpha=alpha, variant=variant, seed=seed)
@@ -336,6 +395,9 @@ def get_encoding(name, variant, m=32, alpha=3.0, seed=0):
         return RandMLPEncoding(m=m, variant=variant, seed=seed)
     if name == "funcval":
         return FuncValEncoding(m=m, variant=variant, seed=seed)
+    if name in ("so3frame", "so3block"):
+        assert variant == "so3", "explicit SO(3) features are even in q"
+        return ExplicitFeatureEncoding(name, seed=seed)
     raise ValueError(name)
 
 

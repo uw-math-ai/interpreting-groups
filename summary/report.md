@@ -624,6 +624,48 @@ training targets rather than sharpening the generalizing expansion. The
 natural follow-up, if the bandwidth frontier matters, is more training data
 (larger f) with the wide model.
 
+## 5.9 P1A: two-sided latent action (added 2026-08-31; 5 seeds per condition)
+
+The v2 plan's mechanism-discrimination test (`experiments/twosided.py`): fit
+affine operators for left translation M^L_k (z(g) → z(kg)) and right
+translation M^R_k (z(g) → z(gk)) and test the properties that distinguish a
+full Peter–Weyl coefficient block — which is two-sided translation-stable, by
+the G_L × G_R-irreducibility of V* ⊠ V — from smaller one-sided faithful
+frames. Metrics: held-out left/right R², right-homomorphism defect
+(M^R_{ab} vs M^R_b M^R_a), and the commutator ‖[M^L_a, M^R_b]‖ (exactly 0 for
+a full block, since the regular actions commute). Feature systems: the trained
+dominant block; the same architecture at random initialization; the raw
+observation features; the explicit faithful frame (SO(3): two columns of the
+rotation matrix, 6 real dims; SU(2): the quaternion, 4 dims); the true full
+block (SO(3): 9 dims); and a random truncation of the true block at the
+frame's dimension.
+
+| system (SO(3) condition) | dim | left R² | right R² | hom-R defect | ‖[L,R]‖ |
+|---|---|---|---|---|---|
+| trained block | 9 | 0.989 ± 0.001 | **0.989 ± 0.001** | 0.012 | **0.012 ± 0.001** |
+| true full block | 9 | 1.000 | 1.000 | 0.000 | 0.000 |
+| faithful frame | 6 | **1.000** | **0.638** | **0.526** | 0.039 |
+| random truncation | 6 | 0.674 | 0.675 | 0.411 | 0.448 |
+| raw observations | 32 | 0.992 | 0.991 | 0.058 | 0.073 |
+| random-init encoder | 16 | 0.892 ± 0.008 | 0.890 ± 0.008 | 0.179 | 0.160 ± 0.014 |
+
+The prediction lands in full: the trained code supports accurate **commuting
+left and right linear actions** (SU(2): L = R = 0.978 ± 0.003, commutator
+0.010 ± 0.001), matching the true block and sharply separated from the
+faithful frame — which passes the left test *exactly* (left translation is
+linear on the two columns) and fails linear right closure exactly as the
+missing-column analysis predicts (right R² 0.638 ≈ the 2/3 that the
+uncorrelated third column implies; right-homomorphism defect 0.53) — and from
+the random truncation, which fails everything. A Schur-type consequence makes
+SU(2) its own control: the quaternionic block has real dimension
+(dim_R W)²/dim_R H = 4, so the minimal frame *coincides* with the full block
+and passes two-sided closure exactly — explaining, in v2 terms, why the SU(2)
+mechanism could be both minimal and fully closed while for SO(3) (real type)
+those properties part ways at 6 vs 9 dimensions. The learned representation
+has precisely the structural property that full coefficient blocks possess and
+cheaper one-sided frames lack. Whether that property is *why* full blocks are
+selected is the P1B question (frame-vs-block matched training, running).
+
 ## 6. Interpretation and limitations
 
 - **Replication status.** The SU(2)/SO(3), SU(3)/PSU(3), Spin(4)-family and fusion

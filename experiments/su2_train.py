@@ -75,13 +75,19 @@ def build_data(args, rng):
     n_eval = args.n_eval
     idx = rng.choice(n_pairs, size=M + n_eval, replace=False)
     tr, t1 = idx[:M], idx[M:]
-    if args.loss == "heatkernel":
+    if args.loss in ("heatkernel", "bandlim"):
+        target = None
+        if args.loss == "bandlim":
+            from core.su2 import wigner_character
+            js, cs = args.bl_js, args.bl_coefs
+            target = lambda rel: sum(
+                c * wigner_character(j, rel) for j, c in zip(js, cs))
         train = make_hk_set(pool[tr // args.N], pool[tr % args.N], args.K,
-                            args.hk_t, rng)
+                            args.hk_t, rng, target)
         T1 = make_hk_set(pool[t1 // args.N], pool[t1 % args.N], args.K,
-                         args.hk_t, rng)
+                         args.hk_t, rng, target)
         T2 = make_hk_set(haar(n_eval, rng), haar(n_eval, rng), args.K,
-                         args.hk_t, rng)
+                         args.hk_t, rng, target)
         # standardize targets with train-set statistics
         mu, sd = train[3].mean(), train[3].std() + 1e-8
         train = train[:3] + (((train[3] - mu) / sd).astype(np.float32),)
@@ -110,9 +116,10 @@ def build_data(args, rng):
 
 # --------------------------- heat-kernel regression data ----------------------
 
-def make_hk_set(qa, qb, K, t, rng):
+def make_hk_set(qa, qb, K, t, rng, target=None):
     """Candidates covering the kernel support (half near the product at uniform
-    radius in (0, pi/2), half Haar) with targets y = K_t(ab c^-1)."""
+    radius in (0, pi/2), half Haar) with targets y = target(ab c^-1)
+    (default: the heat kernel K_t)."""
     n = qa.shape[0]
     prod = qmul(qa, qb)
     r = rng.uniform(0.0, np.pi / 2, size=(n, K, 1))
@@ -122,8 +129,8 @@ def make_hk_set(qa, qb, K, t, rng):
     far = haar(n * K, rng).reshape(n, K, 4)
     pick = rng.random((n, K, 1)) < 0.5
     c = np.where(pick, near, far)
-    y = heat_kernel(qmul(prod[:, None, :], qconj(c)).reshape(-1, 4), t
-                    ).reshape(n, K)
+    rel = qmul(prod[:, None, :], qconj(c)).reshape(-1, 4)
+    y = (heat_kernel(rel, t) if target is None else target(rel)).reshape(n, K)
     return (qa.astype(np.float32), qb.astype(np.float32),
             c.astype(np.float32), y.astype(np.float32))
 
@@ -224,12 +231,17 @@ def main():
     p.add_argument("--alpha", type=float, default=3.0)
     p.add_argument("--enc_seed", type=int, default=0,
                    help="landmark seed, shared across variants (matched control)")
-    p.add_argument("--encoding", choices=["landmark", "randmlp", "funcval"],
+    p.add_argument("--encoding",
+                   choices=["landmark", "randmlp", "funcval", "so3frame",
+                            "so3block"],
                    default="landmark")
-    p.add_argument("--loss", choices=["infonce", "heatkernel"],
+    p.add_argument("--loss", choices=["infonce", "heatkernel", "bandlim"],
                    default="infonce")
     p.add_argument("--hk_t", type=float, default=0.05,
                    help="heat-kernel temperature for --loss heatkernel")
+    p.add_argument("--bl_js", type=float, nargs="+", default=[1.0, 2.0],
+                   help="band-limited target support (--loss bandlim)")
+    p.add_argument("--bl_coefs", type=float, nargs="+", default=[1.0, 0.5])
     p.add_argument("--spec_jmax", type=float, default=2.0,
                    help="largest spin tracked by the FVE spectroscopy")
     p.add_argument("--activation", choices=["gelu", "quadratic"], default="gelu")
@@ -265,9 +277,12 @@ def main():
 
     if args.loss == "heatkernel":
         assert args.variant == "su2", "heat-kernel target is defined on SU(2)"
+    if args.loss == "bandlim":
+        assert args.variant == "su2"
 
     enc = get_encoding(args.encoding, args.variant, m=args.m, alpha=args.alpha,
                        seed=args.enc_seed)
+    args.m = enc.m                      # explicit encodings fix their own width
     psi = enc.torch_fn(device)
 
     print(f"[{args.save_dir}] building data ...", flush=True)
@@ -289,7 +304,7 @@ def main():
     qb = torch.tensor(train[1], device=device)
     qc = torch.tensor(train[2], device=device)
     qy = (torch.tensor(train[3], device=device)
-          if args.loss == "heatkernel" else None)
+          if args.loss in ("heatkernel", "bandlim") else None)
 
     model = TripleScorer(m=args.m, d_enc=args.d_enc, enc_hidden=args.enc_hidden,
                          mlp_hidden=args.mlp_hidden,
@@ -322,7 +337,7 @@ def main():
         ptr += args.batch
 
         logits = model(psi(qa[idx]), psi(qb[idx]), psi(qc[idx]))
-        if args.loss == "heatkernel":
+        if args.loss in ("heatkernel", "bandlim"):
             loss = F.mse_loss(logits, qy[idx])
         else:
             loss = F.cross_entropy(
@@ -334,7 +349,7 @@ def main():
         if step % args.eval_every == 0 or step == 1:
             model.eval()
             rec = {"step": step, "loss": float(loss.item())}
-            if args.loss == "heatkernel":
+            if args.loss in ("heatkernel", "bandlim"):
                 rec["mse_train"] = regression_mse(model, psi, train_sub, device)
                 rec["mse_T1"] = regression_mse(model, psi, T1, device)
                 rec["mse_T2"] = regression_mse(model, psi, T2, device)
@@ -348,6 +363,18 @@ def main():
                         f"T2 {rec['acc_T2']:.3f}")
             for r, ps in T3.items():
                 rec[f"acc_T3_r{r}"] = ranking_accuracy(model, psi, ps, device)
+            for mod, name in [(model.enc, "enc"), (model.interact, "int"),
+                              (model.enc_c, "encc")]:
+                rec[f"norm_{name}"] = float(torch.sqrt(sum(
+                    (p ** 2).sum() for p in mod.parameters())).item())
+            if args.loss == "infonce":
+                with torch.no_grad():
+                    a = torch.tensor(T2[0][:2048], device=device)
+                    b = torch.tensor(T2[1][:2048], device=device)
+                    c = torch.tensor(T2[2][:2048], device=device)
+                    lg = model(psi(a), psi(b), psi(c))
+                    rec["margin_T2"] = float(
+                        (lg[:, 0] - lg[:, 1:].max(1).values).mean().item())
             if step % args.spec_every == 0 or step == 1:
                 rec.update(spectroscopy(model, psi, probe_q, bases, device))
             rec["wall_s"] = round(time.time() - t0, 1)
