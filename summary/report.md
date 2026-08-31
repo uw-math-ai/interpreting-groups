@@ -1,17 +1,26 @@
-# Learning and Interpreting Continuous Group Operations: SU(2) and its Quotient SO(3)
+# Learning and Interpreting Continuous Group Operations: Compact Groups and their Central Quotients
 
 **Status:** evolving working report for agent/collaborator handoff. Last updated
-2026-08-30. Complete: SU(2)/SO(3) headline + causal double dissociation (5 seeds,
+2026-08-31. Complete: SU(2)/SO(3) headline + causal double dissociation (5 seeds,
 Sections 3–5.3); mechanistic loop closure (Section 5.4); observation-map
-robustness, heat-kernel bandwidth in Casimir order with the capacity verdict, and
-SU(3)/PSU(3) with the Z₃ causal dissociation, all seed-replicated
-(Section 5.5); the representation-ring/fusion result (Section 5.6, 5 seeds);
-and the Spin(4) central-quotient program with the minimal-dimension selection
-principle and its block-resolved causal map, seed-replicated (Section 5.7,
-5 seeds per condition). Theory synthesis and open lemmas:
-`summary/theory_notes.md`. `RESULTS_SU2.md`
-carries the public-facing SU(2) summary; `summary/seed_summary.json` the
-per-seed numbers; the task list at the end tracks what remains.
+robustness, heat-kernel bandwidth in Casimir order with the capacity and
+wide-retune verdicts (Sections 5.5, 5.8a); SU(3)/PSU(3) with the Z₃ causal
+dissociation, seed-replicated (Section 5.5c); the representation-ring/fusion
+result (Section 5.6, 5 seeds); the Spin(4) central-quotient program with the
+minimal-carrier selection observation and block-resolved causal map (Section
+5.7, 5 seeds); the Spin(5)/SO(5) pilot (Section 5.8, one seed — the SO(5)
+mixture is an open stress test); and the carrier-cost search (null result,
+Section 5.7/theory notes). Theory: `summary/theory_notes.md` and
+`summary/selection_theorem.md`. The program now operates under the v2 research
+plan (archived at `ideas/research_plan_2026-08-30_v2.md`), whose central
+question is no longer whether representations emerge but **which end-to-end
+mechanism — feature system plus composition law plus scorer — regularized
+optimization selects, under what complexity cost**; Section 8 tracks the
+v2 workstreams (P0 hygiene, P1 two-sided closure and frame-vs-block, P2 SO(5)
+conditioning, P3 theory, P4 quantitative spectral bias, P5 literal
+Clebsch–Gordan). `summary/results_bundle.json` is the compact tracked bundle
+from which headline tables regenerate; `RESULTS_SU2.md` carries the
+public-facing SU(2) summary.
 
 ---
 
@@ -314,8 +323,9 @@ a representation" (`experiments/su2_mechanism.py`; per-run JSONs
 k we fit affine maps T_k with z(kg) ≈ T_k(z(g)) on a probe set and evaluate held
 out. The activations concentrate on a low-dimensional subspace (99.9% of variance
 in 9–14 PCA dimensions), and the dominant isotypic block has *exactly* the
-dimension of the realified fundamental irrep in every seed: 4 (SU(2)) and
-9 (SO(3)). On that block the fitted translation operators match the irrep
+Schur-corrected real coefficient-block dimension in every seed:
+dim_R M_W = (dim_R W)²/dim_R End_G(W) = 16/4 = 4 for SU(2) spin-½
+(quaternionic type) and 9/1 = 9 for the SO(3) vector (real type). On that block the fitted translation operators match the irrep
 matrices up to a fixed change of basis, measured basis-invariantly:
 tr W̃_k versus d_j·χ_j(k) has correlation 1.0000 ± 0.0000 (relative error
 1.1 ± 0.1%), and the eigenvalue phases of W̃_k match those of d_j copies of
@@ -482,8 +492,10 @@ Functions on G×G decompose into (j_a, j_b) sectors under the two-sided action
 computes the two-variable spectroscopy of the interaction MLP's hidden layer
 and output h, plus a fusion-selectivity statistic: within the diagonal (j, j)
 sector, the composed representation D^j(a)D^j(b) = D^j(ab) spans only the
-(2j+1)²-dimensional matrix-product contraction subspace of the full
-2(2j+1)⁴-dimensional realified bilinear space.
+matrix-product contraction subspace of the full realified (j, j) sector — 4 of
+16 real dimensions for SU(2) (j = ½, quaternionic type) and 9 of 81 for SO(3)
+(j = 1, real type); sector dimensions are the measured ranks of the sampled
+realified product basis and depend on Schur type.
 
 Results (f = 0.01, now 5 seeds per condition): for SU(2), h places
 89.9 ± 1.4% of its variance in the (½, ½) sector, and **98.2 ± 0.3% of that
@@ -586,12 +598,15 @@ decode at R² 0.983 — as pre-registered.
 spinor at the 0.5% floor and the carrier split **vector-5 at 68.7% + adjoint-10
 at 22.1%**. The admixture is stable, not drift: the encoding's initialization
 spectrum (5: 29%, 10: 56%) is inverted by step 15k and constant thereafter.
-The minimal carrier is strongly preferred but not purified at this budget; the
-known concentrating manipulations (larger K, smaller f) are the natural
-follow-up before treating the admixture as a qualification of the selection
-principle. Both faithful sectors being present is consistent with Lemma 1
-(any faithful carrier ranks); the principle's claim concerns the minimum-norm
-solution, which the partially-solved task (T2 0.605) has plausibly not reached.
+The minimal carrier is strongly preferred but not purified at this budget.
+Under the v2 plan this condition is treated as a **stress test with a
+precommitted decision rule** (Section 8, P2): if well-conditioned,
+high-performing SO(5) models purify toward vector-5 the minimal-carrier
+observation strengthens; if the vector+adjoint mixture survives replication
+and conditioning-matched training, the observation must be revised — the
+mixture is not to be explained away because vector-5 was expected. Both
+faithful sectors being present is consistent with the faithful-character lemma
+(any faithful carrier ranks).
 
 ### 5.8a Wide-model retune verdict (t = 0.05, complete)
 
@@ -611,104 +626,111 @@ natural follow-up, if the bandwidth frontier matters, is more training data
 
 ## 6. Interpretation and limitations
 
-- **Seed replication complete for the principal cells** (Section 5.3): the headline
-  and causal results hold in 5/5 seeds per condition. The K sweep and the
-  training-fraction sweep remain single-seed.
-- **Evenness of the SO(3) control is by construction.** An even input forces an even
-  learned representation, so the absence of half-integer blocks in the control is
-  necessary, not discovered. The informative content is (i) on the SU(2) side — the
-  model is not forced to build a dominant, clean spinor block, yet does — and (ii) the
-  identity of what each condition builds: the lowest faithful irrep of the respective
-  group, followed by the next irreps in Casimir order. The designed causal version of
-  the double-cover claim (ablate the spin-½ block; measure loss of ±q discrimination)
-  is Task 2.
-- **The spectra alone are correlational; Section 4 addresses this in part.** FVE
-  concentration locates information but does not identify the algorithm (Stander et
-  al., arXiv:2312.06581, showed coset circuits reproduce isotypic signatures; Wu et
-  al., arXiv:2410.07476, showed causal patching can also under-determine the
-  mechanism). The Section 4 results — necessity of the spin-½ block, sufficiency of a
-  single character to explain the scores, and the composition test with shuffled
-  controls — go substantially beyond spectra, but per-argument equivariance (Task 5)
-  and replication across seeds remain outstanding before mechanism-level claims are
-  made with confidence.
-- **Resolution is bounded by the training noise.** No model ranks accurately at
-  r ≤ 0.05 (near chance); whether any training regime yields resolution below the
-  target noise scale σ is open (Task 6).
+- **Replication status.** The SU(2)/SO(3), SU(3)/PSU(3), Spin(4)-family and fusion
+  results hold in 5/5 seeds per condition, including the causal cells. Single-seed:
+  the K sweep, the training-fraction sweep, Spin(5)/SO(5), and the heat-kernel
+  temperature sweep (seed replication of the latter two is scheduled under P2/P4).
+- **Evenness of the quotient controls is by construction.** A Z-invariant input
+  forces a Z-invariant representation, so the absence of forbidden sectors is the
+  exact null constraint (descent rule), not a discovery. The discoveries are the
+  selection among allowed sectors, its determinism across seeds, and the causal
+  block-to-character assignment.
+- **"Minimal faithful carrier" is a selection observation, not a mechanism law.**
+  The v2 plan's correction stands at the head of the program: a mechanism need not
+  store a full coefficient block at all — smaller faithful frames (SO(3): two
+  columns, 6 real dims; SU(3): two columns, 12) separate the group with fewer
+  coordinates but lose linear closure under right translation. What the experiments
+  have established is that trained models build full Schur-corrected coefficient
+  blocks (measured block dimensions exactly 4/9; two-sided closure now under direct
+  test in Section 8, P1A) — why optimization prefers them over cheaper frames is
+  the open cost-identification question (P1B).
+- **Quotient hardness is confounded until conditioning is matched.** The uniform
+  cover-easier-than-quotient pattern (SU(2)>SO(3), SU(3)>PSU(3), Spin(5)>SO(5))
+  may reflect observation geometry, candidate geometry, or optimization rather
+  than representation selection; P2 measures and matches Gram spectra, candidate
+  hardness, and nearest-neighbor baselines before drawing conclusions.
+- **Resolution is bounded by the training noise.** No ranking model resolves below
+  the target noise scale σ; the heat-kernel line (P4) is the controlled setting for
+  spectral-resolution questions.
 
-## 7. Task list (evolving)
+## 7. Historical task list (v1, closed)
 
-Standing policy: **every reported experiment uses ≥5 seeds**; pilot (1-seed) results
-must be labeled as such. Tasks are ordered roughly by priority; none is committed to a
-particular sweep — they are a menu for future runs.
+All thirteen v1 tasks are either complete (1–5, 6 via the heat-kernel line, 8,
+9) or superseded/deprioritized by the v2 plan (7 pool-size sweep; 10 topology;
+11 quadratic variant — subsumed by P5's controlled-bilinearity requirement;
+12 transformer variant; 13 theory — continued as P3). See git history for the
+v1 list.
 
-1. **Seed replication of the pilot.** *Complete (Section 5.3).* Remaining: seeds for
-   the K sweep and the training-fraction sweep if those become load-bearing claims.
-2. **Causal double-cover test.** *Complete, including the product locus
-   (Sections 4 and 5.4b).*
-3. **Logit–character fit.** *Complete for ranking (Section 4).* Remaining:
-   quantitative comparison of fitted coefficients against the heat-kernel envelope,
-   now part of the D1 analysis (queue v3).
-4. **Composition test.** *Complete, including the patched/steering version
-   (Section 5.4b).* Remaining: the SO(3) case with a rotation-matrix composition
-   step (low priority; the D^1 fit-patch already covers the causal content).
-5. **Per-argument equivariance / latent group action.** *Complete (Section 5.4a):
-   translation operators fitted, homomorphism verified, and matched to the irrep
-   matrices basis-invariantly.*
-6. **Resolution/bandwidth sweep (revised after Section 5.1).** The K sweep showed
-   that ranking resolution does not require higher spins (the fundamental character
-   is monotone in distance), so bandwidth selection must be tested with an objective
-   whose optimum genuinely contains higher spins — e.g. regressing the heat-kernel
-   density value K_t(ab c⁻¹) itself, or classification against *structured* (not
-   Haar) negative distributions whose Bayes scorer is non-monotone. Sweep t and
-   measure which characters the fitted score uses.
-7. **Pool-size sweep with exact finite subgroups.** N ∈ {120 (= 2I, exactly closed),
-   512, 2048, 8192} at fixed pair count; connects the finite-group regime of
-   `RESULTS.md` to the continuous regime, and tests whether the critical pair count is
-   set by spectral content rather than pool size.
-8. **Delayed-generalization (grokking) search.** *In progress (queue item 2:
-   f ∈ {0.001, 0.0005, 0.0002}).* Remaining: inflated initialization scale
-   (Omnigrok, arXiv:2210.01117) and rougher encoding kernels if the f-sweep alone
-   does not produce a delayed transition.
-9. **Encoding robustness.** Replicate the pilot with an independent observation map
-   (e.g., the group acting on a generic function on S³, with an even function as the
-   SO(3) control) to confirm the results are not artifacts of the landmark encoding.
-   Related: explain finding (d) (why the quotient task is harder).
-10. **Topology of the learned representation.** Persistent homology of {z(g)} against
-    the Betti profile of S³ (β = 1,0,0,1) with permutation nulls and geodesic
-    distances; the projective-coordinates diagnostic (presence of a ℤ/2 class in H¹)
-    separates S³ from RP³ = SO(3).
-11. **Quadratic-activation variant.** With x ↦ x² activations the interaction layer
-    can implement irrep tensor products exactly (Clebsch–Gordan); an analytic
-    weight construction exists in principle (cf. Gromov, arXiv:2301.02679). Compare
-    the trained solution against the construction.
-12. **Transformer variant.** Re-run the pilot with the repo's 1-layer transformer
-    (`core/model.py`) consuming Ψ-projected inputs, for architectural continuity with
-    `RESULTS.md` and arXiv:2607.07066.
-13. **Theory.** Extend the max-margin analysis of Morwani et al. (arXiv:2311.07568)
-    and/or the Fourier-recovery theorem of Marchetti et al. (arXiv:2312.08550) from
-    finite groups to compact groups (Haar-integral versions); the pilot's spectra are
-    the empirical target.
+## 8. v2 workstreams (active; plan at `ideas/research_plan_2026-08-30_v2.md`)
 
-**Big picture.** The through-line of the repo: networks trained on algebraic operations
-represent elements via irreducible representations and compute via them — established
-for monoids (arXiv:2607.07066) and finite groups (`RESULTS.md`), now extended to a
-compact Lie group, where the representation theory is infinite and the model must
-truncate it. The distinctive contributions available here, in order of ambition:
-(1) the double cover — a global-topology property, invisible at the Lie-algebra level,
-read out of a learned representation; (2) bandwidth selection — which irreps a network
-uses as a function of task precision, with an analytic (heat-kernel) prediction;
-(3) recovery of the group manifold S³ itself from the trained network. All three should
-ultimately rest on causal evidence (Tasks 2–5), not spectra alone.
+Standing policy unchanged: ≥5 seeds for reported results; pilots labeled.
+
+- **P0 — hygiene/auditability.** Tracked results bundle
+  (`summary/results_bundle.json`, regenerated by
+  `experiments/export_bundle.py`: per-run config, seed, checkpoint hash, final
+  metrics, causal/mechanism/fusion JSONs); pytest suite (`tests/`) wrapping the
+  representation-theory self-tests; ridge probes now select λ on a validation
+  split and report on a disjoint test split; Schur-type dimensionality
+  terminology corrected throughout (real block dim = (dim_R W)²/dim_R End_G(W)).
+- **P1A — two-sided latent action (existing checkpoints).**
+  `experiments/twosided.py`: fit left AND right translation operators; test
+  left/right homomorphisms and the commutation [T^L_a, T^R_b] ≈ 0; baselines:
+  raw observations, random-init encoders, explicit faithful frames, and
+  matched-dimension random truncations of the true block. Interpretive role:
+  mechanism discrimination — does the learned code have exactly the two-sided
+  linear closure that distinguishes full coefficient blocks from smaller
+  one-sided faithful frames?
+- **P1B — matched frame-vs-block training.** SO(3) with fixed 6-dim two-column
+  frame features versus fixed 9-dim full-matrix features, all else matched;
+  measure end-to-end cost (loss, margin, module norms, convergence, seed
+  stability). Forks and falsifiers per the plan; no canonical cost predefined.
+- **P2 — SO(5) conditioning stress test.** ≥5 seeds both conditions; f/K/budget
+  variations; conditioning diagnostics (Gram spectra, distance distributions,
+  NN baselines); precommitted decision rule for the vector+adjoint mixture.
+- **P3 — theory.** Two-sided block lemma (complex + real Schur form) added to
+  `summary/selection_theorem.md`; tr dV(X) statement corrected (purely
+  imaginary in general; zero for the semisimple groups used here); the
+  necessity lemma now carries explicit sampling/continuity assumptions
+  (continuous candidate distributions can make exact kernel ambiguities
+  measure-zero).
+- **P4 — quantitative spectral bias.** Score-level coefficient recovery
+  â_j(t)/(d_j e^{−t j(j+1)}) on the heat-kernel models
+  (`experiments/hk_analysis.py`), learning-order curves, j_cut ~ t^{−1/2};
+  calibration first on a band-limited target with exactly known support;
+  seed replication.
+- **P5 — literal Clebsch–Gordan.** Off-diagonal fusion channels
+  (j₁ ⊗ j₂ decompositions with allowed/forbidden-J verdicts and causal
+  channel ablations) on the multi-spin heat-kernel models, where the encoder
+  genuinely carries several spins.
+- **P6 — new groups only when they discriminate predeclared cost theories.**
+
+**Big picture (v2).** Established: networks trained on compact-group
+composition develop causal representation-theoretic mechanisms sensitive to
+the global form of the group, concentrating on small faithful carriers allowed
+by the quotient, computing by the representation's own composition law.
+Open: why optimization selects the particular feature system it does once the
+cost of implementing the group law is counted together with the cost of
+storing the features — with two-sided linear closure of full Peter–Weyl blocks
+as the leading candidate explanation, and quotient conditioning and spectral
+bias as first-class companion questions.
 
 ## Appendix: repository pointers
 
-- `core/su2.py` — quaternion/SU(2) utilities, exact Wigner D^j, FVE machinery,
-  encodings (self-tests: `uv run python -m core.su2`).
-- `core/su2_model.py` — the encoder-factorized scorer.
-- `experiments/su2_train.py` — training driver (all evaluation tiers + spectroscopy
-  logged to `log.jsonl`; `--resume` supported; checkpoints include optimizer state).
-- `experiments/run_su2_pilot.sh` — the four-run pilot (launch detached with `setsid`).
-- `data/su2/<run>/` — logs and checkpoints (not in git).
-- `RESULTS_SU2.md` — public-facing pilot write-up; `RESULTS.md` — finite-group results.
-- `ideas/` (not in git) — literature review (`continuous_groups_review.md`), design
-  decisions (`grilling-08-03.md`), earlier brainstorm (`gpt_notes.txt`).
+- Group machinery (each with `uv run python -m core.<mod>` self-tests):
+  `core/su2.py` (Wigner D^j incl. half-integer, encodings, heat kernel),
+  `core/su3.py`, `core/spin4.py`, `core/spin5.py`; `core/su2_model.py` (scorer).
+- Training drivers: `experiments/{su2,su3,spin4,spin5}_train.py`
+  (`--resume`; checkpoints include optimizer state); queue scripts
+  `experiments/run_queue_v*.sh` (launch detached with `setsid`).
+- Analysis: `experiments/su2_causal.py`, `su3_causal.py`, `spin4_causal.py`
+  (interventions), `su2_mechanism.py` (A1/A2/A4), `twosided.py` (P1A),
+  `su2_fusion.py` (representation ring), `hk_analysis.py` (P4),
+  `carrier_search.py` (cost-model search), `su2_seed_summary.py`,
+  `export_bundle.py` (P0 bundle).
+- Theory: `summary/theory_notes.md`, `summary/selection_theorem.md`.
+- Tracked results: `summary/results_bundle.json`, `summary/seed_summary.json`.
+- `data/<group>/<run>/` — logs/checkpoints (not in git); `tests/` — pytest suite.
+- `RESULTS_SU2.md` — public-facing SU(2) summary; `RESULTS.md` — finite groups.
+- `ideas/` (not in git) — literature review, design decisions, archived plans
+  (`research_plan_2026-08-09.md`, `research_plan_2026-08-30_v2.md`,
+  `understanding_notes_2026-08-30.md`).

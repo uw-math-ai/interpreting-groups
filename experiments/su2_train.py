@@ -163,22 +163,32 @@ def regression_mse(model, psi, hk_set, device, batch=None):
 
 
 def ridge_r2(Z, Y, lams=(1e-3, 1e-2, 1e-1, 1.0, 10.0, 100.0)):
-    """Held-out R^2 of ridge Z -> Y with an 80/20 split and lambda grid."""
+    """Held-out R^2 of ridge Z -> Y with a 60/20/20 train/validation/test
+    split: lambda is selected on the validation split and R^2 reported on the
+    disjoint test split (plan P0 — no hyperparameter selection on the
+    reporting split)."""
     n = Z.shape[0]
-    n_tr = int(0.8 * n)
-    Ztr, Zte = Z[:n_tr], Z[n_tr:]
-    Ytr, Yte = Y[:n_tr], Y[n_tr:]
+    n_tr, n_va = int(0.6 * n), int(0.8 * n)
+    Ztr, Zva, Zte = Z[:n_tr], Z[n_tr:n_va], Z[n_va:]
+    Ytr, Yva, Yte = Y[:n_tr], Y[n_tr:n_va], Y[n_va:]
     mu_z, mu_y = Ztr.mean(0), Ytr.mean(0)
-    Ztr, Zte, Ytr_c = Ztr - mu_z, Zte - mu_z, Ytr - mu_y
+    Ztr, Zva, Zte = Ztr - mu_z, Zva - mu_z, Zte - mu_z
+    Ytr_c = Ytr - mu_y
     G = Ztr.T @ Ztr
-    best = -np.inf
+    XtY = Ztr.T @ Ytr_c
+
+    def r2_of(W, Zs, Ys):
+        pred = Zs @ W + mu_y
+        return 1.0 - ((Ys - pred) ** 2).sum() / ((Ys - Ys.mean(0)) ** 2).sum()
+
+    best_lam, best_val = lams[0], -np.inf
+    Ws = {}
     for lam in lams:
-        W = np.linalg.solve(G + lam * np.eye(G.shape[0]), Ztr.T @ Ytr_c)
-        pred = Zte @ W + mu_y
-        ss_res = ((Yte - pred) ** 2).sum()
-        ss_tot = ((Yte - Yte.mean(0)) ** 2).sum()
-        best = max(best, 1.0 - ss_res / ss_tot)
-    return float(best)
+        Ws[lam] = np.linalg.solve(G + lam * np.eye(G.shape[0]), XtY)
+        v = r2_of(Ws[lam], Zva, Yva)
+        if v > best_val:
+            best_lam, best_val = lam, v
+    return float(r2_of(Ws[best_lam], Zte, Yte))
 
 
 @torch.no_grad()

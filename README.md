@@ -46,12 +46,15 @@ concentrate in the *specific* geometric irrep — grokking alone is not enough.
 
 Full write-up: **[RESULTS.md](RESULTS.md)**.
 
-**New — continuous groups:** the same program extended past finite groups: train on
-(approximate) **SU(2) composition** with continuous encodings and a matched **SO(3)
-control** (one `abs()` apart), and the network builds each group's own Peter–Weyl
-representation theory — **half-integer spin sectors emerge only for the double
-cover**. Pilot write-up: **[RESULTS_SU2.md](RESULTS_SU2.md)**; code in
-`core/su2*.py`, `experiments/su2_train.py`.
+**New — continuous groups:** the same program extended past finite groups, now
+covering **SU(2)/SO(3), SU(3)/PSU(3), Spin(4) and its three central quotients,
+and Spin(5)/SO(5)**: networks trained on compact-group composition with generic
+continuous encodings build each group's own Peter–Weyl representation theory —
+half-integer spins emerge only for the double cover, center charge is causally
+necessary exactly where representation theory places it, and selection among
+faithful carriers is deterministic across seeds. SU(2) summary:
+**[RESULTS_SU2.md](RESULTS_SU2.md)**; full working report and theory notes:
+`summary/`; code in `core/{su2,su3,spin4,spin5}.py` and `experiments/`.
 
 ## Repository layout
 
