@@ -1,0 +1,519 @@
+\documentclass{article}
+
+\usepackage[final]{neurips_2024}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{microtype}
+\usepackage[capitalize,noabbrev]{cleveref}
+\crefformat{equation}{(#2#1#3)}
+
+\newtheorem{lemma}{Lemma}
+\newtheorem{conjecture}{Conjecture}
+\crefname{lemma}{Lemma}{Lemmas}
+\crefname{conjecture}{Conjecture}{Conjectures}
+
+\DeclareMathOperator{\End}{End}
+\newcommand{\SU}{\mathrm{SU}}
+\newcommand{\SO}{\mathrm{SO}}
+\newcommand{\PSU}{\mathrm{PSU}}
+\newcommand{\Spin}{\mathrm{Spin}}
+\newcommand{\PSO}{\mathrm{PSO}}
+\newcommand{\Sp}{\mathrm{Sp}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\HH}{\mathbb{H}}
+
+\title{Neural networks trained on compact group composition\\
+learn the global form of the group}
+
+\author{%
+  UW Math AI Lab\\
+  University of Washington\\
+  \texttt{zengrf2000@gmail.com}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Small neural networks trained to identify products in a compact Lie group,
+observed only through a generic scrambled encoding, build the irreducible
+representations of the group's global form: across ten group forms drawn
+from $\SU(2)$, $\SU(3)$, $\Spin(4)$, and $\Spin(5)$ and their central
+quotients, the learned code concentrates on a small faithful carrier
+determined by the quotient, with half-integer spins present exactly when
+the data distinguish the double cover, deterministically across seeds. The
+code is the full matrix-coefficient block of its carrier and supports
+commuting linear left and right translation actions that smaller faithful
+frames provably lack. In a matched comparison on $\SO(3)$, the block attains a larger margin
+than a faithful frame at $17\%$ lower parameter norm, so training selects
+it as the cheaper complete mechanism. Under regression onto heat-kernel
+targets, the same architecture fills isotypic sectors in order of Casimir
+eigenvalue, with a truncation frontier set by the weight decay rather than
+by capacity.
+\end{abstract}
+
+\section{Introduction}
+\label{sec:intro}
+
+A compact Lie group carries a canonical harmonic analysis: by the
+Peter--Weyl theorem, the matrix coefficients of its irreducible unitary
+representations span a dense subspace of $L^2$
+\cite[Ch.~III]{brocker1985}. For \emph{finite} groups, mechanistic
+interpretability has established that small networks trained on the
+multiplication table represent elements through matrix coefficients of a
+few irreducible representations \cite[Sec.~4]{chughtai2023}, that
+competing descriptions of the same models exist \cite[Sec.~5]{stander2024},
+and that per-argument equivariance reconciles them \cite{wu2024}. All of
+this work presupposes a finite table and one learned embedding per element,
+the setting of the grokking literature
+\cite{power2022, nanda2023, gromov2023, zhong2023}, and the associated
+theory proves irreducible features emerge for finite groups only
+\cite{morwani2024, marchetti2024}, while equivariant architectures place
+the harmonics into the network by construction \cite{cohen2016, geiger2022}.
+Whether this representation theory emerges in a generic network when the
+group is a continuum has remained open.
+
+In this paper, we train encoder-factorized scorers to identify products in
+compact groups presented only through frozen generic observation maps, and
+we analyze the learned representations. Three results follow.
+
+\textbf{The learned carrier identifies the global form of the group.}
+For each central subgroup $Z \subseteq Z(G)$, averaging the observation
+map over $Z$ realizes the same task on the quotient $G/Z$. Across ten
+group forms (\cref{tab:carriers}), the encoder concentrates $93$--$98\%$
+of its variance on a small faithful carrier of the task group, identically
+in every seed, with forbidden sectors at the measurement floor, and
+ablating the carrier destroys exactly the discriminations its central
+character supports (\cref{sec:carriers}).
+
+\textbf{The learned code is the full two-sided coefficient block.}
+The active subspace has exactly the real dimension
+$(\dim_\R W)^2/\dim_\R \End_G(W)$ of the full coefficient block of its
+carrier $W$, and fitted left and right translation operators fit at
+held-out $R^2 \geq 0.98$ and commute, which characterizes the full block
+within its sector (\cref{lem:twosided}). A faithful frame passes the left
+test and fails linear right closure, and in matched training the block
+attains a larger margin at $17\%$ lower parameter norm (\cref{sec:block}):
+optimization selects the block not as the smallest separating code, which
+it is not, but as the cheapest complete mechanism.
+
+\textbf{Regression targets reveal a Casimir-ordered spectral bias with a
+regularization-set frontier.} Trained to regress heat-kernel values
+$K_t(ab\,c^{-1})$, the same architecture builds multi-sector codes whose
+score-level spectral profile recovers the required sectors at their required
+weights up to a sharp cutoff, the cutoff advances sector by sector in order
+of Casimir eigenvalue during training, and on a band-limited target the
+in-support sector that weight decay $1.0$ prunes is retained at weight decay
+$0.1$ (\cref{sec:spectral}).
+
+Our methods are standard. What is new is the object, a continuum group
+with no embedding table, the quotient construction that turns the global
+form into an experimental variable, and the two-sided translation test of
+\cref{sec:block}. The rest of this paper is organized as follows. In \cref{sec:setup}, we
+fix the task and the spectroscopy. In
+\cref{sec:carriers,sec:block,sec:spectral}, we present the carrier,
+mechanism, and spectral results. In \cref{sec:limits}, we state the open
+problems. Proofs and experimental details appear in the appendices.
+
+\section{Task, observations, and spectroscopy}
+\label{sec:setup}
+
+Throughout, $G$ denotes a compact Lie group with Haar probability
+measure, $Z \subseteq Z(G)$ a central subgroup, $W$ an irreducible real
+representation of $G$ with commutant $\End_G(W) \in \{\R, \C, \HH\}$,
+$z(g) \in \R^{128}$ the trained argument-encoder activations, and
+$\chi_\rho$ the character of an irreducible unitary representation
+$\rho$.
+
+\textbf{Task.} Given encodings of $a, b \in G$ and of $K = 64$
+candidates, the model must identify the product. The positive candidate is
+$(ab)\exp(\xi)$ with $\xi$ a centered Gaussian of scale $\sigma = 0.2$
+on the Lie algebra, the $K - 1$ negatives are Haar samples excluded from a
+ball around the positive class, and the loss is cross-entropy over the $K$
+scores. Training pairs come from a pool of $2048$ Haar elements, and we
+report ranking accuracy on pairs of fresh elements never seen in training.
+
+\textbf{Observations.} Each element is presented through a frozen map
+$\Psi$ rather than a token, for $\SU(2)$ the map
+$\Psi(q)_i = \exp(\alpha \langle q, h_i\rangle)$ with $32$ fixed Haar
+landmarks $h_i$ and $\alpha = 3$, standardized under Haar statistics. The
+quotient condition for $G/Z$ replaces $\Psi$ by its average over the
+$Z$-orbit, which is exactly $Z$-invariant, so the observations determine
+elements of $G/Z$ and nothing finer, with all else shared. Every result
+below reproduces under two further observation maps (\cref{app:details}),
+so the selected carrier is a property of the task and the group.
+
+\textbf{Model.} An encoder-factorized scorer with about $0.3$M
+parameters: a shared two-layer GELU encoder produces $z(a), z(b)$, an
+interaction network produces $h(a,b) \in \R^{128}$, a candidate encoder
+produces $z_c(c)$, and the score is $\langle h(a,b), z_c(c)\rangle$,
+trained by AdamW with weight decay $1.0$ unless stated. Every reported
+quantity is a mean over five seeds with its standard deviation.
+
+\textbf{Spectroscopy.} For a fixed probe set of Haar samples, we compute
+the fraction of variance of the centered activations $z$ explained by the
+sampled, jointly orthonormalized spans of matrix coefficients, sector by
+sector in Casimir order, with exact coefficients verified in a unit-test
+suite (\cref{app:details}) and a sampling floor near $0.2\%$. Activations
+are real, so a complex irreducible and its conjugate span one real sector
+of dimension $(\dim_\R W)^2 / \dim_\R \End_G(W)$ (\cref{lem:twosided}).
+
+\section{The learned carrier identifies the global form}
+\label{sec:carriers}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{figure1.pdf}
+\caption{(a) Isotypic spectra of the trained encoder for the $\SU(2)$ and
+$\SO(3)$ conditions (five seeds). (b) Score-level spectral recovery for
+heat-kernel and band-limited targets. Values near $1$ indicate a sector
+carried at its required weight, and the dashed curve shows the in-support
+spin-$2$ sector pruned at weight decay $1.0$.}
+\label{fig:main}
+\end{figure}
+
+Across the ten group forms of \cref{tab:carriers}, the encoder
+concentrates on a small faithful carrier of the task group, deterministically
+across seeds. The half-integer sector of $\SU(2)$ appears if and only if
+the observations distinguish $\pm g$, with $\cos(z(g), z(-g)) = -0.95 \pm
+0.02$ against $+1.000$ in the quotient condition, so the learned code
+detects the double cover, a property invisible to the Lie algebra. When the
+center is not cyclic, no faithful irreducible representation exists, and
+the models build the forced direct sum. Where a smaller reducible faithful
+sum competes against a larger faithful irreducible representation, the sum
+wins, with the alternative under $1\%$ of variance in every seed.
+
+\begin{table}[t]
+\centering
+\caption{Learned carriers across ten group forms, with the fraction of
+encoder variance on the carrier (mean over five seeds) and the rejected
+faithful alternative where one exists. $\Spin(4)$ sectors are pairs
+$(j_L, j_R)$.}
+\label{tab:carriers}
+\scriptsize
+\setlength{\tabcolsep}{4.5pt}
+\renewcommand{\arraystretch}{0.95}
+\begin{tabular}{llll}
+\toprule
+task group & learned carrier & variance & rejected alternative \\
+\midrule
+$\SU(2)$ & spin $\tfrac12$ & $0.96$ & \\
+$\SO(3)$ & spin $1$ & $0.98$ & \\
+$\SU(3)$ & $\mathbf{3} \oplus \bar{\mathbf{3}}$ & $0.97$ & \\
+$\PSU(3)$ & adjoint $\mathbf{8}$ & $0.93$ & \\
+$\Spin(4)$ & $(\tfrac12,0) \oplus (0,\tfrac12)$ & $0.98$ & (no faithful irrep) \\
+$\SO(4)$ & $(\tfrac12,\tfrac12)$ & $0.97$ & \\
+$\SO(3){\times}\SU(2)$ & $(1,0) \oplus (0,\tfrac12)$, $5$ dims & $0.98$ & $(1,\tfrac12)$, $6$ dims: $0.008$ \\
+$\PSO(4)$ & $(1,0) \oplus (0,1)$, $6$ dims & $0.98$ & $(1,1)$, $9$ dims: $0.009$ \\
+$\Spin(5)$ & spinor $\mathbf{4}$ & $0.97$ & \\
+$\SO(5)$ & vector $\mathbf{5}$ + adjoint $\mathbf{10}$ & $0.69 + 0.22$ & (see \cref{sec:limits}) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The selection is causal. Subtracting from $z$ the component linearly
+predictable from the carrier's matrix coefficients collapses ranking to
+chance ($0.02$ against a chance rate of $0.016$) and center discrimination
+to its tie value, while the same ablation applied to any other sector, or
+to a random subspace of equal rank, leaves both intact. The pattern forms a
+double dissociation between each group and its quotient: for $\SU(2)$ and
+$\SO(3)$, ablating spin $\tfrac12$ is fatal for the former and inert for
+the latter, and ablating spin $1$ transposes the pattern, with seed
+standard deviations below $0.005$ on every cell. The $\SU(3)$ pair repeats
+this under the order-three center, where the orbit-averaging intervention
+is an exact identity on the quotient models and fatal on the faithful ones.
+For $\Spin(4)$, whose center supports three distinct discriminations,
+each learned block is necessary for exactly the center flips its central
+character detects and for no others. The trained scorer itself is a
+character function: a single character, $\chi_{1/2}$ for $\SU(2)$ and
+$\chi_1$ for $\SO(3)$, explains $0.97 \pm 0.01$ and $0.88 \pm 0.01$ of the
+score variance on held-out triples.
+
+The following bound, proved in \cref{app:proofs}, explains why ranking
+never forces a larger carrier.
+
+\begin{lemma}
+\label{lem:character}
+Let $V$ be a faithful finite-dimensional unitary representation of a
+compact group $H$ with character $\chi_V$. Then $\operatorname{Re}
+\chi_V(g) \leq \chi_V(e)$ for all $g \in H$, with equality only at $g = e$.
+Moreover, for $X$ in the Lie algebra of $H$,
+$\operatorname{Re}\chi_V(\exp X) = \chi_V(e) -
+\tfrac12 \lVert dV(X)\rVert_{F}^2 + O(\lVert X\rVert^4)$,
+and $X \mapsto \lVert dV(X)\rVert_F^2$ is positive definite.
+\end{lemma}
+
+By \cref{lem:character}, a monotone function of
+$\operatorname{Re}\chi_V(ab\,c^{-1})$ ranks the product above every
+excluded negative for any faithful $V$, so optimization selects the carrier
+on cost. Conversely, a nontrivial kernel forces positive ranking error
+under explicit sampling assumptions (\cref{lem:necessity}), and the
+ablations above realize that necessity block by block.
+
+\section{The mechanism is the full coefficient block}
+\label{sec:block}
+
+The learned code is not merely supported on the carrier's isotypic
+sector. In every seed, the active subspace of $z$ has exactly the real
+dimension of the full block, $4$ for the quaternionic spinor and $9$ for
+the real-type vector, as the following lemma prescribes (proof in
+\cref{app:proofs}).
+
+\begin{lemma}
+\label{lem:twosided}
+Let $\rho \colon G \to U(V_\rho)$ be an irreducible unitary representation
+of a compact group $G$, and let $M_\rho \subseteq L^2(G)$ be the span of its
+matrix coefficients $g \mapsto \langle u, \rho(g) v\rangle$. Then $M_\rho
+\cong V_\rho^* \boxtimes V_\rho$ as a representation of $G \times G$ acting
+by left and right translation, this representation is irreducible, and
+every nonzero subspace of $M_\rho$ invariant under both translation actions
+equals $M_\rho$. For an irreducible real representation $W$ with commutant
+$D = \End_G(W)$, the corresponding real coefficient block has dimension
+$(\dim_\R W)^2 / \dim_\R D$ and is the minimal nonzero two-sided
+translation-stable real subspace of its sector.
+\end{lemma}
+
+\textbf{Two-sided structure.} \Cref{lem:twosided} converts full-block
+identity into a falsifiable property: a full block supports commuting
+linear left and right translation actions, a proper subspace of the sector
+cannot. We fit affine operators $M^L_k$, $M^R_k$ with
+$z(kg) \approx M^L_k z(g)$, $z(gk) \approx M^R_k z(g)$, evaluated held
+out. On the trained $\SO(3)$ code, both actions fit at
+$R^2 = 0.989 \pm 0.001$ with relative commutator defect $0.012 \pm 0.001$,
+matching the exact block. On the explicit $6$-dimensional frame
+$g \mapsto (g e_1, g e_2)$, the left action is exactly linear and the
+right action fails at $R^2 = 0.638$, since the missing column
+$g e_3 = (g e_1) \times (g e_2)$ is uncorrelated with the retained ones,
+and a random $6$-dimensional subspace of the true block fails both actions
+at $R^2 = 0.67$. The fitted operators match the representation itself: the trace of
+$M^L_k$ equals $\dim(W)\,\chi_W(k)$ with correlation $1.000$ across
+group elements.
+
+\textbf{Causal sufficiency.} Replacing the internal product state
+$h(a,b)$ by its ridge reconstruction from the eight realified spinor
+coefficients of a counterfactual product $a'b'$ redirects the $\SU(2)$
+model to select $a'b'$ with probability $0.996$--$0.999$ in every seed,
+while reconstruction from the wrong sector redirects at chance. The output
+$h$ concentrates $89.9 \pm 1.4\%$ of its variance on the diagonal sector
+of its carrier, with $98.2 \pm 0.3\%$ of that energy in the subspace
+spanned by the matrix product $W(a)W(b)$: the interaction implements the
+representation's own composition law.
+
+\textbf{Cost.} Whether two-sided closure is why the block wins is a
+question about training, so we trained matched models on $\SO(3)$ whose
+observations are the exact frame or the exact full block, all else equal.
+At statistically equal accuracy ($0.891 \pm 0.002$ against
+$0.889 \pm 0.003$), the block model attains a larger margin
+($7.29 \pm 0.16$ against $6.49 \pm 0.05$) at $17\%$ lower parameter
+norm, with every module cheaper: the frame model reconstructs the missing
+column nonlinearly, at a cost exceeding the three saved coordinates.
+Regularized training selects the full block as the cheapest complete
+mechanism, storage and composition counted together.
+
+\section{Casimir-ordered spectral bias under regression}
+\label{sec:spectral}
+
+Ranking requires only one faithful character, so it cannot probe how the
+architecture allocates capacity across sectors. Regression onto the
+$\SU(2)$ heat kernel $K_t(g) = \sum_j (2j+1) e^{-t\,j(j+1)} \chi_j(g)$,
+evaluated at $ab\,c^{-1}$, requires every sector the envelope keeps above
+the noise. \Cref{fig:main}(b) reports the fraction of score variance per
+sector, sequentially orthogonalized in Casimir order, divided by the same
+fraction for the exact target, so $1$ means a sector at its required
+weight.
+
+Three regularities emerge. Each trained score is a truncated character
+expansion, with recovered sectors near ratio $1$ and sectors beyond a
+sharp frontier at $0$, the frontier at higher Casimir for smaller $t$. The
+frontier advances in Casimir order during training: at $t = 0.05$, the
+spin-$2$ recovery climbs from $0.12$ to $1.20$ over $70$k steps while spin
+$\tfrac52$ stays at $0$. The frontier is set by
+regularization, not capacity: on the target $\chi_1 + \tfrac12 \chi_2$,
+weight decay $1.0$ prunes the spin-$2$ component and the abandoned
+$12.6\%$ of target variance equals the final test error, while weight
+decay $0.1$ recovers the target exactly. A sector survives when its
+variance contribution exceeds its norm cost, so the spectral cutoff is a
+cost boundary of the same kind that selects the carrier. The target's
+central character governs parity: on this central-even target, the model
+builds an integer-spin code even on the faithful encoding.
+
+\section{Limitations and open problems}
+\label{sec:limits}
+
+The minimal-carrier description fails as stated in one of the ten group
+forms: on $\SO(5)$, the learned carrier is a mixture, vector $\mathbf{5}$
+at $0.68$--$0.70$ of variance plus adjoint $\mathbf{10}$ at
+$0.21$--$0.23$, stable across five seeds, doubled training, more
+candidates, and reduced weight decay. The adjoint fraction falls only when
+generalization improves and no condition solves the task, so asymptotic
+purification and a genuinely mixed minimum-cost mechanism both remain
+open. In \cref{app:conj}, we state the selection principle these results
+suggest as a precise conjecture, and we leave the conditioning of quotient
+observations as future work.
+
+\bibliographystyle{unsrtnat}
+\bibliography{refs}
+
+\appendix
+
+\section{Proofs}
+\label{app:proofs}
+
+\begin{proof}[Proof of \cref{lem:character}]
+Each eigenvalue of the unitary matrix $V(g)$ lies on the unit circle, so
+$\operatorname{Re}\operatorname{tr} V(g) \leq \dim V$, with equality
+exactly when every eigenvalue equals $1$, that is, when $V(g)$ is the
+identity. By faithfulness, this occurs only at $g = e$. For the expansion,
+write $A = dV(X)$, an anti-Hermitian matrix with eigenvalues
+$i\lambda_1, \dots, i\lambda_{\dim V}$. Then $\operatorname{Re}
+\operatorname{tr}\exp(tA) = \sum_k \cos(t\lambda_k) = \dim V -
+\tfrac{t^2}{2}\sum_k \lambda_k^2 + O(t^4)$, and $\sum_k \lambda_k^2 =
+\lVert A\rVert_F^2$. The trace of $A$ is purely imaginary and contributes
+nothing to the real part. If $\lVert dV(X)\rVert_F = 0$, then the
+one-parameter subgroup $\exp(tX)$ lies in the kernel of $V$, which is
+trivial, so $X = 0$, proving positive definiteness.
+\end{proof}
+
+\begin{lemma}
+\label{lem:necessity}
+Let $H$ be a compact group. Assume the score factors as
+$s(a,b,c) = S(\varphi(a), \varphi(b), \varphi(c))$ where $\varphi$ factors
+through the matrix coefficients of a representation $V$ of $H$ with
+nontrivial closed kernel $N$, the function $c \mapsto s(a,b,c)$ is
+continuous, negatives are sampled from a distribution assigning positive
+probability to every open subset of the admissible region, and the
+exclusion radius is smaller than $\min_{n \in N,\, n \neq e} d(e, n)$.
+Then the population ranking loss is bounded away from its optimum.
+\end{lemma}
+
+\begin{proof}
+Fix $n \in N$ with $n \neq e$. By the radius hypothesis, $ab\,n$ lies in
+the admissible negative region. Since $\varphi$ is constant on $N$-cosets,
+$s(a, b, ab\,n) = s(a, b, ab)$, which is at least the score of the noisy
+positive up to the continuity modulus of $s$ over the positive
+displacement. By continuity, there is a ball around $ab\,n$ on which the
+score stays within any prescribed gap of this value, and by the sampling
+hypothesis that ball receives positive probability, so with positive
+probability a sampled negative ties or exceeds the positive.
+\end{proof}
+
+The hypotheses of \cref{lem:necessity} are necessary: with a finite kernel
+and a continuous candidate distribution, the exact ambiguous points have
+measure zero, and without continuity of the score no positive lower bound
+follows from non-separation alone.
+
+\begin{proof}[Proof of \cref{lem:twosided}]
+The map $V_\rho^* \otimes V_\rho \to L^2(G)$ sending $u^* \otimes v$ to
+$g \mapsto \langle u, \rho(g) v \rangle$ intertwines the
+$G \times G$-action by left and right translation with the outer tensor
+product action and is injective by linear independence of matrix
+coefficients \cite[Ch.~III, Thm.~1.5]{brocker1985}. The outer tensor
+product of irreducible representations is an irreducible representation of
+the product group, so $M_\rho$ has no proper nonzero two-sided invariant
+subspace, and $\dim_\C M_\rho = (\dim V_\rho)^2$. For the real form, the
+real Schur lemma gives $\End_G(W) \in \{\R, \C, \HH\}$, and the real
+matrix-coefficient span of $W$ is identified with
+$W^* \otimes_{D} W$, of real dimension
+$(\dim_\R W)^2/\dim_\R D$. Minimality follows from irreducibility of the
+two-sided action on this space, by the same outer-tensor argument applied
+over $D$.
+\end{proof}
+
+\section{The selection conjecture}
+\label{app:conj}
+
+\begin{conjecture}
+\label{conj:selection}
+In the factorized architecture with weight decay, among parameter settings
+achieving population ranking loss within $\varepsilon$ of the optimum, the
+minimum-norm setting realizes, as $\varepsilon \to 0$, the full real
+coefficient block of a faithful carrier minimizing the total regularized
+cost of features, composition, and scoring, with score a monotone function
+of $\operatorname{Re}\chi_V(ab\,c^{-1})$.
+\end{conjecture}
+
+The missing ingredients are a norm lower bound tying any
+$\varepsilon$-optimal score to the effective dimension of the functions it
+computes on $G$, and the exclusion of solutions outside the character
+algebra, the compact-group analogue of the alternative circuits documented
+for finite groups \cite{stander2024, zhong2023}. The descent rule, the
+lemmas of \cref{app:proofs}, and the measured cost gap between frames and
+blocks fix every term such a proof must reproduce.
+
+\section{Experimental details}
+\label{app:details}
+
+\textbf{Groups and encodings.} Elements of $\SU(2)$ are unit quaternions,
+of $\SU(3)$ Haar-random special unitary matrices, of
+$\Spin(4) = \SU(2) \times \SU(2)$ pairs of unit quaternions, and of
+$\Spin(5) = \Sp(2)$ quaternionic $2 \times 2$ unitaries sampled by
+quaternionic Gram--Schmidt. Quotient conditions average the observation map
+over the central subgroup being quotiented: the antipodal average for
+$\SO(3)$ and $\SO(5)$, the order-three orbit average for $\PSU(3)$, and the
+three sign-pair averages for the quotients of $\Spin(4)$. Each average is
+exactly invariant under the quotiented subgroup and distinguishes all other
+center elements, which we verify numerically at construction.
+
+\textbf{Training.} Batch size $4096$ ($2048$ for the larger groups),
+learning rate $10^{-3}$, weight decay $1.0$, $100$k--$200$k steps,
+training fraction $0.01$ of the pair table unless stated. The ranking
+results of \cref{tab:carriers} use five seeds per condition. Heat-kernel
+and band-limited regressions replace the cross-entropy by mean squared
+error on standardized targets, with candidates drawn half near the product
+at uniform geodesic radius and half from Haar measure. Under the $\SU(2)$
+sampling, the Bayes-optimal ranking rule attains accuracy $0.951$.
+
+\textbf{Analyses.} Isotypic fractions use jointly orthonormalized sampled
+coefficient spans processed in Casimir order, which bounds cross-sector
+leakage at the sampling floor. Function-space ablations subtract the
+component of $z$ linearly predictable from a sector's exact matrix
+coefficients, fitted on an independent probe set, and are well defined even
+for sectors at the measurement floor, where subspace estimates are
+noise-dominated. Ridge probes select the regularization strength on a
+validation split and report on a disjoint test split. Translation
+operators are fitted by ridge regression in a PCA frame retaining $99.9\%$
+of activation variance, and homomorphism and commutator defects are
+evaluated on held-out elements with operators fitted independently per
+group element. The score-level spectral profiles regress both the learned
+score and the exact target on the same sequentially orthogonalized
+character design, so standardization and collinearity cancel in the
+reported ratios.
+
+\textbf{Verification.} The representation-theoretic primitives pass a
+unit-test suite covering the homomorphism property, unitarity, characters,
+central characters, Schur orthogonality, planted-sector recovery, and
+exact invariance of the quotient encodings. The spectral-recovery analysis
+reproduces the known support and coefficients of the band-limited target
+at weight decay $0.1$, which serves as the calibration of the instrument.
+The orbit-average intervention is an exact identity on quotient models by
+construction and measures as one, which confirms the intervention
+machinery. Software: PyTorch 2.11, NumPy, single T4 GPU. A tracked
+results bundle records, for every run, the configuration, seed, checkpoint
+hash, final metrics, and analysis outputs, and every table in this paper
+regenerates from the bundle.
+
+\section{Ancillary material}
+\label{app:ancillary}
+
+The repository contains the group libraries with their self-tests
+(\texttt{core/su2.py}, \texttt{core/su3.py}, \texttt{core/spin4.py},
+\texttt{core/spin5.py}), the training drivers
+(\texttt{experiments/*\_train.py}), the intervention and mechanism
+analyses (\texttt{experiments/*\_causal.py},
+\texttt{experiments/su2\_mechanism.py}, \texttt{experiments/twosided.py},
+\texttt{experiments/su2\_fusion.py}, \texttt{experiments/hk\_analysis.py}),
+and the results bundle (\texttt{summary/results\_bundle.json}). The paper
+stands without these files: every claim above is proved in
+\cref{app:proofs}, established by the reported measurements, or cited.
+
+\end{document}
