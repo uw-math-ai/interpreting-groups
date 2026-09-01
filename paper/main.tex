@@ -16,8 +16,10 @@
 
 \newtheorem{lemma}{Lemma}
 \newtheorem{conjecture}{Conjecture}
+\newtheorem{fact}{Fact}
 \crefname{lemma}{Lemma}{Lemmas}
 \crefname{conjecture}{Conjecture}{Conjectures}
+\crefname{fact}{Fact}{Facts}
 \crefname{table}{Table}{Tables}
 
 \DeclareMathOperator{\End}{End}
@@ -30,6 +32,7 @@
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\C}{\mathbb{C}}
 \newcommand{\HH}{\mathbb{H}}
+\newcommand{\Z}{\mathbb{Z}}
 
 \title{Neural networks trained on compact group composition\\
 learn the global form of the group}
@@ -139,9 +142,11 @@ form into an experimental variable, and the two-sided translation test of
 \cref{sec:setup}, we fix the task and the instruments. In
 \cref{sec:carriers,sec:block,sec:spectral}, we present the carrier,
 mechanism, and spectral results. In \cref{sec:limits}, we state the
-revision and a selection conjecture. Proofs are in \cref{app:proofs},
-experimental details in \cref{app:details}, and complete result tables
-and additional figures in \cref{app:tables}.
+revision and a selection conjecture. The background from
+representation theory and harmonic analysis is collected in
+\cref{app:background}, proofs are in \cref{app:proofs}, experimental
+details in \cref{app:details}, and complete result tables and additional
+figures in \cref{app:tables}.
 
 \section{Task, observations, and instruments}
 \label{sec:setup}
@@ -191,7 +196,8 @@ coefficients, an intervention well defined even for sectors at the floor.
 Activation patching replaces the internal product state by reconstructions
 from chosen coordinates. Because activations are real, a complex
 irreducible and its conjugate span one real sector of dimension
-$(\dim_\R W)^2 / \dim_\R \End_G(W)$ (\cref{lem:twosided}).
+$(\dim_\R W)^2 / \dim_\R \End_G(W)$ (\cref{lem:twosided};
+\cref{app:background} collects the background).
 
 \section{The learned carrier identifies the global form}
 \label{sec:carriers}
@@ -420,6 +426,184 @@ as future work.
 
 \appendix
 
+\section{Background: representation theory and harmonic analysis on compact groups}
+\label{app:background}
+
+This appendix collects the facts the paper uses, with references in place
+of proofs. Standard sources are \cite{brocker1985} for compact groups and
+the Peter--Weyl theorem, \cite{sepanski2007} for the real Schur lemma and
+the type classification, \cite{folland1995} for harmonic analysis, and
+\cite{fulton1991} for the representation theory of the classical groups.
+Throughout, $G$ is a compact Lie group and all representations are
+finite-dimensional and continuous.
+
+\paragraph{Haar measure and unitarity.}
+A compact group carries a unique translation-invariant Borel probability
+measure, its Haar measure, and every expectation over group elements in
+this paper is taken with respect to it. Averaging an arbitrary inner
+product over the group makes any representation unitary, and every unitary
+representation decomposes as a finite orthogonal direct sum of irreducible
+ones \cite[Ch.~II]{brocker1985}. The set of isomorphism classes of complex
+irreducible representations is denoted $\widehat G$, and for
+$\rho \in \widehat G$ we write $d_\rho = \dim V_\rho$ and
+$\chi_\rho(g) = \operatorname{tr}\rho(g)$ for its character.
+
+\paragraph{Matrix coefficients and orthogonality.}
+For $\rho \in \widehat G$ and vectors $u, v \in V_\rho$, the function
+$g \mapsto \langle u, \rho(g) v\rangle$ is a matrix coefficient of
+$\rho$. Schur's lemma states that a linear map commuting with two
+irreducible representations is zero or an isomorphism, and that the
+self-intertwiners of a complex irreducible representation are the scalars
+\cite[Ch.~I]{fulton1991}. Its integrated form is the orthogonality of
+coefficients: in a unitary basis,
+\[
+\int_G \rho(g)_{ij}\, \overline{\sigma(g)_{kl}}\, dg
+\;=\; \frac{\delta_{\rho\sigma}\,\delta_{ik}\,\delta_{jl}}{d_\rho},
+\qquad
+\int_G \chi_\rho(g)\, \overline{\chi_\sigma(g)}\, dg
+\;=\; \delta_{\rho\sigma}
+\]
+for $\rho, \sigma \in \widehat G$ \cite[Ch.~II]{brocker1985}. These
+relations are the foundation of the spectroscopy instrument of
+\cref{sec:setup}: they make the coefficient spans of distinct irreducible
+representations orthogonal in $L^2(G)$, so variance fractions per sector
+are well defined, and our implementation verifies them numerically on the
+sampled probe sets.
+
+\paragraph{The Peter--Weyl theorem.}
+The matrix coefficients of all $\rho \in \widehat G$ span a dense subspace
+of $L^2(G)$, and as a representation of $G \times G$ acting by left and
+right translation,
+\[
+L^2(G) \;\cong\; \bigoplus_{\rho \in \widehat G} M_\rho,
+\qquad M_\rho \;\cong\; V_\rho^* \boxtimes V_\rho,
+\]
+an orthogonal Hilbert-space direct sum in which each coefficient space
+$M_\rho$ has dimension $d_\rho^2$
+\cite[Ch.~III]{brocker1985}. Every function a network computes on $G$
+therefore has a canonical spectral decomposition, and the paper's central
+structural question, which sectors a trained model occupies and whether it
+occupies them fully, is a question about this decomposition.
+\Cref{lem:twosided} records the two-sided irreducibility of $M_\rho$ and
+its real form.
+
+\paragraph{Real representations and Schur type.}
+The networks compute with real numbers, so the relevant decomposition is
+that of real representations. For an irreducible real representation $W$,
+the real Schur lemma states that the commutant $\End_G(W)$ is a real
+division algebra, hence isomorphic to $\R$, $\C$, or $\HH$
+\cite[Ch.~III]{sepanski2007}, and the three cases correspond to the
+classical trichotomy for a complex irreducible representation $V$: real
+type when $V$ admits an invariant real structure, quaternionic type when
+it admits an invariant quaternionic structure, and complex type when
+$V \not\cong \bar V$. Realification acts on dimensions as follows. A
+real-type $V$ of dimension $d$ yields $\dim_\R W = d$ with commutant
+$\R$. A complex-type or quaternionic-type $V$ of dimension $d$ yields
+$\dim_\R W = 2d$ with commutant $\C$ or $\HH$, and in the complex case
+$V$ and $\bar V$ realify to the same $W$, which is why a complex
+irreducible and its conjugate span a single real sector in our
+measurements. In all three cases, the real coefficient block has dimension
+\[
+\dim_\R M_W \;=\; \frac{(\dim_\R W)^2}{\dim_\R \End_G(W)},
+\]
+which evaluates to $d^2$, $2d^2$, and $d^2$ in the real, complex, and
+quaternionic cases. The three dimensions measured in the paper are
+instances: $9$ for the real-type vector of $\SO(3)$, $18$ for the
+complex-type fundamental pair of $\SU(3)$, and $4$ for the quaternionic
+spinor of $\SU(2)$.
+
+\paragraph{Characters, class functions, and the scoring identity.}
+Characters are conjugation-invariant, and the irreducible characters form
+an orthonormal basis of the class functions in $L^2(G)$
+\cite[Ch.~II]{brocker1985}. Two identities used throughout are
+$\chi_\rho(g^{-1}) = \overline{\chi_\rho(g)}$ and, for unitary $\rho$,
+\[
+\chi_\rho(ab\,c^{-1})
+\;=\; \operatorname{tr}\bigl(\rho(a)\rho(b)\rho(c)^{*}\bigr)
+\;=\; \bigl\langle \rho(c),\, \rho(a)\rho(b) \bigr\rangle_{\mathrm{HS}},
+\]
+so a character evaluated at $ab\,c^{-1}$ is a Hilbert--Schmidt pairing of
+the candidate's coefficient block against the product of the arguments'
+blocks. This identity is the algebraic content of the sentence ``two-sided
+linearity makes composition bilinear and scoring a pairing'' in
+\cref{sec:block}, and it is the form in which the finite-group mechanism
+of \cite{chughtai2023} generalizes to the compact case.
+
+\paragraph{Central characters and descent to quotients.}
+By Schur's lemma, the center $Z(G)$ acts in any $\rho \in \widehat G$ by a
+character $\omega_\rho \colon Z(G) \to U(1)$, called the central
+character. For a closed central subgroup $Z$, the irreducible
+representations of the quotient $G/Z$ are exactly those $\rho$ with
+$\omega_\rho$ trivial on $Z$, and a $Z$-invariant function on $G$ has
+spectral support only on such $\rho$. This is the descent rule of
+\cref{sec:carriers}: the orbit-averaged observation map is
+$Z$-invariant, so every sector carrying a nontrivial central character of
+$Z$ is forbidden, and the measured floors on those sectors are the
+empirical form of the rule. One consequence used for $\Spin(4)$ deserves a
+proof, since it forces the direct-sum carriers of \cref{tab:carriers}.
+
+\begin{fact}
+\label{fact:cyclic}
+If a compact group admits a faithful irreducible complex representation,
+its center is isomorphic to a closed subgroup of $U(1)$. In particular,
+$\Spin(4)$, with center $\Z_2 \times \Z_2$, has no faithful irreducible
+representation.
+\end{fact}
+
+\begin{proof}
+Under a faithful irreducible $\rho$, the center acts by the scalars
+$\omega_\rho$, and faithfulness makes $z \mapsto \omega_\rho(z)$
+injective, so $Z(G)$ embeds in $U(1)$. Every finite subgroup of $U(1)$ is
+cyclic, and $\Z_2 \times \Z_2$ is not.
+\end{proof}
+
+\paragraph{The Casimir element and the heat kernel.}
+Fix a bi-invariant metric on $G$. The quadratic Casimir element of the
+universal enveloping algebra acts in each irreducible representation
+$\rho$ as a scalar $C(\rho) \geq 0$, and the matrix coefficients of
+$\rho$ are eigenfunctions of the Laplace--Beltrami operator on $G$ with
+eigenvalue $C(\rho)$ \cite[Ch.~5]{sepanski2007}. The Casimir therefore
+plays the role of a squared frequency, and ``Casimir order'' in the paper
+is the compact-group analogue of ordering Fourier modes by frequency. The
+heat kernel at the identity-based variable $g$ is the class function
+\[
+K_t(g) \;=\; \sum_{\rho \in \widehat G} d_\rho\, e^{-t\,C(\rho)}\,
+\chi_\rho(g),
+\]
+the fundamental solution of the heat equation on $G$
+\cite[Ch.~1]{folland1995}, and its envelope $e^{-t\,C(\rho)}$ is the
+analytic source of the required sector weights in \cref{sec:spectral}.
+
+\paragraph{The groups of the experiments.}
+The irreducible representations of $\SU(2)$ are the spin representations
+$D^j$ of dimension $2j+1$ for $j \in \{0, \tfrac12, 1, \tfrac32, \dots\}$,
+with Casimir $C(D^j) = j(j+1)$, quaternionic type for half-integer $j$ and
+real type for integer $j$, and central character $(-1)^{2j}$ at
+$-1 \in \SU(2)$ \cite[Ch.~II]{brocker1985}. The quotient
+$\SO(3) = \SU(2)/\{\pm 1\}$ therefore carries exactly the integer spins,
+which is the double-cover diagnostic of \cref{sec:carriers}. The
+irreducible representations of $\SU(3)$ are labeled by highest weights
+$(p, q)$ with dimension $\tfrac12 (p+1)(q+1)(p+q+2)$ and central character
+$\omega^{\,p-q}$ at the central element $\omega I$ for $\omega$ a
+primitive cube root of unity, so descent to $\PSU(3)$ requires
+$p \equiv q \pmod 3$; the sectors tracked in the experiments are the
+fundamental pair $\mathbf{3} \oplus \bar{\mathbf{3}}$ at $(1,0)$ and
+$(0,1)$, the adjoint $\mathbf{8}$ at $(1,1)$, and the pairs
+$\mathbf{6} \oplus \bar{\mathbf{6}}$ and
+$\mathbf{10} \oplus \bar{\mathbf{10}}$ \cite[Ch.~13]{fulton1991}. The
+group $\Spin(4)$ is isomorphic to $\SU(2) \times \SU(2)$, its irreducible
+representations are the outer products $(j_L, j_R)$ with central character
+$\bigl((-1)^{2j_L}, (-1)^{2j_R}\bigr)$ on the center
+$\Z_2 \times \Z_2$, and its three central quotients are $\SO(4)$ (the
+diagonal $\Z_2$, retaining $j_L + j_R \in \Z$), $\SO(3) \times \SU(2)$
+(one factor's $\Z_2$), and $\PSO(4)$ (the full center, retaining
+$j_L, j_R \in \Z$). The group $\Spin(5)$ is isomorphic to the
+quaternionic unitary group $\Sp(2)$, with quaternionic spinor
+representation $\mathbf{4}$, real vector representation $\mathbf{5}$, and
+adjoint $\mathbf{10}$, and $\SO(5) = \Spin(5)/\{\pm 1\}$ retains the
+representations with trivial central character, among them $\mathbf{5}$
+and $\mathbf{10}$ \cite[Ch.~16]{fulton1991}.
+
 \section{Proofs}
 \label{app:proofs}
 
@@ -471,8 +655,8 @@ follows from non-separation alone.
 The map $V_\rho^* \otimes V_\rho \to L^2(G)$ sending $u^* \otimes v$ to
 $g \mapsto \langle u, \rho(g) v \rangle$ intertwines the
 $G \times G$-action by left and right translation with the outer tensor
-product action and is injective by linear independence of matrix
-coefficients \cite[Ch.~III, Thm.~1.5]{brocker1985}. The outer tensor
+product action and is injective by the orthogonality of matrix coefficients
+(\cref{app:background}). The outer tensor
 product of irreducible representations is an irreducible representation of
 the product group, so $M_\rho$ has no proper nonzero two-sided invariant
 subspace, and $\dim_\C M_\rho = (\dim V_\rho)^2$. For the real form, the
