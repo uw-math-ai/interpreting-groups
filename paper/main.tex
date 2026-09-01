@@ -49,17 +49,17 @@ matrix coefficients of a few irreducible representations. We show that
 the same structure emerges, in sharper form, when the group is a
 continuum. Across ten compact group forms drawn from $\SU(2)$, $\SU(3)$,
 $\Spin(4)$, and $\Spin(5)$ and their central quotients, presented
-through fixed generic encodings, every seed concentrates its encoder
-variance on the matrix coefficients of a smallest faithful
-representation of the task group, so half-integer spins appear exactly
-when the encoding distinguishes the two sheets of the double cover and
-the learned features determine the isomorphism type of the group.
-Ablations, activation patching, and a new test based on the left and
-right translation actions verify the mechanism and show that the
-features span the full matrix-coefficient space of the selected
-representation. Matched training on $\SO(3)$ explains
-the selection, since the $9$-dimensional coefficient space beats a
-$6$-dimensional faithful frame on margin at $17\%$ lower parameter norm.
+through fixed generic encodings, nine concentrate encoder variance on
+the matrix coefficients of a smallest faithful representation of the
+task group, identically in all five seeds per condition, with
+half-integer spins appearing exactly when the encoding distinguishes the
+two sheets of the double cover, so learned spectra and center-sensitive
+causal behavior separate global forms sharing one Lie algebra. Ablations, activation
+patching, and a new test based on the left and right translation actions
+verify the mechanism and show that the features span the full
+matrix-coefficient space of the selected representation. In matched training on $\SO(3)$, the $9$-dimensional coefficient space
+attains a larger margin than a $6$-dimensional faithful frame at matched
+accuracy and $17\%$ lower parameter norm in the tested setting.
 Under regression onto heat-kernel targets, the same architecture fills
 isotypic subspaces in order of Casimir eigenvalue up to a truncation set
 by the weight decay. One finding is negative. On $\SO(5)$, a stable
@@ -96,20 +96,21 @@ the score.
 \textbf{The learned representation determines the global form of the
 group.} Averaging the encoding over a central subgroup $Z$ realizes the same
 task on the quotient $G/Z$, so the isomorphism type becomes an
-experimental variable. In every seed of every condition, the model concentrates $93$--$98\%$ of
+experimental variable. In nine of ten group forms, the model concentrates $93$--$98\%$ of
 encoder variance on a smallest faithful representation of the task
-group, and half-integer spins appear exactly when the encoding
-distinguishes $\pm g$ (\cref{sec:universality}). Unlike the finite-group
-setting \cite{chughtai2023}, selection is deterministic across seeds.
+group, identically in all five seeds, and half-integer spins appear
+exactly when the encoding distinguishes $\pm g$
+(\cref{sec:universality}). Unlike the finite-group setting
+\cite{chughtai2023}, successful selection is deterministic across seeds.
 
 \textbf{The learned features span the full matrix-coefficient space, and
 cost explains why.} The active subspace has exactly the real dimension
 $(\dim_\R W)^2/\dim_\R \End_G(W)$ that the real Schur lemma prescribes,
 and a new two-sided translation test certifies the full space, which the
 trained features pass while a $6$-dimensional faithful frame fails
-linear right closure (\cref{sec:mainline}). In matched training, the $9$-dimensional coefficient space beats the
-frame on margin at $17\%$ lower parameter norm, so regularized training
-selects the cheapest complete mechanism.
+linear right closure (\cref{sec:mainline}). In matched training at this architecture and weight decay, the
+$9$-dimensional coefficient space attains a larger margin than the frame
+at $17\%$ lower parameter norm.
 
 \textbf{Regression reveals a spectral bias in order of the Casimir
 eigenvalue.} Ranking needs one character, so it hides the network's
@@ -119,9 +120,10 @@ of Casimir eigenvalue up to a sharp truncation that moves with the
 weight decay (\cref{sec:spectral}).
 
 \textbf{One finding is negative.} On $\SO(5)$, a stable
-vector-plus-adjoint mixture survives five seeds and every conditioning
-variation we ran, so the minimal-representation description fails as
-stated in one of ten group forms (\cref{sec:universality}).
+vector-plus-adjoint mixture survives five seeds, doubled training, four
+times the candidates, reduced weight decay, and tripled data, so the
+minimal-representation description fails as stated in one of ten group
+forms (\cref{sec:universality}).
 
 \textbf{Paper organization.} \Cref{sec:related,sec:setup} cover related
 work and the setup, \cref{sec:algorithm} the character mechanism,
@@ -248,11 +250,12 @@ question, which \cref{lem:twosided} turns into a falsifiable test.
 \caption{(a) Fraction of encoder variance per isotypic subspace for the
 mainline conditions, five seeds. The conditions differ only in whether
 the encoding distinguishes $\pm g$, and each concentrates on the
-smallest faithful irrep of its own group. (b) Recovery of the character
-expansion of the learned score for heat-kernel and band-limited targets.
-Values near $1$ mean a subspace carried at its required weight, and the
+smallest faithful irrep of its own group. (b) Sequentially orthogonalized character profile of the learned score,
+divided by the same profile of the exact target, for heat-kernel and
+band-limited targets. Values near $1$ mean a subspace carried at its
+required relative weight under this order-dependent profile, and the
 dashed curve shows the in-support spin-$2$ subspace pruned at weight
-decay $1.0$ and recovered at $0.1$ (\cref{sec:spectral}).}
+decay $1.0$ and retained at $0.1$ (\cref{sec:spectral}).}
 \label{fig:main}
 \end{figure}
 
@@ -311,7 +314,7 @@ so every nonzero subspace of $M_\rho$ stable under both actions equals
 $M_\rho$. For an irreducible real representation $W$ with commutant
 $D = \End_G(W)$, the real coefficient space has dimension
 $(\dim_\R W)^2/\dim_\R D$ and is the minimal nonzero two-sided
-translation-stable real subspace of its isotypic component.
+translation-stable real subspace of its isotypic subspace.
 \end{lemma}
 
 On the full coefficient space, left and right translation both act
@@ -328,9 +331,11 @@ The frame determines the rotation with $6$ coordinates, so storage
 minimality cannot explain the selection. In matched training on exact frame features against exact coefficient
 features, the coefficient arm attains margin $7.29 \pm 0.16$ against
 $6.49 \pm 0.05$ at statistically equal accuracy and $17\%$ lower
-parameter norm (\cref{tab:cost}). The frame arm reconstructs its missing column nonlinearly, and that
-costs more than the three saved coordinates, so regularized training
-selects the full coefficient space as the cheapest complete mechanism.
+parameter norm (\cref{tab:cost}). The missing column is quadratic in the retained columns, so a closed
+composition law on the frame has higher polynomial degree than the
+bilinear law on the full space. At this weight decay and architecture,
+regularized training obtains the better margin-per-norm tradeoff from
+the full coefficient space.
 
 \section{Universality across ten group forms}
 \label{sec:universality}
@@ -382,11 +387,10 @@ $\Spin(4)$, whose center supports three distinct discriminations, every
 cell of the summand-resolved intervention map lands where the central
 character puts it (\cref{tab:spin4causal}).
 
-\textbf{The exception is $\SO(5)$, and we report it as a failure.} The
-$\SO(5)$ encoder holds the vector $\mathbf{5}$ at $0.68$--$0.70$ and the
-adjoint $\mathbf{10}$ at $0.21$--$0.23$ of variance, stable across five
-seeds, doubled training, four times the candidates, and reduced weight
-decay, and no condition solves the task. Two hypotheses remain open,
+\textbf{The exception is $\SO(5)$, and we report it as a failure.} The $\SO(5)$ encoder holds the vector $\mathbf{5}$ at $0.68$--$0.70$ and
+the adjoint $\mathbf{10}$ at $0.21$--$0.23$ of variance, stable across
+five seeds, doubled training, four times the candidates, reduced weight
+decay, and tripled data, and no condition solves the task. Two hypotheses remain open,
 purification as the task approaches a solution, or a genuinely mixed
 minimum-cost mechanism, which the cost result of \cref{sec:mainline}
 makes coherent (Experiment~12).
@@ -396,15 +400,16 @@ makes coherent (Experiment~12).
 
 We regress the same architecture onto the $\SU(2)$ heat kernel $K_t(g) =
 \sum_j (2j+1) e^{-t j(j+1)} \chi_j(g)$ evaluated at $ab\,c^{-1}$ and
-measure the recovered character expansion of the learned score
-(\cref{fig:main}b, \cref{app:spectral-exps}).
+measure its sequentially orthogonalized character profile against the
+target's (\cref{fig:main}b, \cref{app:spectral-exps}). The profile is order- and measure-dependent (\cref{app:methods}) and is
+calibrated on a band-limited target with known support.
 
 \textbf{The learned score is a truncated character expansion that fills
 in Casimir order.} Recovered subspaces sit at ratio near $1$ and
 subspaces beyond a sharp truncation sit at $0$, with the truncation at higher Casimir eigenvalue for smaller $t$ and
 advancing in Casimir order during training, so that at $t = 0.05$ the
-spin-$2$ recovery climbs from $0.12$ to $1.20$ while spin~$\tfrac52$
-stays at $0$.
+spin-$2$ ratio climbs from $0.12$ to $1.20$ while spin~$\tfrac52$ stays
+at $0$.
 
 \textbf{The truncation is a cost boundary set by regularization.} On the
 band-limited target $\chi_1 + \tfrac12\chi_2$, weight decay $1.0$ prunes
@@ -420,23 +425,20 @@ faithful $\SU(2)$ encoding (Experiment~15).
 \label{sec:discussion}
 
 Small generic networks trained on compact group composition learn the
-irreducible representations of the exact global form the data determine,
-store them as full matrix-coefficient spaces because that is the
-cheapest complete mechanism, and allocate spectral capacity in Casimir
-order under a regularization-set truncation. The results suggest a selection principle we can state but not yet
-prove, that among near-optimal parameter settings the minimum-norm one
-realizes the full coefficient space of a cost-minimizing faithful
-representation with a monotone character score (\cref{app:questions}
-states the conjecture precisely).
+irreducible representations of the global form the data determine in
+nine of ten forms, store them as full matrix-coefficient spaces, the
+arrangement that wins the measured margin-per-norm tradeoff, and fill
+isotypic subspaces in Casimir order under a regularization-set
+truncation. \Cref{app:questions} states the selection principle these results
+suggest as a precise conjecture, with its missing ingredients named.
 
 \textbf{Limitations and future work.} Every quotient condition
-generalizes below its cover, and we have not yet separated
-representation selection from the conditioning of the quotient encoding.
+generalizes below its cover, and representation selection is not yet
+separated from the conditioning of the quotient encoding.
 Causal interventions carry weaker positive than negative evidence
-\cite{wu2024}, which we mitigate with the two-sided test, exact no-op
-controls, and matched retraining. Solving $\SO(5)$ would separate the
-two open hypotheses, and proving the conjecture would give the first
-selection theorem for a continuous group.
+\cite{wu2024}, mitigated here with the two-sided test, no-op controls,
+and matched retraining. Solving $\SO(5)$ and proving the conjecture are
+the two decisive next steps.
 
 \bibliographystyle{unsrtnat}
 \bibliography{refs}
@@ -521,10 +523,10 @@ $\xi \sim \mathcal N(0, \sigma^2 I)$ on the Lie algebra at
 $\sigma = 0.2$, and $63$ negatives drawn from Haar measure and
 resampled until their distance to the positive class exceeds $0.5$.
 Candidates are frozen at dataset construction. The loss is
-cross-entropy over the $K$ scores. Under this construction the
-Bayes-optimal rule ranks by distance to $ab$, with Monte-Carlo accuracy
-$0.951$ for $\SU(2)$ at $K = 64$, falling to $0.936$ at $K = 128$ and
-$0.922$ at $K = 256$.
+cross-entropy over the $K$ scores. Under this construction the geodesic-distance rule, which is monotone in
+the likelihood for isotropic algebra noise, ranks by distance to $ab$,
+with Monte-Carlo accuracy $0.951$ for $\SU(2)$ at $K = 64$, falling to
+$0.936$ at $K = 128$ and $0.922$ at $K = 256$.
 
 \textbf{Evaluation tiers.} T1 is ranking accuracy on held-out pairs of
 pool elements, the analogue of held-out cells of a multiplication
@@ -561,9 +563,13 @@ $\Spin(5)$), and $100$k--$200$k steps, with $f = 0.01$ unless stated.
 Heat-kernel and band-limited regressions replace the cross-entropy by
 mean squared error on standardized targets, with candidates drawn half
 near the product at uniform geodesic radius and half from Haar measure.
-All runs use a single NVIDIA T4 GPU, PyTorch 2.11, and complete in
-hours (mainline conditions) to about two days (the largest groups).
-Five seeds per reported condition throughout.
+All runs use a single NVIDIA T4 GPU, PyTorch 2.11, and complete in hours
+(mainline conditions) to about two days (the largest groups). The
+ranking conditions of \cref{tab:carriers}, the interventions, the
+two-sided test, and the matched-training comparison use five seeds per
+condition. The candidate-count sweep, the training-fraction sweep, and
+the wide-model retunes use one seed, and the heat-kernel temperatures
+have three seeds at present, which each table states.
 
 \textbf{Groups and exact coefficients.} Elements of $\SU(2)$ are unit
 quaternions, of $\SU(3)$ Haar-random special unitary matrices, of
@@ -582,9 +588,10 @@ encodings.
 
 \textbf{Reproducibility.} A tracked results bundle records, for every
 run, the configuration, seed, checkpoint hash, final metrics, and
-analysis outputs, and every table in this paper regenerates from the
-bundle. Code and the bundle are included as anonymized supplementary
-material.
+analysis outputs. The seed, cost, and $\SO(5)$ summary tables regenerate
+from the bundle deterministically, and extending regeneration to every
+table is part of the evidence freeze. Code and the bundle are included
+as anonymized supplementary material.
 
 \section{Background: representation theory and harmonic analysis on compact groups}
 \label{app:background}
@@ -972,8 +979,8 @@ from $4$ to $9$ points of T2 as $f$ falls.
 \subsection{Experiment 3: candidate-count sweep and a revised
 interpretation}
 
-More candidates make ranking harder, and the Bayes ceiling falls from
-$0.951$ at $K = 64$ to $0.922$ at $K = 256$. We predicted before the
+More candidates make ranking harder, and the distance-rule ceiling falls
+from $0.951$ at $K = 64$ to $0.922$ at $K = 256$. We predicted before the
 sweep that harder ranking would broaden the spin spectrum. The
 prediction was wrong. At $K = 256$, the $\SU(2)$ encoder concentrates
 harder ($0.975$ in spin~$\tfrac12$), the score--character fit rises
@@ -982,10 +989,9 @@ improves markedly (T3 at $r = 0.2$ rises from $0.618$ to $0.921$),
 and held-out accuracy tracks the falling ceiling at a roughly
 constant $0.96$ fraction.
 
-The revision follows from \cref{lem:character}. The fundamental
-character is monotone in distance to the product, so ranking by it is
-Bayes-optimal at any resolution, and fine resolution does not require
-higher-spin content. The spin-$1$ admixture that accumulates at
+The revision follows from \cref{lem:character}. The fundamental character is monotone in distance to the product, so
+ranking by it matches the distance rule at any resolution, and fine
+resolution does not require higher-spin content. The spin-$1$ admixture that accumulates at
 $K = 64$ coincides with slightly declining fine resolution over
 training, consistent with drift rather than mechanism. Questions
 about spectral bandwidth therefore need a regression target, which is
@@ -1054,7 +1060,7 @@ Universality across seeds is a statement about a shared
 representation up to gauge.
 
 \subsection{Experiment 7: patching, composition, and the
-representation ring}
+matrix-product contraction}
 
 If the interaction network implements the composition law, the
 product state $h(a,b)$ should be controllable through the composed
@@ -1075,13 +1081,14 @@ its variance in the diagonal $(\tfrac12, \tfrac12)$ subspace, and
 $98.2 \pm 0.3\%$ of that energy lies in the $4$-of-$16$-dimensional
 contraction subspace spanned by the matrix product
 $D^{1/2}(a) D^{1/2}(b)$. The corresponding $\SO(3)$ numbers are
-$77.5 \pm 1.6\%$ and $93.9 \pm 0.9\%$ of $9$ of $81$ dimensions. The
-hidden layer occupies exactly the channels tensor-generated from the
+$77.5 \pm 1.6\%$ and $93.9 \pm 0.9\%$ of $9$ of $81$ dimensions. The hidden layer occupies exactly the channels tensor-generated from the
 encoder content, pass-through $(\tfrac12, 0)$ and $(0, \tfrac12)$ at
 about $25\%$ each and the bilinear $(\tfrac12, \tfrac12)$ at $22\%$,
-with all other channels at the floor. The interaction is the specific
-Clebsch--Gordan contraction that implements the group product, and
-the network's internal algebra follows the representation ring.
+with all other channels at the floor. We name this result exactly. The
+interaction concentrates on the matrix-product contraction within the
+dominant two-input subspace. A literal decomposition into total-spin
+channels under the diagonal action, with causal channel ablations, has
+not been run, so we make no representation-ring claim.
 
 \subsection{Experiment 8: the two-sided translation test}
 
@@ -1221,10 +1228,10 @@ $0.29$, adjoint $0.56$) is inverted by step $15$k and constant
 thereafter. Per the rule, the minimal-representation description
 holds in nine of ten group forms and fails as stated for $\SO(5)$.
 Two hypotheses remain open. The data trend is consistent with
-purification as the task approaches a solution, and the cost framing
-of Experiment~9 makes a genuinely mixed minimum-cost mechanism
-respectable, since the selected object is the cheapest complete
-mechanism rather than the smallest representation. Deciding requires
+purification as the task approaches a solution, and the cost framing of Experiment~9 makes a genuinely mixed
+minimum-cost mechanism a live hypothesis, since the measured selection
+criterion there was a margin-per-norm tradeoff of the complete mechanism
+rather than representation size. Deciding requires
 a condition that solves $\SO(5)$.
 
 \begin{table}[t]
@@ -1287,29 +1294,29 @@ training keeps improving the default model, and extra capacity at
 this data budget is spent memorizing frozen targets rather than
 sharpening the generalizing expansion.
 
-\subsection{Experiment 15: score-level recovery and the
-regularization frontier}
+\subsection{Experiment 15: the score-level character profile and
+the regularization frontier}
 
 The activation-level spectra of Experiment~13 leave open whether the
 score itself is a truncated character expansion. The sequentially
-orthogonalized recovery analysis of \cref{app:methods} answers at
-the score level, and \cref{tab:recovery} reports the profiles.
-Recovered subspaces sit near ratio $1$, subspaces beyond a sharp
-truncation sit at exactly $0$, and the truncation advances in
-Casimir order during training, with the $t = 0.05$ spin-$2$
-recovery climbing from $0.12$ through $0.83$ to $1.20$ across
-$50$k--$120$k steps while $j \geq \tfrac52$ stays at $0$.
+orthogonalized profile of \cref{app:methods} answers at the score level,
+under its stated order and measure dependence, and \cref{tab:recovery}
+reports the profiles.
+Carried subspaces sit near ratio $1$, subspaces beyond a sharp
+truncation sit at exactly $0$, and the truncation advances in Casimir
+order during training, with the $t = 0.05$ spin-$2$ ratio climbing from
+$0.12$ through $0.83$ to $1.20$ across $50$k--$120$k steps while $j \geq
+\tfrac52$ stays at $0$.
 
 The band-limited target $\chi_1 + \tfrac12\chi_2$ calibrates the
 method and isolates the role of regularization. At weight decay
 $1.0$, every out-of-support subspace sits at a $0.0000$ floor, and
 the model prunes the in-support spin-$2$ remainder, whose $12.6\%$
-of target variance matches the final test MSE of $0.131$. Partial
-spin-$2$ recovery at $25$k--$50$k steps ($0.33$--$0.44$) is removed
-by $60$k, so the pruning is an optimization decision rather than a
-failure to reach the subspace. At weight decay $0.1$ on the same
-target, test MSE falls to $0.004$ and the recovery profile is
-$(1.00, 1.01, 0.94, 0.95)$ with out-of-support floors intact. The
+of target variance matches the final test MSE of $0.131$. Partial spin-$2$ content at $25$k--$50$k steps ($0.33$--$0.44$) is
+removed by $60$k, so the pruning is an optimization decision rather than
+a failure to reach the subspace. At weight decay $0.1$ on the same
+target, test MSE falls to $0.004$ and the profile is $(1.00, 1.01, 0.94,
+0.95)$ with out-of-support floors intact. The
 truncation frontier is a cost boundary set by regularization, and
 under weight decay $1.0$ the $25$-real-dimensional spin-$2$
 coefficient space costs more norm than its variance contribution is
@@ -1482,9 +1489,8 @@ coefficients, $9$ dims & $0.889 \pm 0.003$ & $7.29 \pm 0.16$ & $16.7$ & $9.8$ & 
 
 \begin{table}[t]
 \centering
-\caption{Recovery of the character expansion of the score per
-checkpoint (Experiment~15). Sequentially orthogonalized profile,
-model divided by target, with subspaces beyond spin $2$ at $0.000$
+\caption{Sequentially orthogonalized character profile of the score per
+checkpoint (Experiment~15), model divided by target, with subspaces beyond spin $2$ at $0.000$
 throughout and omitted. The band-limited target is
 $\chi_1 + \tfrac12\chi_2$. The truncation advances in Casimir order
 during training, and weight decay $0.1$ recovers the band-limited
@@ -1563,9 +1569,9 @@ initialization scale, is a controlled experiment we have not run.
 nine successes rest on within-condition replication, exact no-op
 controls, and interventions that land where central characters
 predict, and none of that changes. What the failure removes is the
-claim that minimal-total-dimension selection is a law. The cost
-picture of Experiment~9 predicts selection of the cheapest complete
-mechanism, and whether the $\SO(5)$ mixture is that mechanism or a
-transient of an unsolved task is exactly the open question.
+claim that minimal-total-dimension selection is a law. The cost picture of Experiment~9 measures a margin-per-norm advantage
+for the complete mechanism in one setting, and whether the $\SO(5)$
+mixture is a genuinely mixed minimum-cost mechanism or a transient of an
+unsolved task is exactly the open question.
 
 \end{document}
