@@ -1,0 +1,108 @@
+{
+  "schema_name": "config-corrections",
+  "schema_version": 1,
+  "policy": "historical raw config.json files are never rewritten; this record maps stale serialized values to effective values, derived from checkpoint-embedded configs",
+  "code_commit_at_correction": "f9e3a375991e0b4f9fafdd2f0c9add0af8aa3d93+dirty",
+  "corrections": [
+    {
+      "run": "data/su2/so3_so3frame_f0.01_s0",
+      "field": "m",
+      "old_value_in_config_json": 32,
+      "corrected_value": 6,
+      "reason": "config.json was serialized before the explicit encoding 'so3frame' replaced args.m with its own width; the checkpoint-embedded config and the model weights carry the effective value",
+      "evidence": "checkpoint config['m'] and enc.0.weight input width",
+      "checkpoint": "data/su2/so3_so3frame_f0.01_s0/ckpt_60000.pt",
+      "checkpoint_sha256": "a144affa3fadbad0e9d7e34b9a30355ccd9088b1121ef3afe83ba35120c989bb"
+    },
+    {
+      "run": "data/su2/so3_so3frame_f0.01_s1",
+      "field": "m",
+      "old_value_in_config_json": 32,
+      "corrected_value": 6,
+      "reason": "config.json was serialized before the explicit encoding 'so3frame' replaced args.m with its own width; the checkpoint-embedded config and the model weights carry the effective value",
+      "evidence": "checkpoint config['m'] and enc.0.weight input width",
+      "checkpoint": "data/su2/so3_so3frame_f0.01_s1/ckpt_60000.pt",
+      "checkpoint_sha256": "fbb5a98d38c46b6862b9d0672bed8c5275682204ae14f9eb954e975c566e80f3"
+    },
+    {
+      "run": "data/su2/so3_so3frame_f0.01_s2",
+      "field": "m",
+      "old_value_in_config_json": 32,
+      "corrected_value": 6,
+      "reason": "config.json was serialized before the explicit encoding 'so3frame' replaced args.m with its own width; the checkpoint-embedded config and the model weights carry the effective value",
+      "evidence": "checkpoint config['m'] and enc.0.weight input width",
+      "checkpoint": "data/su2/so3_so3frame_f0.01_s2/ckpt_60000.pt",
+      "checkpoint_sha256": "0a83451cbfe6eb0ef0bd19e1358bfdc7567e8286a4b00c8cb8f8531a7d9a7c6f"
+    },
+    {
+      "run": "data/su2/so3_so3frame_f0.01_s3",
+      "field": "m",
+      "old_value_in_config_json": 32,
+      "corrected_value": 6,
+      "reason": "config.json was serialized before the explicit encoding 'so3frame' replaced args.m with its own width; the checkpoint-embedded config and the model weights carry the effective value",
+      "evidence": "checkpoint config['m'] and enc.0.weight input width",
+      "checkpoint": "data/su2/so3_so3frame_f0.01_s3/ckpt_60000.pt",
+      "checkpoint_sha256": "a1f3f7d4340d9a9ce444a06f512dc6a161ec887440367b7002a998033458055c"
+    },
+    {
+      "run": "data/su2/so3_so3frame_f0.01_s4",
+      "field": "m",
+      "old_value_in_config_json": 32,
+      "corrected_value": 6,
+      "reason": "config.json was serialized before the explicit encoding 'so3frame' replaced args.m with its own width; the checkpoint-embedded config and the model weights carry the effective value",
+      "evidence": "checkpoint config['m'] and enc.0.weight input width",
+      "checkpoint": "data/su2/so3_so3frame_f0.01_s4/ckpt_60000.pt",
+      "checkpoint_sha256": "3abf353bc1a5d2298f69795f486e8d72df4b036a20565f2e78bae1433d6849cc"
+    },
+    {
+      "run": "data/su2/so3_so3block_f0.01_s0",
+      "field": "m",
+      "old_value_in_config_json": 32,
+      "corrected_value": 9,
+      "reason": "config.json was serialized before the explicit encoding 'so3block' replaced args.m with its own width; the checkpoint-embedded config and the model weights carry the effective value",
+      "evidence": "checkpoint config['m'] and enc.0.weight input width",
+      "checkpoint": "data/su2/so3_so3block_f0.01_s0/ckpt_60000.pt",
+      "checkpoint_sha256": "699e0ffc9ae7738aee4e6e335b821f1299ec404b9660dd10350440011a139caf"
+    },
+    {
+      "run": "data/su2/so3_so3block_f0.01_s1",
+      "field": "m",
+      "old_value_in_config_json": 32,
+      "corrected_value": 9,
+      "reason": "config.json was serialized before the explicit encoding 'so3block' replaced args.m with its own width; the checkpoint-embedded config and the model weights carry the effective value",
+      "evidence": "checkpoint config['m'] and enc.0.weight input width",
+      "checkpoint": "data/su2/so3_so3block_f0.01_s1/ckpt_60000.pt",
+      "checkpoint_sha256": "f6d54ffb85c285d8b3e8aa359ca7eb4824e48f080cb933717bcd7c548ece2eda"
+    },
+    {
+      "run": "data/su2/so3_so3block_f0.01_s2",
+      "field": "m",
+      "old_value_in_config_json": 32,
+      "corrected_value": 9,
+      "reason": "config.json was serialized before the explicit encoding 'so3block' replaced args.m with its own width; the checkpoint-embedded config and the model weights carry the effective value",
+      "evidence": "checkpoint config['m'] and enc.0.weight input width",
+      "checkpoint": "data/su2/so3_so3block_f0.01_s2/ckpt_60000.pt",
+      "checkpoint_sha256": "481f232571ece3faa685c922bbaf42fdc0ba74c956834c5e95401bc4f674baa9"
+    },
+    {
+      "run": "data/su2/so3_so3block_f0.01_s3",
+      "field": "m",
+      "old_value_in_config_json": 32,
+      "corrected_value": 9,
+      "reason": "config.json was serialized before the explicit encoding 'so3block' replaced args.m with its own width; the checkpoint-embedded config and the model weights carry the effective value",
+      "evidence": "checkpoint config['m'] and enc.0.weight input width",
+      "checkpoint": "data/su2/so3_so3block_f0.01_s3/ckpt_60000.pt",
+      "checkpoint_sha256": "ec91ae62728d2be685734fd56c43dc55aeafd203e59c284d117b257f13ed7b85"
+    },
+    {
+      "run": "data/su2/so3_so3block_f0.01_s4",
+      "field": "m",
+      "old_value_in_config_json": 32,
+      "corrected_value": 9,
+      "reason": "config.json was serialized before the explicit encoding 'so3block' replaced args.m with its own width; the checkpoint-embedded config and the model weights carry the effective value",
+      "evidence": "checkpoint config['m'] and enc.0.weight input width",
+      "checkpoint": "data/su2/so3_so3block_f0.01_s4/ckpt_60000.pt",
+      "checkpoint_sha256": "0c181580e93acb9216755abdc1c33cb69057650ce6c5c81862c38cfb949fd02d"
+    }
+  ]
+}

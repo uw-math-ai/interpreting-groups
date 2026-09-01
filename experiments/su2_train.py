@@ -24,6 +24,8 @@ Usage:
         --save_dir data/su2/su2_N2048_f0.01_s0
 """
 import argparse
+
+from core.provenance import write_config, check_resume_compat
 import json
 import time
 from pathlib import Path
@@ -268,8 +270,6 @@ def main():
 
     save = Path(args.save_dir)
     save.mkdir(parents=True, exist_ok=True)
-    (save / "config.json").write_text(json.dumps(vars(args), indent=2))
-    log_f = open(save / "log.jsonl", "a")
 
     rng = np.random.default_rng(args.seed)
     torch.manual_seed(args.seed)
@@ -280,9 +280,15 @@ def main():
     if args.loss == "bandlim":
         assert args.variant == "su2"
 
+    # resolve every derived field BEFORE serializing the config (G0.2)
     enc = get_encoding(args.encoding, args.variant, m=args.m, alpha=args.alpha,
                        seed=args.enc_seed)
-    args.m = enc.m                      # explicit encodings fix their own width
+    requested = {}
+    if enc.m != args.m:                 # explicit encodings fix their own width
+        requested["m"] = args.m
+        args.m = enc.m
+    write_config(save, args, requested)
+    log_f = open(save / "log.jsonl", "a")
     psi = enc.torch_fn(device)
 
     print(f"[{args.save_dir}] building data ...", flush=True)
@@ -319,6 +325,7 @@ def main():
         if ckpts:
             state = torch.load(ckpts[-1], map_location=device,
                                weights_only=False)
+            check_resume_compat(state, args)
             model.load_state_dict(state["model"])
             if "opt" in state:
                 opt.load_state_dict(state["opt"])

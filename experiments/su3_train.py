@@ -21,6 +21,8 @@ Usage:
         --save_dir data/su3/su3_N2048_f0.01_s0
 """
 import argparse
+
+from core.provenance import write_config, check_resume_compat
 import json
 import time
 from pathlib import Path
@@ -169,7 +171,7 @@ def main():
 
     save = Path(args.save_dir)
     save.mkdir(parents=True, exist_ok=True)
-    (save / "config.json").write_text(json.dumps(vars(args), indent=2))
+    write_config(save, args)   # no derived fields in this trainer (G0.2)
     log_f = open(save / "log.jsonl", "a")
 
     rng = np.random.default_rng(args.seed)
@@ -205,6 +207,7 @@ def main():
         if ckpts:
             state = torch.load(ckpts[-1], map_location=device,
                                weights_only=False)
+            check_resume_compat(state, args)
             model.load_state_dict(state["model"])
             if "opt" in state:
                 opt.load_state_dict(state["opt"])
