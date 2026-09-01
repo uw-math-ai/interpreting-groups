@@ -90,3 +90,113 @@ fig.tight_layout(pad=0.4)
 fig.savefig(ROOT / "paper/figure1.pdf")
 fig.savefig(ROOT / "paper/figure1.png", dpi=220)
 print("saved paper/figure1.{pdf,png}")
+
+
+# ---------------- appendix figure: dynamics and per-group spectra -------------
+def appendix_figure():
+    fig = plt.figure(figsize=(9.0, 5.2), facecolor="white")
+    gs = fig.add_gridspec(2, 3, hspace=0.52, wspace=0.34,
+                          left=0.07, right=0.98, top=0.93, bottom=0.09)
+
+    spin_colors = {0.5: BLUE, 1.0: ORANGE, 1.5: AQUA, 2.0: YELLOW}
+    spin_names = {0.5: "j=1/2", 1.0: "j=1", 1.5: "j=3/2", 2.0: "j=2"}
+
+    # (a)(b) spin content during training
+    for col, (variant, tag) in enumerate([("su2", "SU(2)"), ("so3", "SO(3)")]):
+        ax = fig.add_subplot(gs[0, col])
+        recs = [json.loads(l) for l in
+                open(ROOT / f"data/su2/{variant}_N2048_f0.01_s0/log.jsonl")
+                if "fve_0.5" in l]
+        steps = [r["step"] for r in recs]
+        for j in [0.5, 1.0, 1.5, 2.0]:
+            ax.plot(steps, [max(r[f"fve_{j}"], 2e-4) for r in recs], "-",
+                    color=spin_colors[j], linewidth=1.5, label=spin_names[j])
+        ax.set_yscale("log")
+        ax.set_ylim(1.5e-4, 2)
+        ax.set_xlabel("training step")
+        if col == 0:
+            ax.set_ylabel("FVE per sector (log)")
+            ax.legend(frameon=False, fontsize=7, loc="center right")
+        ax.set_title(f"({chr(97+col)}) {tag} spin content", loc="left",
+                     fontsize=9.5)
+
+    # (c) SU(3)/PSU(3) sector spectra (5-seed means)
+    ax = fig.add_subplot(gs[0, 2])
+    sect = ["fve_10", "fve_11", "fve_20", "fve_30"]
+    lab = [r"$3\oplus\bar 3$", r"$8$", r"$6\oplus\bar 6$", r"$10\oplus\bar{10}$"]
+    means = {}
+    for v in ("su3", "psu3"):
+        vals = []
+        for s0 in range(5):
+            recs = [json.loads(l) for l in
+                    open(ROOT / f"data/su3/{v}_N2048_f0.01_s{s0}/log.jsonl")
+                    if "fve_10" in l]
+            vals.append([recs[-1][k] for k in sect])
+        means[v] = np.array(vals).mean(0)
+    x = np.arange(4)
+    ax.bar(x - 0.19, means["su3"], 0.38, color=BLUE, label="SU(3)")
+    ax.bar(x + 0.19, means["psu3"], 0.38, color=ORANGE, label="PSU(3)")
+    ax.set_xticks(x, lab, fontsize=8)
+    ax.set_ylim(0, 1.05)
+    ax.legend(frameon=False, fontsize=8)
+    ax.set_title("(c) SU(3) vs PSU(3) sectors", loc="left", fontsize=9.5)
+
+    # (d) Spin(4) conditions: carrier vs rejected alternative
+    ax = fig.add_subplot(gs[1, 0:2])
+    conds = ["spin4", "so4", "leftq", "pso4"]
+    cond_lab = ["Spin(4)", "SO(4)", r"SO(3)$\times$SU(2)", "PSO(4)"]
+    KEY = {"spin4": ["fve_0.5_0", "fve_0_0.5"], "so4": ["fve_0.5_0.5"],
+           "leftq": ["fve_0_0.5", "fve_1_0"], "pso4": ["fve_1_0", "fve_0_1"]}
+    ALT = {"spin4": None, "so4": None, "leftq": "fve_1_0.5", "pso4": "fve_1_1"}
+    car, alt = [], []
+    for c in conds:
+        vals, avals = [], []
+        for s0 in range(5):
+            recs = [json.loads(l) for l in
+                    open(ROOT / f"data/spin4/{c}_N2048_f0.01_s{s0}/log.jsonl")
+                    if "fve_0.5_0" in l]
+            r = recs[-1]
+            vals.append(sum(r[k] for k in KEY[c]))
+            avals.append(r[ALT[c]] if ALT[c] else 0.0)
+        car.append(np.mean(vals))
+        alt.append(np.mean(avals))
+    x = np.arange(4)
+    ax.bar(x - 0.19, car, 0.38, color=BLUE, label="learned carrier")
+    ax.bar(x + 0.19, alt, 0.38, color=ORANGE,
+           label="rejected faithful irrep")
+    ax.set_xticks(x, cond_lab, fontsize=8.5)
+    ax.set_ylim(0, 1.05)
+    ax.legend(frameon=False, fontsize=8)
+    ax.set_title("(d) Spin(4) family: carrier vs rejected alternative",
+                 loc="left", fontsize=9.5)
+
+    # (e) Spin(5)/SO(5)
+    ax = fig.add_subplot(gs[1, 2])
+    sect5 = ["fve_4", "fve_5", "fve_10", "fve_14"]
+    lab5 = [r"$\mathbf{4}$", r"$\mathbf{5}$", r"$\mathbf{10}$", r"$\mathbf{14}$"]
+    m5 = {}
+    for v in ("spin5", "so5"):
+        vals = []
+        for s0 in range(5):
+            recs = [json.loads(l) for l in
+                    open(ROOT / f"data/spin5/{v}_N2048_f0.01_s{s0}/log.jsonl")
+                    if "fve_4" in l]
+            vals.append([recs[-1][k] for k in sect5])
+        m5[v] = np.array(vals).mean(0)
+    x = np.arange(4)
+    ax.bar(x - 0.19, m5["spin5"], 0.38, color=BLUE, label="Spin(5)")
+    ax.bar(x + 0.19, m5["so5"], 0.38, color=ORANGE, label="SO(5)")
+    ax.set_xticks(x, lab5, fontsize=8.5)
+    ax.set_ylim(0, 1.05)
+    ax.legend(frameon=False, fontsize=8)
+    ax.set_title("(e) Spin(5) vs SO(5) sectors", loc="left", fontsize=9.5)
+
+    for ax in fig.axes:
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+    fig.savefig(ROOT / "paper/figureA1.pdf")
+    fig.savefig(ROOT / "paper/figureA1.png", dpi=200)
+    print("saved paper/figureA1.{pdf,png}")
+
+
+appendix_figure()
