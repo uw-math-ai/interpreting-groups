@@ -85,6 +85,18 @@ D = End_G(W) ∈ {R, C, H} (real Schur lemma), the real coefficient block has
 dimension dim_R M_W = (dim_R W)² / dim_R D, and it is the minimal nonzero
 two-sided translation-stable real subspace of its sector.*
 
+Conventions and proof route (corrected 2026-09-01 after independent review,
+see `summary/theory_review.md`): with (L_k f)(g) = f(k^-1 g) and
+(R_k f)(g) = f(g k), left translation acts on the bra slot (V*) and right
+translation on the ket slot (V). The complex minimality is the
+irreducibility of V* boxtimes V over G x G. The real minimality does NOT
+follow from an "outer tensor over D" argument (outer tensors of real
+irreducibles need not be irreducible, e.g. C tensor_R C splits); it follows
+from the double-commutant route: the algebra spanned by {W(g)} is
+End_D(W) = M_m(D^op) by Jacobson density, the coefficient span is its image
+under the trace pairing, two-sided translation-stable subspaces correspond
+to two-sided ideals, and M_m(D^op) is simple.
+
 Instances (matching every measured block dimension): SO(3) vector — 9/1 = 9;
 SU(2) spin-½ — 16/4 = 4 (quaternionic); SU(3) fundamental pair — 36/2 = 18
 (complex type). This lemma gives d² its precise role: **not** the minimum

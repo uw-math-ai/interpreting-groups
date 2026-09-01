@@ -231,8 +231,8 @@ quadratic form in $X$ up to higher order.
 \Cref{lem:character} says that a monotone function of
 $\operatorname{Re}\chi_V(ab\,c^{-1})$ ranks the true product above every
 excluded negative for any faithful $V$, and a representation with
-nontrivial kernel has population ranking loss bounded away from the
-optimum under explicit sampling assumptions (\cref{lem:necessity},
+nontrivial kernel assigns the product and its kernel translates
+identical scores, so it cannot separate them (\cref{lem:necessity},
 \cref{app:proofs}). A trained model therefore needs a faithful
 representation of exactly the task group and is free to select the
 cheapest one. Whether it stores a
@@ -784,50 +784,55 @@ lies in the kernel of $V$, which is trivial, so $X = 0$, proving
 positive definiteness.
 \end{proof}
 
-\begin{lemma}
+\begin{lemma}[Kernel collisions]
 \label{lem:necessity}
 Let $H$ be a compact group. Assume the score factors as
 $s(a,b,c) = S(\varphi(a), \varphi(b), \varphi(c))$ where $\varphi$
 factors through the matrix coefficients of a representation $V$ of $H$
-with nontrivial closed kernel $N$, the function $c \mapsto s(a,b,c)$
-is continuous, negatives are sampled from a distribution assigning
-positive probability to every open subset of the admissible region,
-and the exclusion radius is smaller than
-$\min_{n \in N,\, n \neq e} d(e, n)$. Then the population ranking loss
-is bounded away from its optimum.
+with nontrivial closed kernel $N$. Then
+$s(a, b, ab\,n) = s(a, b, ab)$ for every $n \in N$ and all $(a, b)$,
+so the scorer assigns identical scores to the exact product and to
+each of its kernel translates, and every center discrimination
+supported on $N$ sits exactly at its tie value.
 \end{lemma}
 
 \begin{proof}
-Fix $n \in N$ with $n \neq e$. By the radius hypothesis, $ab\,n$ lies
-in the admissible negative region. Since $\varphi$ is constant on
-$N$-cosets, $s(a, b, ab\,n) = s(a, b, ab)$, which is at least the
-score of the noisy positive up to the continuity modulus of $s$ over
-the positive displacement. By continuity, there is a ball around
-$ab\,n$ on which the score stays within any prescribed gap of this
-value, and by the sampling hypothesis that ball receives positive
-probability, so with positive probability a sampled negative ties or
-exceeds the positive.
+Every matrix coefficient of $V$ is constant on $N$-cosets, so
+$\varphi$ is, and $ab\,n$ lies in the $N$-coset of $ab$.
 \end{proof}
 
-The hypotheses are needed. With a finite kernel and a continuous
-candidate distribution, the exact ambiguous points have measure zero,
-and without continuity of the score no positive lower bound follows
-from non-separation alone.
+Exact collisions do not by themselves bound the population ranking loss
+away from its optimum. With a finite kernel and a continuous candidate
+distribution, sampled negatives avoid the collision set with probability
+one, and a uniform gap would additionally require a modulus of
+continuity for the scorer class, a density lower bound near the kernel
+translates, and a quantified comparison with the noisy positive. We
+leave that quantitative statement open and use only the collision form,
+which is exactly what the tie-aware center discriminations measure.
 
 \begin{proof}[Proof of \cref{lem:twosided}]
-The map $V_\rho^* \otimes V_\rho \to L^2(G)$ sending $u^* \otimes v$
-to $g \mapsto \langle u, \rho(g) v \rangle$ intertwines the
-$G \times G$-action by left and right translation with the outer
-tensor product action and is injective by the orthogonality of matrix
-coefficients (\cref{app:background}). The outer tensor product of
+Fix the conventions $(L_k f)(g) = f(k^{-1} g)$ and
+$(R_k f)(g) = f(g k)$, so that for the coefficient
+$f_{u,v}(g) = \langle u, \rho(g) v\rangle$ left translation acts on
+the $u$ slot through the contragredient and right translation acts on
+the $v$ slot. The map $V_\rho^* \otimes V_\rho \to L^2(G)$ sending
+$u^* \otimes v$ to $f_{u,v}$ then intertwines the
+$G \times G$-action with the outer tensor product action and is
+injective by the orthogonality of matrix coefficients
+(\cref{app:background}). Over $\C$, the outer tensor product of
 irreducible representations is an irreducible representation of the
 product group, so $M_\rho$ has no proper nonzero two-sided invariant
 subspace, and $\dim_\C M_\rho = (\dim V_\rho)^2$. For the real form,
-the real Schur lemma gives $\End_G(W) \in \{\R, \C, \HH\}$, and the
-real matrix-coefficient span of $W$ is identified with
-$W^* \otimes_{D} W$, of real dimension $(\dim_\R W)^2/\dim_\R D$.
-Minimality follows from irreducibility of the two-sided action on this
-space, by the same outer-tensor argument applied over $D$.
+the real Schur lemma gives $D = \End_G(W) \in \{\R, \C, \HH\}$, and
+by the Jacobson density theorem the algebra spanned by
+$\{W(g)\}_{g \in G}$ is all of $\End_D(W) \cong M_m(D^{\mathrm{op}})$
+with $m = \dim_D W$, of real dimension
+$(\dim_\R W)^2/\dim_\R D$. The real coefficient span of $W$ is the
+image of $\End_D(W)$ under the trace pairing, which identifies it
+with $W^* \otimes_D W$ at that dimension. A real subspace of the
+coefficient span invariant under both translation actions corresponds
+to a two-sided ideal of $\End_D(W)$, and $M_m(D^{\mathrm{op}})$ is a
+simple algebra, so the only nonzero such subspace is the whole span.
 \end{proof}
 
 \section{Analysis methods in detail}
