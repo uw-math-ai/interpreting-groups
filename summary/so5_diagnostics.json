@@ -1,0 +1,1252 @@
+{
+  "envelope": {
+    "schema_name": "so5-diagnostics",
+    "schema_version": 1,
+    "generated_at_utc": "2026-09-01T07:38:21.927951+00:00",
+    "code_commit": "b503cee3ce6f5144fc7b4b89f83522c470f428b0+dirty",
+    "analysis_source_sha256": "494c7e6fb11bf0a76844858fbdd74fd8bb5232edea5eb82979daf2509f829de8",
+    "source_checkpoint": null,
+    "run_config_sha256": null,
+    "training_seed": null,
+    "analysis_seed": 0,
+    "analysis_args": {
+      "n": 2048,
+      "enc_seeds": [
+        0,
+        1,
+        2
+      ],
+      "analysis_seed": 0,
+      "out": "summary/so5_diagnostics.json"
+    },
+    "environment": {
+      "python": "3.12.6",
+      "platform": "Linux-6.1.158-180.294.amzn2023.x86_64-x86_64-with-glibc2.34",
+      "torch": "2.11.0+cu130",
+      "cuda": "13.0",
+      "device": "cpu",
+      "numpy": "2.4.4"
+    }
+  },
+  "results": {
+    "training_values": {
+      "sigma": 0.15,
+      "excl_radius": 0.7,
+      "K": 64
+    },
+    "effective_rank_definitions": "exp of spectral entropy; and min k with 95% variance",
+    "encodings": {
+      "spin5_landmark": {
+        "per_seed": [
+          {
+            "enc_seed": 0,
+            "gram": {
+              "effective_rank_entropy": 22.273704842660823,
+              "effective_rank_entropy_ci95": [
+                21.920659797351103,
+                22.292808233824637
+              ],
+              "n95": 29,
+              "n95_ci95": [
+                28.0,
+                29.0
+              ],
+              "condition_number": 93.58454577243165,
+              "condition_number_ci95": [
+                91.2917275668467,
+                110.73276182674647
+              ],
+              "eig_floor": 1e-10,
+              "n_boot": 200
+            },
+            "jacobian": {
+              "sv_mean": [
+                8.913640022277832,
+                7.385970115661621,
+                6.466787815093994,
+                5.645697593688965,
+                5.015166759490967,
+                4.4895124435424805,
+                3.972492218017578,
+                3.4747815132141113,
+                3.0154759883880615,
+                2.564939498901367
+              ],
+              "sv_min_q05_q50_q95": [
+                2.000670909881592,
+                2.60722017288208,
+                3.0146219730377197
+              ],
+              "local_condition_q05_q50_q95": [
+                2.772826910018921,
+                3.360295295715332,
+                4.678076267242432
+              ],
+              "fd_step_discrepancy_median": 0.00021673355513485149,
+              "eps": 0.0001,
+              "eps_validation": 0.001,
+              "n_base": 64
+            },
+            "distortion": {
+              "spearman_int_vs_obs": 0.5361268522679978,
+              "obs_over_int_ratio_q05_q50_q95": [
+                3.059091761909886,
+                3.9783290781029472,
+                5.232709221185037
+              ],
+              "ratio_dispersion": 1.7105433992990438
+            },
+            "nn": {
+              "nn_top1_agreement": 0.41015625,
+              "d_pos_q05_q50_q95": [
+                0.3404553363673635,
+                0.5303086031423823,
+                0.7732891924319553
+              ],
+              "d_negmin_q05_q50_q95": [
+                1.0320486132498852,
+                1.3694062541602698,
+                1.6426971497421652
+              ],
+              "overlap_intrinsic": 0.022460937499999997,
+              "overlap_observation": 0.08642578424629202,
+              "sigma": 0.15,
+              "excl_radius": 0.7,
+              "K": 64
+            },
+            "ceilings": {
+              "geodesic_distance_rule_acc": 1.0,
+              "observation_distance_rule_acc": 0.9912109375,
+              "n_instances": 2048,
+              "rule_note": "geodesic rule is monotone in the positive likelihood for small isotropic algebra noise; observation rule receives the true product and isolates encoding distortion"
+            }
+          },
+          {
+            "enc_seed": 1,
+            "gram": {
+              "effective_rank_entropy": 21.000111849568928,
+              "effective_rank_entropy_ci95": [
+                20.68931202545008,
+                21.023058364496116
+              ],
+              "n95": 27,
+              "n95_ci95": [
+                27.0,
+                27.0
+              ],
+              "condition_number": 148.0315200298369,
+              "condition_number_ci95": [
+                139.4999924401867,
+                174.0640000204662
+              ],
+              "eig_floor": 1e-10,
+              "n_boot": 200
+            },
+            "jacobian": {
+              "sv_mean": [
+                8.890110969543457,
+                7.409190654754639,
+                6.561899185180664,
+                5.768085956573486,
+                5.103611469268799,
+                4.539483070373535,
+                4.013894557952881,
+                3.540879487991333,
+                3.0394647121429443,
+                2.4483642578125
+              ],
+              "sv_min_q05_q50_q95": [
+                1.935054898262024,
+                2.4479563236236572,
+                3.0094122886657715
+              ],
+              "local_condition_q05_q50_q95": [
+                2.9860663414001465,
+                3.5245676040649414,
+                4.705461502075195
+              ],
+              "fd_step_discrepancy_median": 0.0002126832041540183,
+              "eps": 0.0001,
+              "eps_validation": 0.001,
+              "n_base": 64
+            },
+            "distortion": {
+              "spearman_int_vs_obs": 0.5121809599498114,
+              "obs_over_int_ratio_q05_q50_q95": [
+                2.9872923689806026,
+                3.9641305289288535,
+                5.293383749907612
+              ],
+              "ratio_dispersion": 1.7719670845990714
+            },
+            "nn": {
+              "nn_top1_agreement": 0.396484375,
+              "d_pos_q05_q50_q95": [
+                0.3439044977227777,
+                0.5365124521487634,
+                0.7721539566797307
+              ],
+              "d_negmin_q05_q50_q95": [
+                1.0377706832809985,
+                1.3796091959240904,
+                1.6564499694355719
+              ],
+              "overlap_intrinsic": 0.021484375,
+              "overlap_observation": 0.09228514082344388,
+              "sigma": 0.15,
+              "excl_radius": 0.7,
+              "K": 64
+            },
+            "ceilings": {
+              "geodesic_distance_rule_acc": 0.99951171875,
+              "observation_distance_rule_acc": 0.99365234375,
+              "n_instances": 2048,
+              "rule_note": "geodesic rule is monotone in the positive likelihood for small isotropic algebra noise; observation rule receives the true product and isolates encoding distortion"
+            }
+          },
+          {
+            "enc_seed": 2,
+            "gram": {
+              "effective_rank_entropy": 21.467505572713147,
+              "effective_rank_entropy_ci95": [
+                21.142349821872962,
+                21.49213430274507
+              ],
+              "n95": 28,
+              "n95_ci95": [
+                28.0,
+                28.0
+              ],
+              "condition_number": 118.28549556401367,
+              "condition_number_ci95": [
+                115.88063162804514,
+                137.762220482961
+              ],
+              "eig_floor": 1e-10,
+              "n_boot": 200
+            },
+            "jacobian": {
+              "sv_mean": [
+                9.104129791259766,
+                7.465638160705566,
+                6.391891956329346,
+                5.636667251586914,
+                4.935539245605469,
+                4.3267669677734375,
+                3.7636091709136963,
+                3.3243820667266846,
+                2.8155174255371094,
+                2.3057591915130615
+              ],
+              "sv_min_q05_q50_q95": [
+                1.7732431888580322,
+                2.281773090362549,
+                2.8866076469421387
+              ],
+              "local_condition_q05_q50_q95": [
+                3.0165328979492188,
+                3.806581497192383,
+                5.401934623718262
+              ],
+              "fd_step_discrepancy_median": 0.00022051525593269616,
+              "eps": 0.0001,
+              "eps_validation": 0.001,
+              "n_base": 64
+            },
+            "distortion": {
+              "spearman_int_vs_obs": 0.48260617996500393,
+              "obs_over_int_ratio_q05_q50_q95": [
+                2.9412997799590506,
+                4.002994610217036,
+                5.371609584790798
+              ],
+              "ratio_dispersion": 1.8262706920902783
+            },
+            "nn": {
+              "nn_top1_agreement": 0.3271484375,
+              "d_pos_q05_q50_q95": [
+                0.3538922093985426,
+                0.5367941316067255,
+                0.7731471673842948
+              ],
+              "d_negmin_q05_q50_q95": [
+                1.0418246536261695,
+                1.3816398675497679,
+                1.6592328162056151
+              ],
+              "overlap_intrinsic": 0.017578125000000003,
+              "overlap_observation": 0.11035156926231686,
+              "sigma": 0.15,
+              "excl_radius": 0.7,
+              "K": 64
+            },
+            "ceilings": {
+              "geodesic_distance_rule_acc": 0.99951171875,
+              "observation_distance_rule_acc": 0.99072265625,
+              "n_instances": 2048,
+              "rule_note": "geodesic rule is monotone in the positive likelihood for small isotropic algebra noise; observation rule receives the true product and isolates encoding distortion"
+            }
+          }
+        ],
+        "aggregate": {
+          "gram/effective_rank_entropy": {
+            "mean": 21.580440754980966,
+            "sd": 0.644263567617006
+          },
+          "gram/n95": {
+            "mean": 28.0,
+            "sd": 1.0
+          },
+          "gram/condition_number": {
+            "mean": 119.96718712209407,
+            "sd": 27.262415819567916
+          },
+          "distortion/spearman_int_vs_obs": {
+            "mean": 0.5103046640609378,
+            "sd": 0.02680962430990162
+          },
+          "distortion/ratio_dispersion": {
+            "mean": 1.7695937253294645,
+            "sd": 0.05790013989502962
+          },
+          "nn/nn_top1_agreement": {
+            "mean": 0.3779296875,
+            "sd": 0.04450597212931969
+          },
+          "nn/overlap_intrinsic": {
+            "mean": 0.0205078125,
+            "sd": 0.002583741514711511
+          },
+          "nn/overlap_observation": {
+            "mean": 0.09635416477735093,
+            "sd": 0.01247110717263554
+          },
+          "ceilings/geodesic_distance_rule_acc": {
+            "mean": 0.9996744791666666,
+            "sd": 0.000281909311127747
+          },
+          "ceilings/observation_distance_rule_acc": {
+            "mean": 0.9918619791666666,
+            "sd": 0.0015696046160470305
+          },
+          "jacobian/fd_step_discrepancy_median": {
+            "mean": 0.0002166440050738553,
+            "sd": 3.9167937367240875e-06
+          }
+        }
+      },
+      "so5_landmark": {
+        "per_seed": [
+          {
+            "enc_seed": 0,
+            "gram": {
+              "effective_rank_entropy": 38.67306754215676,
+              "effective_rank_entropy_ci95": [
+                37.91959658983728,
+                38.535585128678285
+              ],
+              "n95": 39,
+              "n95_ci95": [
+                39.0,
+                39.0
+              ],
+              "condition_number": 20.52764535676964,
+              "condition_number_ci95": [
+                20.233820232200785,
+                24.28511066618081
+              ],
+              "eig_floor": 1e-10,
+              "n_boot": 200
+            },
+            "jacobian": {
+              "sv_mean": [
+                12.02872085571289,
+                10.065384864807129,
+                8.743781089782715,
+                7.701300621032715,
+                6.745437145233154,
+                5.920695781707764,
+                5.2361226081848145,
+                4.606917381286621,
+                3.9754114151000977,
+                3.2261016368865967
+              ],
+              "sv_min_q05_q50_q95": [
+                2.5398268699645996,
+                3.159393548965454,
+                4.039881229400635
+              ],
+              "local_condition_q05_q50_q95": [
+                2.899343252182007,
+                3.6664199829101562,
+                4.9811530113220215
+              ],
+              "fd_step_discrepancy_median": 0.00016547140694456175,
+              "eps": 0.0001,
+              "eps_validation": 0.001,
+              "n_base": 64
+            },
+            "distortion": {
+              "spearman_int_vs_obs": 0.1890871822615896,
+              "obs_over_int_ratio_q05_q50_q95": [
+                3.259917527006592,
+                4.564541424807727,
+                6.30409318211082
+              ],
+              "ratio_dispersion": 1.9338198374299156
+            },
+            "nn": {
+              "nn_top1_agreement": 0.3193359375,
+              "d_pos_q05_q50_q95": [
+                0.3404553363673635,
+                0.5303086031423823,
+                0.7732891924319553
+              ],
+              "d_negmin_q05_q50_q95": [
+                0.9431396752781483,
+                1.2600448425989759,
+                1.4923041474765983
+              ],
+              "overlap_intrinsic": 0.03320312500000001,
+              "overlap_observation": 0.20898437401253792,
+              "sigma": 0.15,
+              "excl_radius": 0.7,
+              "K": 64
+            },
+            "ceilings": {
+              "geodesic_distance_rule_acc": 0.998046875,
+              "observation_distance_rule_acc": 0.97314453125,
+              "n_instances": 2048,
+              "rule_note": "geodesic rule is monotone in the positive likelihood for small isotropic algebra noise; observation rule receives the true product and isolates encoding distortion"
+            }
+          },
+          {
+            "enc_seed": 1,
+            "gram": {
+              "effective_rank_entropy": 38.629514015601806,
+              "effective_rank_entropy_ci95": [
+                37.85178840365231,
+                38.46762152256868
+              ],
+              "n95": 39,
+              "n95_ci95": [
+                38.0,
+                38.0
+              ],
+              "condition_number": 19.346686058580826,
+              "condition_number_ci95": [
+                19.120856523228667,
+                23.250337858624945
+              ],
+              "eig_floor": 1e-10,
+              "n_boot": 200
+            },
+            "jacobian": {
+              "sv_mean": [
+                11.751851081848145,
+                9.85930061340332,
+                8.630727767944336,
+                7.634801387786865,
+                6.750897407531738,
+                5.952511787414551,
+                5.262897968292236,
+                4.496090412139893,
+                3.8569211959838867,
+                3.0998923778533936
+              ],
+              "sv_min_q05_q50_q95": [
+                2.395805835723877,
+                3.123039722442627,
+                3.8836638927459717
+              ],
+              "local_condition_q05_q50_q95": [
+                3.1080594062805176,
+                3.7399682998657227,
+                4.862889289855957
+              ],
+              "fd_step_discrepancy_median": 0.00015969360538292676,
+              "eps": 0.0001,
+              "eps_validation": 0.001,
+              "n_base": 64
+            },
+            "distortion": {
+              "spearman_int_vs_obs": 0.19995625012991952,
+              "obs_over_int_ratio_q05_q50_q95": [
+                3.2238444792208067,
+                4.567180994491435,
+                6.286224319985835
+              ],
+              "ratio_dispersion": 1.949915500112833
+            },
+            "nn": {
+              "nn_top1_agreement": 0.294921875,
+              "d_pos_q05_q50_q95": [
+                0.3439044977227777,
+                0.5365124521487634,
+                0.7721539566797307
+              ],
+              "d_negmin_q05_q50_q95": [
+                0.955656802401333,
+                1.2736489032634157,
+                1.5094772430649537
+              ],
+              "overlap_intrinsic": 0.03369140625,
+              "overlap_observation": 0.24951172691301282,
+              "sigma": 0.15,
+              "excl_radius": 0.7,
+              "K": 64
+            },
+            "ceilings": {
+              "geodesic_distance_rule_acc": 0.99658203125,
+              "observation_distance_rule_acc": 0.974609375,
+              "n_instances": 2048,
+              "rule_note": "geodesic rule is monotone in the positive likelihood for small isotropic algebra noise; observation rule receives the true product and isolates encoding distortion"
+            }
+          },
+          {
+            "enc_seed": 2,
+            "gram": {
+              "effective_rank_entropy": 37.76303061385466,
+              "effective_rank_entropy_ci95": [
+                36.98371242071995,
+                37.645553539739254
+              ],
+              "n95": 38,
+              "n95_ci95": [
+                38.0,
+                38.0
+              ],
+              "condition_number": 26.89211270462249,
+              "condition_number_ci95": [
+                25.879670724940947,
+                31.437477275637523
+              ],
+              "eig_floor": 1e-10,
+              "n_boot": 200
+            },
+            "jacobian": {
+              "sv_mean": [
+                11.907246589660645,
+                9.963730812072754,
+                8.645452499389648,
+                7.534665584564209,
+                6.498089790344238,
+                5.704771995544434,
+                4.943605899810791,
+                4.28973913192749,
+                3.6063947677612305,
+                2.949528694152832
+              ],
+              "sv_min_q05_q50_q95": [
+                2.198038101196289,
+                2.8754050731658936,
+                3.8410027027130127
+              ],
+              "local_condition_q05_q50_q95": [
+                3.154045820236206,
+                4.06002140045166,
+                5.547746658325195
+              ],
+              "fd_step_discrepancy_median": 0.00015721581439720467,
+              "eps": 0.0001,
+              "eps_validation": 0.001,
+              "n_base": 64
+            },
+            "distortion": {
+              "spearman_int_vs_obs": 0.1514991836235372,
+              "obs_over_int_ratio_q05_q50_q95": [
+                3.133009319553462,
+                4.58797159947602,
+                6.46301468983301
+              ],
+              "ratio_dispersion": 2.0628775821050422
+            },
+            "nn": {
+              "nn_top1_agreement": 0.2919921875,
+              "d_pos_q05_q50_q95": [
+                0.3538922093985426,
+                0.5367941316067255,
+                0.7731471673842948
+              ],
+              "d_negmin_q05_q50_q95": [
+                0.9614492589319299,
+                1.2800151776285043,
+                1.5052757662697784
+              ],
+              "overlap_intrinsic": 0.025878906250000003,
+              "overlap_observation": 0.2412109218815195,
+              "sigma": 0.15,
+              "excl_radius": 0.7,
+              "K": 64
+            },
+            "ceilings": {
+              "geodesic_distance_rule_acc": 0.99853515625,
+              "observation_distance_rule_acc": 0.9755859375,
+              "n_instances": 2048,
+              "rule_note": "geodesic rule is monotone in the positive likelihood for small isotropic algebra noise; observation rule receives the true product and isolates encoding distortion"
+            }
+          }
+        ],
+        "aggregate": {
+          "gram/effective_rank_entropy": {
+            "mean": 38.35520405720441,
+            "sd": 0.5132993937999208
+          },
+          "gram/n95": {
+            "mean": 38.666666666666664,
+            "sd": 0.5773502691896258
+          },
+          "gram/condition_number": {
+            "mean": 22.25548137332432,
+            "sd": 4.05862400239004
+          },
+          "distortion/spearman_int_vs_obs": {
+            "mean": 0.18018087200501545,
+            "sd": 0.0254266316170813
+          },
+          "distortion/ratio_dispersion": {
+            "mean": 1.9822043065492636,
+            "sd": 0.07032709741610632
+          },
+          "nn/nn_top1_agreement": {
+            "mean": 0.3020833333333333,
+            "sd": 0.015012828851041934
+          },
+          "nn/overlap_intrinsic": {
+            "mean": 0.030924479166666668,
+            "sd": 0.004376409394449464
+          },
+          "nn/overlap_observation": {
+            "mean": 0.2332356742690234,
+            "sd": 0.021408409892852302
+          },
+          "ceilings/geodesic_distance_rule_acc": {
+            "mean": 0.9977213541666666,
+            "sd": 0.0010164384763018228
+          },
+          "ceilings/observation_distance_rule_acc": {
+            "mean": 0.9744466145833334,
+            "sd": 0.0012288141984490154
+          },
+          "jacobian/fd_step_discrepancy_median": {
+            "mean": 0.00016079360890823105,
+            "sd": 4.23629648322162e-06
+          }
+        }
+      },
+      "so5_vector_control": {
+        "per_seed": [
+          {
+            "enc_seed": 0,
+            "gram": {
+              "effective_rank_entropy": 24.854270426662815,
+              "effective_rank_entropy_ci95": [
+                24.674107107196324,
+                24.745399297815734
+              ],
+              "n95": 24,
+              "n95_ci95": [
+                24.0,
+                24.0
+              ],
+              "condition_number": 1.5057047853780163,
+              "condition_number_ci95": [
+                1.6623532293284395,
+                1.8566029697573945
+              ],
+              "eig_floor": 1e-10,
+              "n_boot": 200
+            },
+            "jacobian": {
+              "sv_mean": [
+                4.482430458068848,
+                4.477892875671387,
+                4.475505828857422,
+                4.474001884460449,
+                4.472440242767334,
+                4.471063137054443,
+                4.469783782958984,
+                4.468482971191406,
+                4.46688985824585,
+                4.464356899261475
+              ],
+              "sv_min_q05_q50_q95": [
+                4.462118148803711,
+                4.464413642883301,
+                4.466344833374023
+              ],
+              "local_condition_q05_q50_q95": [
+                1.003333568572998,
+                1.0039806365966797,
+                1.0048025846481323
+              ],
+              "fd_step_discrepancy_median": 0.00015783364506205544,
+              "eps": 0.0001,
+              "eps_validation": 0.001,
+              "n_base": 64
+            },
+            "distortion": {
+              "spearman_int_vs_obs": 0.8524428611214675,
+              "obs_over_int_ratio_q05_q50_q95": [
+                3.033215956920091,
+                3.38020393658418,
+                3.748616851917917
+              ],
+              "ratio_dispersion": 1.2358555754547196
+            },
+            "nn": {
+              "nn_top1_agreement": 0.9453125,
+              "d_pos_q05_q50_q95": [
+                0.3404553363673635,
+                0.5303086031423823,
+                0.7732891924319553
+              ],
+              "d_negmin_q05_q50_q95": [
+                0.9431396752781483,
+                1.2600448425989759,
+                1.4923041474765983
+              ],
+              "overlap_intrinsic": 0.03320312500000001,
+              "overlap_observation": 0.026855471578299383,
+              "sigma": 0.15,
+              "excl_radius": 0.7,
+              "K": 64
+            },
+            "ceilings": {
+              "geodesic_distance_rule_acc": 0.998046875,
+              "observation_distance_rule_acc": 0.998046875,
+              "n_instances": 2048,
+              "rule_note": "geodesic rule is monotone in the positive likelihood for small isotropic algebra noise; observation rule receives the true product and isolates encoding distortion"
+            }
+          },
+          {
+            "enc_seed": 1,
+            "gram": {
+              "effective_rank_entropy": 24.830950549776283,
+              "effective_rank_entropy_ci95": [
+                24.630834530376937,
+                24.720617014015914
+              ],
+              "n95": 24,
+              "n95_ci95": [
+                24.0,
+                24.0
+              ],
+              "condition_number": 1.497520421949242,
+              "condition_number_ci95": [
+                1.6832214650824702,
+                1.8942318356258327
+              ],
+              "eig_floor": 1e-10,
+              "n_boot": 200
+            },
+            "jacobian": {
+              "sv_mean": [
+                4.481191158294678,
+                4.478684425354004,
+                4.476881980895996,
+                4.475042343139648,
+                4.473466396331787,
+                4.471686840057373,
+                4.469801425933838,
+                4.4681572914123535,
+                4.465979099273682,
+                4.459698677062988
+              ],
+              "sv_min_q05_q50_q95": [
+                4.455624103546143,
+                4.459472179412842,
+                4.46454381942749
+              ],
+              "local_condition_q05_q50_q95": [
+                1.0036746263504028,
+                1.0048422813415527,
+                1.005752682685852
+              ],
+              "fd_step_discrepancy_median": 0.0001556750721647404,
+              "eps": 0.0001,
+              "eps_validation": 0.001,
+              "n_base": 64
+            },
+            "distortion": {
+              "spearman_int_vs_obs": 0.8540847270972305,
+              "obs_over_int_ratio_q05_q50_q95": [
+                3.0384042290611717,
+                3.38305748022833,
+                3.741768742347991
+              ],
+              "ratio_dispersion": 1.2314914212399415
+            },
+            "nn": {
+              "nn_top1_agreement": 0.9345703125,
+              "d_pos_q05_q50_q95": [
+                0.3439044977227777,
+                0.5365124521487634,
+                0.7721539566797307
+              ],
+              "d_negmin_q05_q50_q95": [
+                0.955656802401333,
+                1.2736489032634157,
+                1.5094772430649537
+              ],
+              "overlap_intrinsic": 0.03369140625,
+              "overlap_observation": 0.03906251429933285,
+              "sigma": 0.15,
+              "excl_radius": 0.7,
+              "K": 64
+            },
+            "ceilings": {
+              "geodesic_distance_rule_acc": 0.99658203125,
+              "observation_distance_rule_acc": 0.99755859375,
+              "n_instances": 2048,
+              "rule_note": "geodesic rule is monotone in the positive likelihood for small isotropic algebra noise; observation rule receives the true product and isolates encoding distortion"
+            }
+          },
+          {
+            "enc_seed": 2,
+            "gram": {
+              "effective_rank_entropy": 24.857628397331,
+              "effective_rank_entropy_ci95": [
+                24.666948454738215,
+                24.74996556251468
+              ],
+              "n95": 24,
+              "n95_ci95": [
+                24.0,
+                24.0
+              ],
+              "condition_number": 1.4469010220233356,
+              "condition_number_ci95": [
+                1.6423856941976736,
+                1.852023363276107
+              ],
+              "eig_floor": 1e-10,
+              "n_boot": 200
+            },
+            "jacobian": {
+              "sv_mean": [
+                4.4809250831604,
+                4.478808403015137,
+                4.476576805114746,
+                4.474940299987793,
+                4.473297119140625,
+                4.471595287322998,
+                4.4700140953063965,
+                4.468023300170898,
+                4.466034889221191,
+                4.46198034286499
+              ],
+              "sv_min_q05_q50_q95": [
+                4.458817958831787,
+                4.461915016174316,
+                4.4651384353637695
+              ],
+              "local_condition_q05_q50_q95": [
+                1.0035160779953003,
+                1.0042974948883057,
+                1.004949688911438
+              ],
+              "fd_step_discrepancy_median": 0.0001487814588472247,
+              "eps": 0.0001,
+              "eps_validation": 0.001,
+              "n_base": 64
+            },
+            "distortion": {
+              "spearman_int_vs_obs": 0.8463233498993279,
+              "obs_over_int_ratio_q05_q50_q95": [
+                3.0271419111573237,
+                3.377702517392205,
+                3.7682221877250335
+              ],
+              "ratio_dispersion": 1.244811871500396
+            },
+            "nn": {
+              "nn_top1_agreement": 0.9443359375,
+              "d_pos_q05_q50_q95": [
+                0.3538922093985426,
+                0.5367941316067255,
+                0.7731471673842948
+              ],
+              "d_negmin_q05_q50_q95": [
+                0.9614492589319299,
+                1.2800151776285043,
+                1.5052757662697784
+              ],
+              "overlap_intrinsic": 0.025878906250000003,
+              "overlap_observation": 0.02099609995443221,
+              "sigma": 0.15,
+              "excl_radius": 0.7,
+              "K": 64
+            },
+            "ceilings": {
+              "geodesic_distance_rule_acc": 0.99853515625,
+              "observation_distance_rule_acc": 0.99853515625,
+              "n_instances": 2048,
+              "rule_note": "geodesic rule is monotone in the positive likelihood for small isotropic algebra noise; observation rule receives the true product and isolates encoding distortion"
+            }
+          }
+        ],
+        "aggregate": {
+          "gram/effective_rank_entropy": {
+            "mean": 24.847616457923365,
+            "sd": 0.014530428848707118
+          },
+          "gram/n95": {
+            "mean": 24.0,
+            "sd": 0.0
+          },
+          "gram/condition_number": {
+            "mean": 1.4833754097835312,
+            "sd": 0.031851713816440086
+          },
+          "distortion/spearman_int_vs_obs": {
+            "mean": 0.8509503127060087,
+            "sd": 0.004090295781651638
+          },
+          "distortion/ratio_dispersion": {
+            "mean": 1.2373862893983523,
+            "sd": 0.006790869802038193
+          },
+          "nn/nn_top1_agreement": {
+            "mean": 0.94140625,
+            "sd": 0.005940197783494355
+          },
+          "nn/overlap_intrinsic": {
+            "mean": 0.030924479166666668,
+            "sd": 0.004376409394449464
+          },
+          "nn/overlap_observation": {
+            "mean": 0.028971361944021484,
+            "sd": 0.009217189151266486
+          },
+          "ceilings/geodesic_distance_rule_acc": {
+            "mean": 0.9977213541666666,
+            "sd": 0.0010164384763018228
+          },
+          "ceilings/observation_distance_rule_acc": {
+            "mean": 0.998046875,
+            "sd": 0.00048828125
+          },
+          "jacobian/fd_step_discrepancy_median": {
+            "mean": 0.00015409672535800686,
+            "sd": 4.727991412718236e-06
+          }
+        }
+      },
+      "so5_random_feature": {
+        "per_seed": [
+          {
+            "enc_seed": 0,
+            "gram": {
+              "effective_rank_entropy": 28.876589280632885,
+              "effective_rank_entropy_ci95": [
+                28.412834685199755,
+                28.80159302085371
+              ],
+              "n95": 34,
+              "n95_ci95": [
+                33.0,
+                33.0
+              ],
+              "condition_number": 38.7668113767568,
+              "condition_number_ci95": [
+                37.93041421262662,
+                45.041329290832685
+              ],
+              "eig_floor": 1e-10,
+              "n_boot": 200
+            },
+            "jacobian": {
+              "sv_mean": [
+                11.538445472717285,
+                9.103198051452637,
+                7.872439861297607,
+                6.943076133728027,
+                6.124762058258057,
+                5.4268951416015625,
+                4.874442100524902,
+                4.318265914916992,
+                3.7218849658966064,
+                3.10504150390625
+              ],
+              "sv_min_q05_q50_q95": [
+                2.3963935375213623,
+                3.0472896099090576,
+                3.8798258304595947
+              ],
+              "local_condition_q05_q50_q95": [
+                2.7507925033569336,
+                3.618928909301758,
+                5.135891914367676
+              ],
+              "fd_step_discrepancy_median": 0.0001700466891634278,
+              "eps": 0.0001,
+              "eps_validation": 0.001,
+              "n_base": 64
+            },
+            "distortion": {
+              "spearman_int_vs_obs": 0.4125617975056684,
+              "obs_over_int_ratio_q05_q50_q95": [
+                3.441684653248399,
+                4.576877638784625,
+                6.097079345867908
+              ],
+              "ratio_dispersion": 1.771539219932088
+            },
+            "nn": {
+              "nn_top1_agreement": 0.359375,
+              "d_pos_q05_q50_q95": [
+                0.3404553363673635,
+                0.5303086031423823,
+                0.7732891924319553
+              ],
+              "d_negmin_q05_q50_q95": [
+                0.9431396752781483,
+                1.2600448425989759,
+                1.4923041474765983
+              ],
+              "overlap_intrinsic": 0.03320312500000001,
+              "overlap_observation": 0.16845701573280633,
+              "sigma": 0.15,
+              "excl_radius": 0.7,
+              "K": 64
+            },
+            "ceilings": {
+              "geodesic_distance_rule_acc": 0.998046875,
+              "observation_distance_rule_acc": 0.9833984375,
+              "n_instances": 2048,
+              "rule_note": "geodesic rule is monotone in the positive likelihood for small isotropic algebra noise; observation rule receives the true product and isolates encoding distortion"
+            },
+            "alpha_matching": {
+              "alpha": 1.580140977205527,
+              "pre_std_cover": 0.35340228375541705,
+              "pre_std_rf": 0.4473047517322253
+            }
+          },
+          {
+            "enc_seed": 1,
+            "gram": {
+              "effective_rank_entropy": 28.435122746235525,
+              "effective_rank_entropy_ci95": [
+                27.97292089341184,
+                28.388021970838416
+              ],
+              "n95": 33,
+              "n95_ci95": [
+                33.0,
+                33.0
+              ],
+              "condition_number": 41.94733727518384,
+              "condition_number_ci95": [
+                41.6319272766555,
+                50.58052086239474
+              ],
+              "eig_floor": 1e-10,
+              "n_boot": 200
+            },
+            "jacobian": {
+              "sv_mean": [
+                11.441295623779297,
+                9.260278701782227,
+                7.8228068351745605,
+                6.934170246124268,
+                6.171619892120361,
+                5.439974308013916,
+                4.793975353240967,
+                4.182137966156006,
+                3.63549542427063,
+                3.016258716583252
+              ],
+              "sv_min_q05_q50_q95": [
+                2.363248586654663,
+                2.9787116050720215,
+                3.7399632930755615
+              ],
+              "local_condition_q05_q50_q95": [
+                2.744732618331909,
+                3.737287759780884,
+                5.760847568511963
+              ],
+              "fd_step_discrepancy_median": 0.00016295497334795073,
+              "eps": 0.0001,
+              "eps_validation": 0.001,
+              "n_base": 64
+            },
+            "distortion": {
+              "spearman_int_vs_obs": 0.3643886482537477,
+              "obs_over_int_ratio_q05_q50_q95": [
+                3.420592930906758,
+                4.580358962379509,
+                6.1919172953029396
+              ],
+              "ratio_dispersion": 1.8101882978696144
+            },
+            "nn": {
+              "nn_top1_agreement": 0.3310546875,
+              "d_pos_q05_q50_q95": [
+                0.3439044977227777,
+                0.5365124521487634,
+                0.7721539566797307
+              ],
+              "d_negmin_q05_q50_q95": [
+                0.955656802401333,
+                1.2736489032634157,
+                1.5094772430649537
+              ],
+              "overlap_intrinsic": 0.03369140625,
+              "overlap_observation": 0.15771484539831174,
+              "sigma": 0.15,
+              "excl_radius": 0.7,
+              "K": 64
+            },
+            "ceilings": {
+              "geodesic_distance_rule_acc": 0.99658203125,
+              "observation_distance_rule_acc": 0.9814453125,
+              "n_instances": 2048,
+              "rule_note": "geodesic rule is monotone in the positive likelihood for small isotropic algebra noise; observation rule receives the true product and isolates encoding distortion"
+            },
+            "alpha_matching": {
+              "alpha": 1.5807990367941218,
+              "pre_std_cover": 0.3535750084200525,
+              "pre_std_rf": 0.44733707472027134
+            }
+          },
+          {
+            "enc_seed": 2,
+            "gram": {
+              "effective_rank_entropy": 28.04339871683663,
+              "effective_rank_entropy_ci95": [
+                27.570068946370874,
+                27.96737524350502
+              ],
+              "n95": 33,
+              "n95_ci95": [
+                33.0,
+                33.0
+              ],
+              "condition_number": 37.08419711845123,
+              "condition_number_ci95": [
+                38.127857040466,
+                45.86931663268872
+              ],
+              "eig_floor": 1e-10,
+              "n_boot": 200
+            },
+            "jacobian": {
+              "sv_mean": [
+                11.676546096801758,
+                9.535341262817383,
+                8.190078735351562,
+                7.15355920791626,
+                6.298301696777344,
+                5.580748558044434,
+                4.937511444091797,
+                4.281402587890625,
+                3.6911449432373047,
+                3.053901195526123
+              ],
+              "sv_min_q05_q50_q95": [
+                2.355799674987793,
+                3.050206422805786,
+                3.622164011001587
+              ],
+              "local_condition_q05_q50_q95": [
+                2.786738157272339,
+                3.7408883571624756,
+                5.219095230102539
+              ],
+              "fd_step_discrepancy_median": 0.00016848691302584484,
+              "eps": 0.0001,
+              "eps_validation": 0.001,
+              "n_base": 64
+            },
+            "distortion": {
+              "spearman_int_vs_obs": 0.33748128163749547,
+              "obs_over_int_ratio_q05_q50_q95": [
+                3.3372333390908264,
+                4.516447145597121,
+                6.109712064252124
+              ],
+              "ratio_dispersion": 1.8307716133258494
+            },
+            "nn": {
+              "nn_top1_agreement": 0.3525390625,
+              "d_pos_q05_q50_q95": [
+                0.3538922093985426,
+                0.5367941316067255,
+                0.7731471673842948
+              ],
+              "d_negmin_q05_q50_q95": [
+                0.9614492589319299,
+                1.2800151776285043,
+                1.5052757662697784
+              ],
+              "overlap_intrinsic": 0.025878906250000003,
+              "overlap_observation": 0.19677731261527384,
+              "sigma": 0.15,
+              "excl_radius": 0.7,
+              "K": 64
+            },
+            "ceilings": {
+              "geodesic_distance_rule_acc": 0.99853515625,
+              "observation_distance_rule_acc": 0.98095703125,
+              "n_instances": 2048,
+              "rule_note": "geodesic rule is monotone in the positive likelihood for small isotropic algebra noise; observation rule receives the true product and isolates encoding distortion"
+            },
+            "alpha_matching": {
+              "alpha": 1.5797235173943698,
+              "pre_std_cover": 0.3534606525351058,
+              "pre_std_rf": 0.44749685453580057
+            }
+          }
+        ],
+        "aggregate": {
+          "gram/effective_rank_entropy": {
+            "mean": 28.451703581235012,
+            "sd": 0.4168426825155267
+          },
+          "gram/n95": {
+            "mean": 33.333333333333336,
+            "sd": 0.5773502691896258
+          },
+          "gram/condition_number": {
+            "mean": 39.266115256797285,
+            "sd": 2.46971887458349
+          },
+          "distortion/spearman_int_vs_obs": {
+            "mean": 0.3714772424656372,
+            "sd": 0.03803888920149176
+          },
+          "distortion/ratio_dispersion": {
+            "mean": 1.8041663770425174,
+            "sd": 0.030071859846444383
+          },
+          "nn/nn_top1_agreement": {
+            "mean": 0.34765625,
+            "sd": 0.014778072217208551
+          },
+          "nn/overlap_intrinsic": {
+            "mean": 0.030924479166666668,
+            "sd": 0.004376409394449464
+          },
+          "nn/overlap_observation": {
+            "mean": 0.1743163912487973,
+            "sd": 0.020179650575446188
+          },
+          "ceilings/geodesic_distance_rule_acc": {
+            "mean": 0.9977213541666666,
+            "sd": 0.0010164384763018228
+          },
+          "ceilings/observation_distance_rule_acc": {
+            "mean": 0.98193359375,
+            "sd": 0.0012918707573557572
+          },
+          "jacobian/fd_step_discrepancy_median": {
+            "mean": 0.00016716285851240778,
+            "sd": 3.726653803049954e-06
+          }
+        }
+      }
+    }
+  }
+}
