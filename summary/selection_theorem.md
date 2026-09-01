@@ -35,30 +35,42 @@ excluded negative, for **any** faithful V. This is the observed scorer family
 (score–character fits of 0.97–0.99 for SU(2), 0.70 linear for SU(3)), and it
 frees optimization to choose V on cost alone.
 
-## Lemma 2 (faithfulness is necessary — with sampling assumptions)
+## Proposition 2 (kernel collisions and non-identifiability; revised 2026-09-01)
 
-*Assume: (i) the score factors as s(a,b,c) = S(φ(a), φ(b), φ(c)) with no
-bypass path, where φ factors through the matrix coefficients of a
-representation V with nontrivial closed kernel N ⊆ H; (ii) the learned score
-is continuous in c; (iii) negatives are sampled from a distribution assigning
-positive probability to every open subset of the admissible region (Haar
-restricted to the excluded-ball complement does); (iv) the exclusion radius is
-smaller than min_{n ∈ N, n ≠ e} d(e, n). Then the population ranking loss is
-bounded away from the optimum.*
+The earlier "necessity lemma" claimed a uniform positive population-loss gap
+under the condition `exclusion radius < min_{n ∈ N, n ≠ e} d(e, n)`. That
+condition is vacuous whenever the kernel N is infinite (a positive-dimensional
+closed subgroup accumulates at e, so the minimum is 0), pointwise continuity
+does not yield a uniform gap over a scorer class, and the comparison against
+the noisy positive was never quantified. Per the evidence-first handoff
+(Section 9), we adopt the honest endpoint B: an exact-collision statement,
+with the uniform quantitative lower bound left open.
 
-Proof sketch. Pick n ∈ N \ {e}; by (iv), ab·n lies in the admissible negative
-region. By (i), s(a, b, ab·n) = s(a, b, ab) ≥ the score of the noisy positive
-minus a continuity gap; by (ii) there is a δ-ball around ab·n on which the
-score stays within any ε of that value; by (iii) that ball receives positive
-probability, so with positive probability a sampled negative ties or beats the
-positive. ∎
+*Proposition (exact score collisions). Assume the score factors as
+s(a,b,c) = S(φ(a), φ(b), φ(c)) where φ factors through the matrix
+coefficients of a representation V of H with nontrivial closed kernel N.
+Then for every n ∈ N and all (a, b), s(a, b, ab·n) = s(a, b, ab): the scorer
+assigns the exact product and each of its kernel translates identical
+scores, so no such scorer can identify the product within a kernel coset.
+In particular the center discrimination D for any center element in N is
+exactly at its tie value.*
 
-The assumptions are not decoration: with a *finite* kernel and continuous
-candidate sampling, the exact ambiguous points have measure zero, and without
-score continuity (or a positive-measure ambiguous set) non-separation alone
-implies no positive error bound — the v2 plan's caveat, adopted here. The
-causal suites verify the contrapositive block by block: ablating a block
-erases exactly the discriminations its central character sees.
+Proof. φ is constant on N-cosets because every matrix coefficient of V is,
+and ab·n lies in the N-coset of ab. ∎
+
+What this does and does not give. It gives exact non-identifiability, which
+is what the tie-aware center discriminations measure (the causal suites
+verify the contrapositive summand by summand: ablating a summand erases
+exactly the discriminations its central character sees, and the quotient
+no-op controls read exact ties). It does not by itself give a positive
+lower bound on the population ranking loss: with a finite kernel and a
+continuous candidate distribution, exact kernel translates of the product
+have probability zero among sampled negatives, and turning collisions into
+a uniform loss gap requires a modulus-of-continuity assumption on the
+scorer class, a positive-density assumption near the kernel translates, and
+a quantified comparison with the noisy positive (endpoint A of the handoff).
+We state that route as an open quantitative problem rather than as a
+theorem.
 
 ## Lemma 3 (two-sided Peter–Weyl block; complex and real forms)
 
