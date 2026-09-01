@@ -1,4 +1,4 @@
-"""Figure 1 for the MATH-AI submission, built from tracked results."""
+"""Figures for the workshop submission, built from tracked results."""
 import json
 from pathlib import Path
 
@@ -51,7 +51,7 @@ axA.set_xlabel(r"spin $j$")
 axA.set_ylabel("fraction of encoder variance")
 axA.set_ylim(0, 1.05)
 axA.legend(frameon=False, loc="upper right", fontsize=8)
-axA.set_title("(a) Isotypic spectra, 5 seeds", loc="left", fontsize=9.5)
+axA.set_title("(a) Isotypic decomposition, 5 seeds", loc="left", fontsize=9.5)
 
 # --- B: score-level spectral recovery vs j ---------------------------------
 series = [
@@ -80,7 +80,7 @@ axB.set_xlabel(r"spin $j$")
 axB.set_ylabel("recovered / required weight")
 axB.set_ylim(-0.08, 1.95)
 axB.legend(frameon=False, fontsize=7.5, loc="upper right", ncol=1)
-axB.set_title("(b) Score-level spectral recovery", loc="left", fontsize=9.5)
+axB.set_title("(b) Character-expansion recovery", loc="left", fontsize=9.5)
 
 for ax in (axA, axB):
     ax.spines["top"].set_visible(False)
@@ -115,7 +115,7 @@ def appendix_figure():
         ax.set_ylim(1.5e-4, 2)
         ax.set_xlabel("training step")
         if col == 0:
-            ax.set_ylabel("FVE per sector (log)")
+            ax.set_ylabel("variance fraction (log)")
             ax.legend(frameon=False, fontsize=7, loc="center right")
         ax.set_title(f"({chr(97+col)}) {tag} spin content", loc="left",
                      fontsize=9.5)
@@ -139,7 +139,7 @@ def appendix_figure():
     ax.set_xticks(x, lab, fontsize=8)
     ax.set_ylim(0, 1.05)
     ax.legend(frameon=False, fontsize=8)
-    ax.set_title("(c) SU(3) vs PSU(3) sectors", loc="left", fontsize=9.5)
+    ax.set_title("(c) SU(3) vs PSU(3) components", loc="left", fontsize=9.5)
 
     # (d) Spin(4) conditions: carrier vs rejected alternative
     ax = fig.add_subplot(gs[1, 0:2])
@@ -161,13 +161,13 @@ def appendix_figure():
         car.append(np.mean(vals))
         alt.append(np.mean(avals))
     x = np.arange(4)
-    ax.bar(x - 0.19, car, 0.38, color=BLUE, label="learned carrier")
+    ax.bar(x - 0.19, car, 0.38, color=BLUE, label="learned representation")
     ax.bar(x + 0.19, alt, 0.38, color=ORANGE,
-           label="rejected faithful irrep")
+           label="rejected faithful irreducible")
     ax.set_xticks(x, cond_lab, fontsize=8.5)
     ax.set_ylim(0, 1.05)
     ax.legend(frameon=False, fontsize=8)
-    ax.set_title("(d) Spin(4) family: carrier vs rejected alternative",
+    ax.set_title("(d) Spin(4) family: learned vs rejected",
                  loc="left", fontsize=9.5)
 
     # (e) Spin(5)/SO(5)
@@ -189,7 +189,7 @@ def appendix_figure():
     ax.set_xticks(x, lab5, fontsize=8.5)
     ax.set_ylim(0, 1.05)
     ax.legend(frameon=False, fontsize=8)
-    ax.set_title("(e) Spin(5) vs SO(5) sectors", loc="left", fontsize=9.5)
+    ax.set_title("(e) Spin(5) vs SO(5) components", loc="left", fontsize=9.5)
 
     for ax in fig.axes:
         ax.spines["top"].set_visible(False)
