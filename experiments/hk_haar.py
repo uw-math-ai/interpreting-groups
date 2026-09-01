@@ -134,10 +134,12 @@ def model_score_fn(run_dir, ckpt_name, device):
     enc = get_encoding(eff["encoding"], eff["variant"], m=eff.get(
         "requested_overrides", {}).get("m", eff["m"]), alpha=eff["alpha"],
         seed=eff["enc_seed"])
-    model = TripleScorer(m=eff["m"], d_enc=eff["d_enc"],
-                         enc_hidden=eff["enc_hidden"],
-                         mlp_hidden=eff["mlp_hidden"],
-                         activation=eff["activation"],
+    # the oldest runs predate the width CLI args; fall back to the
+    # architecture defaults they were trained with
+    model = TripleScorer(m=eff["m"], d_enc=eff.get("d_enc", 128),
+                         enc_hidden=eff.get("enc_hidden", 256),
+                         mlp_hidden=eff.get("mlp_hidden", 512),
+                         activation=eff.get("activation", "gelu"),
                          mlp_depth=eff.get("mlp_depth", 1)).to(device)
     model.load_state_dict(state["model"])
     model.eval()
