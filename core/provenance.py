@@ -19,7 +19,7 @@ from pathlib import Path
 IMMUTABLE_KEYS = (
     "variant", "encoding", "loss", "m", "N", "frac", "sigma", "excl_radius",
     "K", "alpha", "enc_seed", "activation", "d_enc", "enc_hidden",
-    "mlp_hidden", "batch", "seed", "hk_t", "bl_js", "bl_coefs",
+    "mlp_hidden", "mlp_depth", "batch", "seed", "hk_t", "bl_js", "bl_coefs",
 )
 
 CKPT_SELECTION_RULE = (

@@ -250,6 +250,7 @@ def main():
     p.add_argument("--d_enc", type=int, default=128)
     p.add_argument("--enc_hidden", type=int, default=256)
     p.add_argument("--mlp_hidden", type=int, default=512)
+    p.add_argument("--mlp_depth", type=int, default=1)
     p.add_argument("--steps", type=int, default=200_000)
     p.add_argument("--batch", type=int, default=4096)
     p.add_argument("--lr", type=float, default=1e-3)
@@ -314,7 +315,8 @@ def main():
 
     model = TripleScorer(m=args.m, d_enc=args.d_enc, enc_hidden=args.enc_hidden,
                          mlp_hidden=args.mlp_hidden,
-                         activation=args.activation).to(device)
+                         activation=args.activation,
+                         mlp_depth=args.mlp_depth).to(device)
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr,
                             weight_decay=args.wd)
 

@@ -27,12 +27,13 @@ class Quadratic(nn.Module):
 
 class TripleScorer(nn.Module):
     def __init__(self, m=32, d_enc=128, enc_hidden=256, mlp_hidden=512,
-                 activation="gelu"):
+                 activation="gelu", mlp_depth=1):
         super().__init__()
         act = {"gelu": nn.GELU, "quadratic": Quadratic}[activation]
         self.enc = _mlp([m, enc_hidden, d_enc], act)          # E (shared for a, b)
         self.enc_c = _mlp([m, enc_hidden, d_enc], act)        # E_c (candidates)
-        self.interact = _mlp([2 * d_enc, mlp_hidden, d_enc], act)
+        self.interact = _mlp([2 * d_enc] + [mlp_hidden] * mlp_depth + [d_enc],
+                             act)
 
     def embed(self, psi):
         return self.enc(psi)
