@@ -22,9 +22,9 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from core.spin5 import (Sp2LandmarkEncoding, chordal, haar_sp2, qmat_mul,
-                        random_algebra, rep_spinor, rep_vector, sector_basis5,
-                        sp2_expmap)
+from core.spin5 import (Sp2LandmarkEncoding, chordal, get_spin5_encoding,
+                        haar_sp2, qmat_mul, random_algebra, rep_spinor,
+                        rep_vector, sector_basis5, sp2_expmap)
 from core.su2_model import TripleScorer
 from experiments.su2_train import ridge_r2
 
@@ -101,6 +101,11 @@ def main():
     p.add_argument("--excl_radius", type=float, default=0.7)
     p.add_argument("--K", type=int, default=64)
     p.add_argument("--m", type=int, default=48)
+    p.add_argument("--encoding", default="landmark",
+                   choices=["landmark", "so5vec", "so5rf"],
+                   help="so5vec/so5rf are intrinsic SO(5) observations "
+                        "(require --variant so5); so5vec is the diagnostic "
+                        "upper control, so5rf the generic selection test")
     p.add_argument("--alpha", type=float, default=2.0)
     p.add_argument("--enc_seed", type=int, default=0)
     p.add_argument("--steps", type=int, default=100_000)
@@ -120,15 +125,20 @@ def main():
 
     save = Path(args.save_dir)
     save.mkdir(parents=True, exist_ok=True)
-    write_config(save, args)   # no derived fields in this trainer (G0.2)
-    log_f = open(save / "log.jsonl", "a")
 
     rng = np.random.default_rng(args.seed)
     torch.manual_seed(args.seed)
     device = torch.device(args.device)
 
-    enc = Sp2LandmarkEncoding(m=args.m, alpha=args.alpha,
-                              variant=args.variant, seed=args.enc_seed)
+    # resolve derived fields BEFORE serializing the config (G0.2)
+    enc = get_spin5_encoding(args.encoding, args.variant, m=args.m,
+                             alpha=args.alpha, seed=args.enc_seed)
+    requested = {}
+    if enc.m != args.m:                  # intrinsic encodings fix their width
+        requested["m"] = args.m
+        args.m = enc.m
+    write_config(save, args, requested)
+    log_f = open(save / "log.jsonl", "a")
     psi = enc.torch_fn(device)
 
     print(f"[{args.save_dir}] building data ...", flush=True)

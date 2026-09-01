@@ -262,6 +262,158 @@ class Sp2LandmarkEncoding:
         return fn
 
 
+
+def geodesic_sp2(U, V, quotient=False):
+    """Bi-invariant geodesic distance on Sp(2), elementwise over the batch.
+
+    Eigenphases of W = U^dag V come in conjugate pairs {e^{+-i th1},
+    e^{+-i th2}}; d = sqrt(th1^2 + th2^2). Solved from the trace identities
+    cos th1 + cos th2 = tr_C(W)/2 and cos^2 th1 + cos^2 th2 =
+    (tr_C(W^2)/2 + 2)/2 (no eigendecomposition needed). With
+    quotient=True returns min(d(U, V), d(U, -V)), the SO(5) = Sp(2)/{+-1}
+    quotient distance.
+    """
+    def _d(U, V):
+        W = qmat_mul(qmat_dag(U), V)
+        W2 = qmat_mul(W, W)
+        s1 = W[..., 0, 0, 0] + W[..., 1, 1, 0]        # Re tr_H(W) = tr_C/2
+        s2 = W2[..., 0, 0, 0] + W2[..., 1, 1, 0]      # Re tr_H(W^2)
+        sumsq = (s2 + 2.0) / 2.0                      # cos^2 th1 + cos^2 th2
+        prod = (s1 ** 2 - sumsq) / 2.0                # cos th1 * cos th2
+        disc = np.sqrt(np.maximum(s1 ** 2 / 4.0 - prod, 0.0))
+        c1 = np.clip(s1 / 2.0 + disc, -1.0, 1.0)
+        c2 = np.clip(s1 / 2.0 - disc, -1.0, 1.0)
+        return np.sqrt(np.arccos(c1) ** 2 + np.arccos(c2) ** 2)
+
+    if not quotient:
+        return _d(U, V)
+    return np.minimum(_d(U, V), _d(U, -V))
+
+
+def _torch_embed_c(U):
+    """Torch version of embed_c. U: real tensor [..., 2, 2, 4] ->
+    complex [..., 4, 4]."""
+    import torch
+    w, x, y, z = U[..., 0], U[..., 1], U[..., 2], U[..., 3]
+    a, b = torch.complex(w, x), torch.complex(y, z)
+    rows = []
+    for i in range(2):
+        r0 = torch.stack([a[..., i, 0], b[..., i, 0],
+                          a[..., i, 1], b[..., i, 1]], dim=-1)
+        r1 = torch.stack([-torch.conj(b[..., i, 0]), torch.conj(a[..., i, 0]),
+                          -torch.conj(b[..., i, 1]),
+                          torch.conj(a[..., i, 1])], dim=-1)
+        rows += [r0, r1]
+    return torch.stack(rows, dim=-2)
+
+
+def _torch_rep_vector(U, device):
+    """Torch vector rep via the complex embedding:
+    V(U)[a, b] = (1/2) Re tr_C(embed(E_a)^dag embed(U) embed(E_b)
+    embed(U)^dag)."""
+    import torch
+    E = torch.tensor(embed_c(_B5.astype(np.float64)),
+                     dtype=torch.complex64, device=device)   # [5, 4, 4]
+    Ed = E.conj().transpose(-1, -2)
+    M = _torch_embed_c(U).to(torch.complex64)
+    Md = M.conj().transpose(-1, -2)
+    out = torch.einsum("aij,njk,bkl,nli->nab", Ed, M, E, Md)
+    return 0.5 * out.real
+
+
+class So5VectorEncoding:
+    """DIAGNOSTIC UPPER CONTROL: the raw 5x5 SO(5) vector-representation
+    matrix, flattened and standardized under Haar. Exactly center-invariant
+    by construction and it exposes the vector coefficients directly, so a
+    model trained on it cannot be cited as evidence of spontaneous vector
+    selection. Use So5RandomFeatureEncoding for the selection test."""
+
+    def __init__(self, seed=0):
+        self.m = 25
+        probe = haar_sp2(65536, np.random.default_rng(seed + 91))
+        raw = rep_vector(probe).reshape(-1, 25)
+        self.mean, self.std = raw.mean(0), raw.std(0) + 1e-8
+
+    def __call__(self, U):
+        raw = rep_vector(U).reshape(U.shape[0], 25)
+        return ((raw - self.mean) / self.std).astype(np.float32)
+
+    def torch_fn(self, device):
+        import torch
+        mean = torch.tensor(self.mean, dtype=torch.float32, device=device)
+        std = torch.tensor(self.std, dtype=torch.float32, device=device)
+
+        def fn(U):
+            shp = U.shape[:-3]
+            V = _torch_rep_vector(U.reshape(-1, 2, 2, 4), U.device)
+            V = V.reshape(shp + (25,))
+            return (V - mean) / std
+        return fn
+
+
+class So5RandomFeatureEncoding:
+    """Generic quotient observation (the less biased SO(5) selection test):
+    Psi(g)_i = exp(alpha <V(g), W_i>_F) with frozen unit-norm Gaussian 5x5
+    matrices W_i, exactly center-invariant because V(-g) = V(g). alpha is
+    chosen empirically so the pre-activation standard deviation matches the
+    Sp(2) landmark encoding's (alpha_cover * std_cover / std_rf); the
+    measured values are recorded on the instance."""
+
+    def __init__(self, m=48, alpha_cover=2.0, seed=0):
+        self.m = m
+        rng = np.random.default_rng(seed + 95)
+        W = rng.standard_normal((m, 5, 5))
+        self.W = W / np.sqrt((W ** 2).sum(axis=(1, 2), keepdims=True))
+        # empirical pre-activation matching against the cover landmarks
+        probe = haar_sp2(65536, np.random.default_rng(seed + 96))
+        H = rng.standard_normal((m, 2, 2, 4))
+        H /= np.sqrt((H ** 2).sum(axis=(1, 2, 3), keepdims=True))
+        pre_cover = np.einsum("mijq,nijq->nm", H, probe)
+        Vp = rep_vector(probe)
+        pre_rf = np.einsum("mab,nab->nm", self.W, Vp)
+        self.pre_std_cover = float(pre_cover.std())
+        self.pre_std_rf = float(pre_rf.std())
+        self.alpha = alpha_cover * self.pre_std_cover / self.pre_std_rf
+        raw = np.exp(self.alpha * pre_rf)
+        self.mean, self.std = raw.mean(0), raw.std(0) + 1e-8
+
+    def _raw(self, U):
+        pre = np.einsum("mab,nab->nm", self.W, rep_vector(U))
+        return np.exp(self.alpha * pre)
+
+    def __call__(self, U):
+        return ((self._raw(U) - self.mean) / self.std).astype(np.float32)
+
+    def torch_fn(self, device):
+        import torch
+        W = torch.tensor(self.W, dtype=torch.float32, device=device)
+        mean = torch.tensor(self.mean, dtype=torch.float32, device=device)
+        std = torch.tensor(self.std, dtype=torch.float32, device=device)
+
+        def fn(U):
+            shp = U.shape[:-3]
+            V = _torch_rep_vector(U.reshape(-1, 2, 2, 4), U.device)
+            V = V.reshape(shp + (5, 5))
+            pre = torch.einsum("mab,...ab->...m", W, V)
+            return (torch.exp(self.alpha * pre) - mean) / std
+        return fn
+
+
+def get_spin5_encoding(name, variant, m=48, alpha=2.0, seed=0):
+    """Factory. "landmark" is the historical Sp2LandmarkEncoding (its own
+    variant handling); "so5vec"/"so5rf" are intrinsic quotient observations
+    and require variant == "so5"."""
+    if name == "landmark":
+        return Sp2LandmarkEncoding(m=m, alpha=alpha, variant=variant,
+                                   seed=seed)
+    assert variant == "so5", f"{name} is an intrinsic SO(5) observation"
+    if name == "so5vec":
+        return So5VectorEncoding(seed=seed)
+    if name == "so5rf":
+        return So5RandomFeatureEncoding(m=m, alpha_cover=alpha, seed=seed)
+    raise ValueError(name)
+
+
 # --------------------------------- self test ----------------------------------
 
 def _self_test():
