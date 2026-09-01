@@ -44,195 +44,308 @@ learn the global form of the group}
 \maketitle
 
 \begin{abstract}
-Small neural networks trained to identify products in a compact Lie group
-learn the irreducible representations of the group. Across ten group forms
-drawn from $\SU(2)$, $\SU(3)$, $\Spin(4)$, and $\Spin(5)$ and their central
-quotients, with each element presented through a fixed generic encoding,
-the trained features concentrate on the matrix coefficients of a small
-faithful representation of the task group, the same one in every seed, and
-half-integer spins appear precisely when the encoding distinguishes the two
-sheets of the double cover. The learned features therefore determine the
-isomorphism type of the group and not merely its Lie algebra. Ablations
-show that each isotypic component is necessary for exactly the center
-discriminations its central character supports. A test based on the
-two-sided translation action shows that the features span the full
-matrix-coefficient space of the representation, whose real dimension the
-real Schur lemma prescribes, and that they admit commuting linear left and
-right translation actions. A frame of two columns of a rotation matrix
-determines the rotation with fewer coordinates and admits a linear left
-action, yet in matched training on $\SO(3)$ the $9$-dimensional
-coefficient space attains a larger margin than the $6$-dimensional frame
-at $17\%$ lower total parameter norm, so regularized training selects the
-coefficient space as the cheaper complete mechanism. Under regression onto
-heat-kernel targets, the same architecture fills isotypic components in
-order of Casimir eigenvalue up to a truncation point that moves with the
-weight decay. One finding is negative. On $\SO(5)$, a stable
-vector-plus-adjoint mixture survives every replication, so the
-minimal-representation description fails as stated in one of the ten
-group forms.
+Small networks trained on finite group composition are known to learn
+matrix coefficients of a few irreducible representations. We show that
+the same structure emerges, in sharper form, when the group is a
+continuum. Across ten compact group forms drawn from $\SU(2)$, $\SU(3)$,
+$\Spin(4)$, and $\Spin(5)$ and their central quotients, presented
+through fixed generic encodings, every seed concentrates its encoder
+variance on the matrix coefficients of a smallest faithful
+representation of the task group, so half-integer spins appear exactly
+when the encoding distinguishes the two sheets of the double cover and
+the learned features determine the isomorphism type of the group.
+Ablations, activation patching, and a new test based on the left and
+right translation actions verify the mechanism and show that the
+features span the full matrix-coefficient space of the selected
+representation. Matched training on $\SO(3)$ explains
+the selection, since the $9$-dimensional coefficient space beats a
+$6$-dimensional faithful frame on margin at $17\%$ lower parameter norm.
+Under regression onto heat-kernel targets, the same architecture fills
+isotypic subspaces in order of Casimir eigenvalue up to a truncation set
+by the weight decay. One finding is negative. On $\SO(5)$, a stable
+vector-plus-adjoint mixture survives every replication we ran, so the
+minimal-representation description holds in nine of the ten group forms
+and fails in one.
 \end{abstract}
 
 \section{Introduction}
+\label{sec:intro}
 
-By the Peter--Weyl theorem, the matrix coefficients of the irreducible
-unitary representations of a compact Lie group span a dense subspace of
-$L^2$ of the group \cite[Ch.~III]{brocker1985}. For \emph{finite} groups,
-mechanistic interpretability has established that small networks trained
-on the multiplication table represent elements through matrix coefficients
-of a few irreducible representations \cite[Sec.~4]{chughtai2023}, that
-competing descriptions of the same models exist
-\cite[Sec.~5]{stander2024}, and that per-argument equivariance reconciles
-them \cite{wu2024}. All of this work presupposes a finite table and one
-learned embedding per element, the setting of the grokking literature
-\cite{power2022, nanda2023, gromov2023, zhong2023}, the associated theory
-proves emergence of irreducible features for finite groups
-\cite{morwani2024, marchetti2024}, and equivariant architectures build the
-harmonics into the network \cite{cohen2016, geiger2022}. Whether this
-representation theory emerges in a generic network when the group is a
-continuum has remained open.
+When a small network learns to compose rotations, which group does it
+learn? The rotation group $\SO(3)$ and its double cover $\SU(2)$ share a
+Lie algebra, yet they are different groups with different irreducible
+representations. For finite groups, the corresponding question is answered in detail.
+Networks trained on a group multiplication table learn matrix
+coefficients of a few irreducible representations and score candidates
+through characters \cite[Sec.~4]{chughtai2023}, and all of this work
+presupposes a finite table and one learned embedding per element.
+Whether the representation theory emerges in a generic network when the
+group is a continuum, where no embedding table can exist, has remained
+open.
 
-In this paper, we answer that question and report the regularities that
-the analysis uncovered along the way. We train encoder-factorized scorers
-to identify products in compact groups, with each element presented
-through a fixed generic encoding, and we analyze the learned features by
-isotypic decomposition, ablation, activation patching, and a test built on
-the two-sided translation action of the group on its own matrix
-coefficients. Four findings result, and the last revises the first.
+In this work, we answer that question for compact Lie groups. We train
+encoder-factorized scorers to identify products in ten group forms drawn
+from $\SU(2)$, $\SU(3)$, $\Spin(4)$, and $\Spin(5)$ and their central
+quotients, with each element presented through a fixed generic encoding,
+and we verify our understanding with four lines of evidence, namely
+concentration of the encoder on the matrix coefficients of a single
+faithful representation, causal ablations in both directions,
+translation operators and activation patching, and character read-off of
+the score.
 
 \textbf{The learned representation determines the global form of the
-group.} For each central subgroup $Z \subseteq Z(G)$, averaging the
-encoding over $Z$ realizes the same task on the quotient $G/Z$, so the
-isomorphism type of the group becomes an experimental variable while the
-Lie algebra stays fixed. Across ten group forms (\cref{tab:carriers}), the
-trained features concentrate $93$--$98\%$ of their variance on the matrix
-coefficients of a small faithful representation of the task group, the
-same one in every seed, and every isotypic component that the descent rule
-forbids stays at the measurement floor. The selection is causal. Ablating
-the learned representation collapses ranking to chance and removes exactly
-the center discriminations its central character supports, while
-equal-rank ablations elsewhere leave the model intact
-(\cref{sec:carriers}).
+group.} Averaging the encoding over a central subgroup $Z$ realizes the same
+task on the quotient $G/Z$, so the isomorphism type becomes an
+experimental variable. In every seed of every condition, the model concentrates $93$--$98\%$ of
+encoder variance on a smallest faithful representation of the task
+group, and half-integer spins appear exactly when the encoding
+distinguishes $\pm g$ (\cref{sec:universality}). Unlike the finite-group
+setting \cite{chughtai2023}, selection is deterministic across seeds.
 
 \textbf{The learned features span the full matrix-coefficient space, and
-cost selects it.} The active subspace of the features has exactly the real
-dimension $(\dim_\R W)^2/\dim_\R \End_G(W)$ of the full coefficient space
-of the learned representation $W$, and fitted left and right translation
-operators reach held-out $R^2 \geq 0.98$ and commute, which characterizes
-the full coefficient space inside its isotypic component
-(\cref{lem:twosided}). A frame of two columns determines a rotation with
-six coordinates and admits an exactly linear left action, and its right
-action fails to be linear. In matched training on $\SO(3)$, the
-$9$-dimensional coefficient space attains a larger margin than the
-$6$-dimensional frame at $17\%$ lower parameter norm (\cref{sec:block}).
-Regularized training selects the coefficient space because composition and
-scoring become bilinear on it, and the saving on those maps exceeds the
-cost of the extra coordinates.
+cost explains why.} The active subspace has exactly the real dimension
+$(\dim_\R W)^2/\dim_\R \End_G(W)$ that the real Schur lemma prescribes,
+and a new two-sided translation test certifies the full space, which the
+trained features pass while a $6$-dimensional faithful frame fails
+linear right closure (\cref{sec:mainline}). In matched training, the $9$-dimensional coefficient space beats the
+frame on margin at $17\%$ lower parameter norm, so regularized training
+selects the cheapest complete mechanism.
 
-\textbf{Regression targets reveal a spectral bias ordered by the Casimir
-eigenvalue.} Trained to regress heat-kernel values $K_t(ab\,c^{-1})$, the
-same architecture recovers the required isotypic components at their
-required weights up to a sharp truncation point, the truncation advances
-in order of Casimir eigenvalue during training, in analogy with the
-spectral bias of \cite{rahaman2019}, and the truncation moves with the
-regularization strength. On a band-limited target, weight decay $1.0$
-prunes an in-support component that weight decay $0.1$ retains
-(\cref{sec:spectral}).
+\textbf{Regression reveals a spectral bias in order of the Casimir
+eigenvalue.} Ranking needs one character, so it hides the network's
+allocation policy. Regression onto heat-kernel targets requires many
+isotypic subspaces at known weights, and the model fills them in order
+of Casimir eigenvalue up to a sharp truncation that moves with the
+weight decay (\cref{sec:spectral}).
 
 \textbf{One finding is negative.} On $\SO(5)$, a stable
 vector-plus-adjoint mixture survives five seeds and every conditioning
 variation we ran, so the minimal-representation description fails as
-stated in one of ten group forms. We report the failure in
-\cref{sec:limits} together with the two hypotheses that remain open.
+stated in one of ten group forms (\cref{sec:universality}).
 
-Our analysis methods are standard. The new ingredients are the object, a
-continuum group with no embedding table, the quotient construction that
-turns the isomorphism type into an experimental variable, and the
-two-sided translation test of \cref{sec:block}. The rest of this paper is
-organized as follows. In \cref{sec:setup}, we fix the task and the
-analysis methods. In \cref{sec:carriers,sec:block,sec:spectral}, we
-present the three positive findings. In \cref{sec:limits}, we present the
-negative finding and a selection conjecture. Background from
-representation theory and harmonic analysis is collected in
-\cref{app:background}, proofs are in \cref{app:proofs}, experimental
-details in \cref{app:details}, and complete result tables and additional
-figures in \cref{app:tables}.
+\textbf{Paper organization.} \Cref{sec:related,sec:setup} cover related
+work and the setup, \cref{sec:algorithm} the character mechanism,
+\cref{sec:mainline} the mainline reverse engineering,
+\cref{sec:universality,sec:spectral} the ten-group and spectral-bias
+studies, and \cref{sec:discussion} concludes. The appendix carries the
+full record, and \cref{app:structure} maps it.\footnote{Code, tracked results, and the scripts that regenerate every
+table are included as anonymized supplementary material.}
 
-\section{Task, encodings, and analysis methods}
+\section{Related work}
+\label{sec:related}
+
+\citet{chughtai2023} reverse engineer networks trained on finite group
+composition and propose the group composition via representations (GCR)
+algorithm, in which embeddings hold representation matrices and logits
+are characters, \citet{stander2024} argue for a coset-based description
+of the same models, and \citet{wu2024} reconcile the two accounts. All
+of this work presupposes a finite table and free embeddings, the setting
+of the grokking literature \cite{power2022, nanda2023, gromov2023,
+zhong2023}, the associated theory proves emergence of irreducible
+features for finite groups \cite{morwani2024, marchetti2024}, and
+equivariant architectures build the harmonics in by construction
+\cite{cohen2016, geiger2022}. Our object differs in kind. A continuum
+group admits no embedding table, every element can be held out, and the
+global form of the group becomes an experimental variable.
+\citet{rahaman2019} name the spectral bias toward low frequencies, which
+we quantify on a group manifold. \Cref{app:priorwork} details the
+comparisons and the safeguards we adopt from the adjudication
+literature.
+
+\section{Setup and background}
 \label{sec:setup}
 
-Throughout, $G$ denotes a compact Lie group with Haar probability measure,
-$Z \subseteq Z(G)$ a central subgroup, $W$ an irreducible real
-representation of $G$ with commutant $\End_G(W) \in \{\R, \C, \HH\}$,
-$z(g) \in \R^{128}$ the trained argument-encoder activations, and
-$\chi_\rho$ the character of an irreducible unitary representation $\rho$.
+\textbf{Task.} Given encodings of $a, b \in G$ and of $K = 64$
+candidates, the model must identify the product. The positive candidate
+is $(ab)\exp(\xi)$ with $\xi$ a centered Gaussian of scale $0.2$ on the
+Lie algebra, the $63$ negatives are Haar samples excluded from a ball
+around the positive class, and the loss is cross-entropy over the $K$ scores. Training pairs come from a fixed pool of $2048$
+Haar elements at training fraction $f = 0.01$ unless stated, and we
+report ranking accuracy on pairs of fresh elements never seen in
+training (\cref{app:details}).
 
-\textbf{Task.} Given encodings of $a, b \in G$ and of $K = 64$ candidates,
-the model must identify the product. The positive candidate is
-$(ab)\exp(\xi)$ with $\xi$ a centered Gaussian of scale $\sigma = 0.2$ on
-the Lie algebra, the $K - 1$ negatives are Haar samples excluded from a
-ball around the positive class, and the loss is cross-entropy over the $K$
-scores. The Bayes-optimal rule ranks candidates by distance to $ab$ and
-attains accuracy $0.951$ under the $\SU(2)$ sampling. Training pairs come
-from a pool of $2048$ Haar elements, and we report ranking accuracy on
-pairs of fresh elements never seen in training.
+\textbf{Encodings and quotient conditions.} Each element enters through
+a frozen map $\Psi$, so the model has no per-element parameters. The
+mainline encoding evaluates $32$ fixed Haar landmark kernels,
+standardized under Haar statistics. For a central subgroup $Z \subseteq
+Z(G)$, the quotient condition replaces $\Psi$ by its average over the
+$Z$-orbit, which is exactly $Z$-invariant and separates the elements of
+$G/Z$, so it realizes the same task on the quotient group with all
+hyperparameters shared. Every headline result reproduces under two
+further encodings (\cref{app:mainline-exps}).
 
-\textbf{Encodings.} Each element enters through a fixed map $\Psi$, so the
-model has no per-element parameters. For $\SU(2)$, we take
-$\Psi(q)_i = \exp(\alpha \langle q, h_i\rangle)$ with $32$ fixed Haar
-landmarks $h_i$ and $\alpha = 3$, standardized under Haar statistics. The
-quotient condition for $G/Z$ replaces $\Psi$ by its average over the
-$Z$-orbit. The averaged map is exactly $Z$-invariant and separates the
-elements of $G/Z$, so it realizes the quotient group, and the two
-conditions share landmarks, dimension, and all hyperparameters. Every
-result below reproduces under two further encodings (\cref{app:details}),
-so the selected representation is a property of the task and the group.
+\textbf{Model.} An encoder-factorized scorer with about $0.3$M
+parameters. A shared two-layer GELU encoder produces activations $z(a),
+z(b) \in \R^{128}$, an interaction network produces $h(a,b)$, a
+candidate encoder produces $z_c(c)$, and the score is $s(a,b,c) =
+\langle h(a,b), z_c(c)\rangle$, trained by AdamW with weight decay
+$1.0$. We reverse engineer one mainline model per condition and
+replicate every quantity over five seeds (mean $\pm$ standard
+deviation).
 
-\textbf{Model.} An encoder-factorized scorer with about $0.3$M parameters.
-A shared two-layer GELU encoder produces $z(a), z(b)$, an interaction
-network produces $h(a,b) \in \R^{128}$, a candidate encoder produces
-$z_c(c)$, and the score is $\langle h(a,b), z_c(c)\rangle$, trained by
-AdamW with weight decay $1.0$ unless stated. Every reported quantity is a
-mean over five seeds with its standard deviation.
+\textbf{Mathematical background.} A representation of a compact group $G$ is a continuous homomorphism
+$\rho \colon G \to GL(V)$, irreducible if $V$ has no proper invariant
+subspace, and faithful if $\rho$ is injective (we use the shorthand
+irrep). The character is $\chi_\rho(g) = \operatorname{tr} \rho(g)$, and
+the functions $g \mapsto \rho(g)_{ij}$ are the matrix coefficients of
+$\rho$. By the Peter--Weyl theorem, the matrix coefficients of all irreps span a
+dense subspace of $L^2(G)$ and are orthogonal across irreps, so any
+square-integrable feature of the group decomposes into isotypic
+subspaces indexed by irreps. Our networks compute with real numbers, the
+commutant $\End_G(W)$ of an irreducible real representation $W$ is $\R$,
+$\C$, or $\HH$, and the real coefficient space of $W$ has dimension
+$(\dim_\R W)^2/\dim_\R \End_G(W)$. The center acts in each irrep by a central character, the irreps of
+$G/Z$ are exactly those with trivial central character on $Z$, and a
+$Z$-invariant encoding therefore forbids every subspace charged under
+$Z$ (the descent rule).
+\Cref{app:background} develops the background, including the concrete
+representation theory of the five groups.
 
-\textbf{Analysis methods.} The isotypic decomposition computes, on a fixed
-Haar probe set, the fraction of variance of the centered activations $z$
-lying in the sampled, jointly orthonormalized spans of matrix
-coefficients, component by component in order of Casimir eigenvalue, with
-exact coefficients verified in a unit-test suite (\cref{app:details}) and
-a sampling floor near $0.2\%$ of variance. Ablations subtract from $z$ the
-part linearly predictable from a chosen component's exact matrix
-coefficients, an intervention well defined even for components at the
-floor. Activation patching replaces the internal product state by
-reconstructions from chosen coordinates. The activations are real, so a
-complex irreducible representation and its conjugate span one real
-isotypic component, of dimension $(\dim_\R W)^2 / \dim_\R \End_G(W)$
-(\cref{lem:twosided}, with background in \cref{app:background}).
+\section{The character mechanism on compact groups}
+\label{sec:algorithm}
 
-\section{The learned representation determines the global form}
-\label{sec:carriers}
+The GCR algorithm of \citet{chughtai2023} extends verbatim to a compact
+group. Hold matrix coefficients $\rho(a)$ and $\rho(b)$ of a faithful
+irrep in the encoder, compute the product $\rho(a)\rho(b) = \rho(ab)$
+in the interaction network, and score candidate $c$ by the character,
+using the identity
+\[
+\chi_\rho(ab\,c^{-1})
+= \operatorname{tr}\bigl(\rho(a)\rho(b)\rho(c)^{*}\bigr)
+= \bigl\langle \rho(c),\, \rho(a)\rho(b)\bigr\rangle_{\mathrm{HS}} .
+\]
+Composition is bilinear and scoring is linear in the candidate's
+coefficients, so the mechanism fits a factorized scorer (proofs of the
+two results below are in \cref{app:proofs}).
+
+\begin{lemma}
+\label{lem:character}
+Let $V$ be a faithful finite-dimensional unitary representation of a
+compact group $H$ with character $\chi_V$. Then
+$\operatorname{Re}\chi_V(g) \leq \chi_V(e)$ for all $g \in H$, with
+equality only at $g = e$, and near the identity
+$\chi_V(e) - \operatorname{Re}\chi_V(\exp X)$ is a positive definite
+quadratic form in $X$ up to higher order.
+\end{lemma}
+
+\Cref{lem:character} says that a monotone function of
+$\operatorname{Re}\chi_V(ab\,c^{-1})$ ranks the true product above every
+excluded negative for any faithful $V$, and a representation with
+nontrivial kernel has population ranking loss bounded away from the
+optimum under explicit sampling assumptions (\cref{lem:necessity},
+\cref{app:proofs}). A trained model therefore needs a faithful
+representation of exactly the task group and is free to select the
+cheapest one. Whether it stores a
+full coefficient space or a smaller separating frame is an empirical
+question, which \cref{lem:twosided} turns into a falsifiable test.
+
+\section{Reverse engineering the mainline models}
+\label{sec:mainline}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.92\textwidth]{figure1.pdf}
-\caption{(a) Isotypic decomposition of the trained encoder for the
-$\SU(2)$ and $\SO(3)$ conditions (five seeds). (b) Recovery of the
-character expansion of the score for heat-kernel and band-limited targets.
-Values near $1$ indicate a component carried at its required weight, and
-the dashed curve shows the in-support spin-$2$ component pruned at weight
-decay $1.0$.}
+\includegraphics[width=0.84\textwidth]{figure1.pdf}
+\caption{(a) Fraction of encoder variance per isotypic subspace for the
+mainline conditions, five seeds. The conditions differ only in whether
+the encoding distinguishes $\pm g$, and each concentrates on the
+smallest faithful irrep of its own group. (b) Recovery of the character
+expansion of the learned score for heat-kernel and band-limited targets.
+Values near $1$ mean a subspace carried at its required weight, and the
+dashed curve shows the in-support spin-$2$ subspace pruned at weight
+decay $1.0$ and recovered at $0.1$ (\cref{sec:spectral}).}
 \label{fig:main}
 \end{figure}
 
+Every claim below replicates in five seeds per condition, and
+\cref{app:mainline-exps} documents each experiment in full.
+
+\textbf{The encoder learns the smallest faithful irrep, and the double
+cover is visible.} The $\SU(2)$ encoder places $0.84 \pm 0.01$ of its variance in the
+spin-$\tfrac12$ isotypic subspace, with the quaternion linearly
+decodable at held-out $R^2 = 0.995$. The $\SO(3)$ encoder places $0.92
+\pm 0.01$ in spin~$1$, every half-integer subspace sits at the $0.2\%$
+sampling floor, and the quaternion is not decodable. The $\SU(2)$ features are odd under the center, with $\cos(z(g), z(-g))
+= -0.72 \pm 0.02$, and the $\SO(3)$ features are exactly even
+(\cref{fig:main}a), so the learned features see the two sheets of the
+double cover.
+
+\textbf{Ablations give a causal double dissociation.} We ablate by
+subtracting from $z$ the part linearly predictable from a chosen
+subspace's exact matrix coefficients. Ablating spin~$\tfrac12$ collapses
+the $\SU(2)$ model to chance ($0.026 \pm 0.002$ against chance $0.016$)
+and collapses its center discrimination to the tie value, and is a
+no-op on the $\SO(3)$ model ($1.000 \pm 0.000$). Ablating spin~$1$
+transposes the pattern exactly. Random subspaces of equal rank are inert in both conditions, and
+restricting to the claimed subspace preserves performance
+(\cref{tab:su2causal}). The learned decision rule is the compact-group
+form of the GCR logit, with the fundamental character alone explaining
+$0.97 \pm 0.01$ of score variance for $\SU(2)$ and $0.88 \pm 0.01$ for
+$\SO(3)$ (Experiment~5).
+
+\textbf{Translation operators realize the representation, and patching
+confirms sufficiency.} Fitted affine maps $T_k$ with $z(kg) \approx T_k z(g)$ reach held-out
+$R^2 = 0.90$--$0.98$, and on the dominant subspace they match $d_j$
+copies of the irrep, with eigenvalue phases agreeing to $0.0014 \pm
+0.0001$ radians for $\SU(2)$ (Experiment~6). Replacing the internal
+product state $h(a,b)$ by its reconstruction from the eight realified
+spinor coefficients of a counterfactual product $a'b'$ redirects the
+model to select $a'b'$ with probability $0.996$--$0.999$, while the
+wrong-irrep reconstruction redirects at chance, and the interaction
+output concentrates on the span of the matrix product $W(a)W(b)$, so the
+network computes the representation's own composition law
+(Experiment~7).
+
+\textbf{The learned features span the full coefficient space, which the
+two-sided test certifies.} In every seed, the active subspace of $z$
+has exactly the real dimension of the full coefficient space, $4$ for
+the quaternionic spinor and $9$ for the real-type vector irrep. The
+following lemma turns full-space identity into a falsifiable
+prediction.
+
+\begin{lemma}
+\label{lem:twosided}
+For an irreducible unitary representation $\rho$ of a compact group
+$G$, the span $M_\rho \subseteq L^2(G)$ of its matrix coefficients is
+irreducible under $G \times G$ acting by left and right translation,
+so every nonzero subspace of $M_\rho$ stable under both actions equals
+$M_\rho$. For an irreducible real representation $W$ with commutant
+$D = \End_G(W)$, the real coefficient space has dimension
+$(\dim_\R W)^2/\dim_\R D$ and is the minimal nonzero two-sided
+translation-stable real subspace of its isotypic component.
+\end{lemma}
+
+On the full coefficient space, left and right translation both act
+linearly and the actions commute, and on any proper subspace at least
+one action fails. Fitted operators on the trained $\SO(3)$ features
+reach held-out $R^2 = 0.989 \pm 0.001$ per side with commutator defect
+$0.012 \pm 0.001$, matching the exact coefficient space, while the
+$6$-dimensional two-column frame passes the left test exactly and fails
+right closure at $R^2 = 0.638$, and a random $6$-dimensional truncation
+fails both (\cref{tab:twosided}).
+
+\textbf{Matched training shows the full space is the cheaper mechanism.}
+The frame determines the rotation with $6$ coordinates, so storage
+minimality cannot explain the selection. In matched training on exact frame features against exact coefficient
+features, the coefficient arm attains margin $7.29 \pm 0.16$ against
+$6.49 \pm 0.05$ at statistically equal accuracy and $17\%$ lower
+parameter norm (\cref{tab:cost}). The frame arm reconstructs its missing column nonlinearly, and that
+costs more than the three saved coordinates, so regularized training
+selects the full coefficient space as the cheapest complete mechanism.
+
+\section{Universality across ten group forms}
+\label{sec:universality}
+
 \begin{table}[t]
 \centering
-\caption{Learned representations across ten group forms, with the fraction
-of encoder variance on their matrix coefficients (mean over five seeds)
-and the rejected faithful alternative where one exists. $\Spin(4)$
-representations are labeled by pairs $(j_L, j_R)$. Seed statistics and
-intervention results per condition are in \cref{app:tables}.}
+\caption{The learned representation across ten group forms, with the
+fraction of encoder variance on its matrix coefficients (mean over five
+seeds) and the rejected faithful alternative where one exists.
+$\Spin(4)$ irreps are labeled $(j_L, j_R)$. Full spectra, seed
+statistics, and interventions are in
+\cref{app:universality-exps,app:tables}.}
 \label{tab:carriers}
-\small
-\setlength{\tabcolsep}{5pt}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{llll}
 \toprule
 task group & learned representation & variance & rejected alternative \\
@@ -241,240 +354,267 @@ $\SU(2)$ & spin $\tfrac12$ & $0.96$ & \\
 $\SO(3)$ & spin $1$ & $0.98$ & \\
 $\SU(3)$ & $\mathbf{3} \oplus \bar{\mathbf{3}}$ & $0.97$ & \\
 $\PSU(3)$ & adjoint $\mathbf{8}$ & $0.93$ & \\
-$\Spin(4)$ & $(\tfrac12,0) \oplus (0,\tfrac12)$ & $0.98$ & (no faithful irreducible) \\
+$\Spin(4)$ & $(\tfrac12,0) \oplus (0,\tfrac12)$ & $0.98$ & (no faithful irrep exists) \\
 $\SO(4)$ & $(\tfrac12,\tfrac12)$ & $0.97$ & \\
-$\SO(3){\times}\SU(2)$ & $(1,0) \oplus (0,\tfrac12)$, $5$ dims & $0.98$ & $(1,\tfrac12)$, $6$ dims: $0.008$ \\
-$\PSO(4)$ & $(1,0) \oplus (0,1)$, $6$ dims & $0.98$ & $(1,1)$, $9$ dims: $0.011$ \\
+$\SO(3){\times}\SU(2)$ & $(1,0) \oplus (0,\tfrac12)$, $5$ dims & $0.98$ & $(1,\tfrac12)$, $6$ dims, at $0.008$ \\
+$\PSO(4)$ & $(1,0) \oplus (0,1)$, $6$ dims & $0.98$ & $(1,1)$, $9$ dims, at $0.011$ \\
 $\Spin(5)$ & spinor $\mathbf{4}$ & $0.97$ & \\
-$\SO(5)$ & vector $\mathbf{5}$ + adjoint $\mathbf{10}$ & $0.69 + 0.22$ & (see \cref{sec:limits}) \\
+$\SO(5)$ & vector $\mathbf{5}$ + adjoint $\mathbf{10}$ & $0.69 + 0.22$ & (negative result) \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Across the ten group forms of \cref{tab:carriers}, the trained features
-concentrate on the matrix coefficients of a small faithful representation
-of the task group, the same one in every seed. The half-integer component
-of $\SU(2)$ appears if and only if the encoding distinguishes $\pm g$,
-with $\cos(z(g), z(-g)) = -0.95 \pm 0.02$ in the faithful condition and
-$+1.000$ in the quotient condition. The learned features therefore detect
-the double cover, a property of the isomorphism type that the Lie algebra
-does not determine. When the center of the group fails to be cyclic, no
-faithful irreducible representation exists (\cref{fact:cyclic}), and the
-models build the direct sum that faithfulness forces. Where a smaller
-reducible faithful sum competes against a larger faithful irreducible
-representation, the sum wins, with the alternative under $1\%$ of variance
-in every seed.
+\textbf{Selection is deterministic and follows the descent rule.} Ten
+group forms test whether the mainline findings are general
+(\cref{tab:carriers}). In nine of ten, the encoder concentrates on a
+smallest faithful representation of the task group, the same one in all
+five seeds, with every subspace the descent rule forbids at the floor. On $\SU(3)$, the measured center
+cosine is $-0.484 \pm 0.005$ against the exact prediction $\cos(2\pi/3)
+= -0.5$. When the center is
+not cyclic, no faithful irrep exists (\cref{fact:cyclic}), and the
+$\Spin(4)$ models build the direct sum that faithfulness forces. Where a smaller reducible sum competes against a larger faithful irrep,
+the sum wins in every seed.
 
-The selection is causal. Subtracting from $z$ the part linearly
-predictable from the learned representation's matrix coefficients
-collapses ranking to chance ($0.02$ against a chance rate of $0.016$) and
-collapses center discrimination to its tie value, while the same ablation
-on any other component, or on a random subspace of equal rank, leaves both
-intact. The pattern is a double dissociation between each group and its
-quotient, with seed standard deviations below $0.005$ on every cell
-(\cref{tab:su2causal}). It repeats under the order-three center of
-$\SU(3)$, where orbit averaging acts as the identity on quotient models
-and destroys the faithful ones (\cref{tab:su3causal}), and it holds
-summand by summand for $\Spin(4)$, whose center supports three distinct
-discriminations, with each learned summand necessary for exactly the
-center elements its central character detects (\cref{tab:spin4causal}).
-The trained scorer is itself a character function, and a single character
-explains $0.97 \pm 0.01$ of the score variance for $\SU(2)$ (with
-$\chi_{1/2}$) and $0.88 \pm 0.01$ for $\SO(3)$ (with $\chi_1$).
+\textbf{Each summand is necessary for exactly the discriminations its
+central character supports.} The mainline double dissociation repeats
+under the order-three center of $\SU(3)$ (\cref{tab:su3causal}), and on
+$\Spin(4)$, whose center supports three distinct discriminations, every
+cell of the summand-resolved intervention map lands where the central
+character puts it (\cref{tab:spin4causal}).
 
-The following bound, proved in \cref{app:proofs}, explains why ranking
-never forces a larger representation.
-
-\begin{lemma}
-\label{lem:character}
-Let $V$ be a faithful finite-dimensional unitary representation of a
-compact group $H$ with character $\chi_V$. Then
-$\operatorname{Re}\chi_V(g) \leq \chi_V(e)$ for all $g \in H$, with
-equality only at $g = e$. Moreover, for $X$ in the Lie algebra of $H$,
-$\operatorname{Re}\chi_V(\exp X) = \chi_V(e) -
-\tfrac12 \lVert dV(X)\rVert_{F}^2 + O(\lVert X\rVert^4)$,
-and $X \mapsto \lVert dV(X)\rVert_F^2$ is positive definite.
-\end{lemma}
-
-By \cref{lem:character}, a monotone function of
-$\operatorname{Re}\chi_V(ab\,c^{-1})$ ranks the product above every
-excluded negative for any faithful $V$, so optimization selects the
-representation on cost. Conversely, a representation with nontrivial
-kernel forces positive ranking error under explicit sampling assumptions
-(\cref{lem:necessity}), and the ablations above realize that necessity
-summand by summand.
-
-\section{The learned features span the full coefficient space}
-\label{sec:block}
-
-The learned features occupy their isotypic component fully. In every seed,
-the active subspace of $z$ has exactly the real dimension of the full
-coefficient space, $4$ for the quaternionic spinor and $9$ for the
-real-type vector representation, as the following lemma prescribes (proof
-in \cref{app:proofs}).
-
-\begin{lemma}
-\label{lem:twosided}
-Let $\rho \colon G \to U(V_\rho)$ be an irreducible unitary representation
-of a compact group $G$, and let $M_\rho \subseteq L^2(G)$ be the span of
-its matrix coefficients $g \mapsto \langle u, \rho(g) v\rangle$. Then
-$M_\rho \cong V_\rho^* \boxtimes V_\rho$ as a representation of
-$G \times G$ acting by left and right translation, this representation is
-irreducible, and every nonzero subspace of $M_\rho$ invariant under both
-translation actions equals $M_\rho$. For an irreducible real
-representation $W$ with commutant $D = \End_G(W)$, the corresponding real
-coefficient space has dimension $(\dim_\R W)^2 / \dim_\R D$ and is the
-minimal nonzero two-sided translation-stable real subspace of its isotypic
-component.
-\end{lemma}
-
-\textbf{Two-sided structure.} \Cref{lem:twosided} makes full-coefficient
-identity falsifiable. The full coefficient space admits commuting linear
-left and right translation actions, and every proper subspace of the
-isotypic component loses at least one of them. We fit affine operators
-$M^L_k$, $M^R_k$ with $z(kg) \approx M^L_k z(g)$,
-$z(gk) \approx M^R_k z(g)$, evaluated held out. On the trained $\SO(3)$
-features, both actions fit at $R^2 = 0.989 \pm 0.001$ with relative
-commutator defect $\lVert [M^L_a, M^R_b]\rVert = 0.012 \pm 0.001$,
-matching the exact coefficient space. On the frame
-$g \mapsto (g e_1, g e_2)$, the left action is exactly linear and the
-right action fits at $R^2 = 0.638$, since the missing column
-$g e_3 = (g e_1) \times (g e_2)$ is uncorrelated with the retained ones
-under Haar measure. A random subspace of the coefficient space at the
-frame's dimension loses both actions, fitting at $R^2 = 0.67$ (full
-comparison in \cref{tab:twosided}). The fitted operators realize the
-representation itself. The trace of $M^L_k$ equals
-$\dim(W)\,\chi_W(k)$ with correlation $1.000$ across group elements, and
-its eigenvalue phases match those of $\dim(W)$ copies of $W(k)$ to
-$0.002$ radians for $\SU(2)$.
-
-\textbf{Causal sufficiency.} Replacing the internal product state $h(a,b)$
-by its ridge reconstruction from the eight realified spinor coefficients
-of a counterfactual product $a'b'$ redirects the $\SU(2)$ model to select
-$a'b'$ with probability $0.996$--$0.999$ in every seed, equal to or better
-than patching the full activation, while reconstruction from the wrong
-component redirects at chance. The output $h$ concentrates
-$89.9 \pm 1.4\%$ of its variance on the diagonal two-argument component of
-the learned representation, with $98.2 \pm 0.3\%$ of that energy in the
-subspace spanned by the matrix product $W(a)W(b)$, so the interaction
-network implements the representation's own composition law.
-
-\textbf{Cost.} To test whether two-sided linearity is the reason the
-coefficient space wins, we trained matched models on $\SO(3)$ whose
-encodings are the exact frame with $6$ coordinates or the exact
-coefficient space with $9$, all else equal. At statistically equal
-accuracy ($0.891 \pm 0.002$ against $0.889 \pm 0.003$), the
-coefficient-space model attains a larger margin ($7.29 \pm 0.16$ against
-$6.49 \pm 0.05$) at $17\%$ lower total parameter norm, with every module
-cheaper (\cref{tab:cost}). The frame model reconstructs the missing column
-nonlinearly, and the reconstruction costs more than the three saved
-coordinates. Regularized training therefore selects the full coefficient
-space as the cheapest complete mechanism, with storage and composition
-counted together.
+\textbf{The exception is $\SO(5)$, and we report it as a failure.} The
+$\SO(5)$ encoder holds the vector $\mathbf{5}$ at $0.68$--$0.70$ and the
+adjoint $\mathbf{10}$ at $0.21$--$0.23$ of variance, stable across five
+seeds, doubled training, four times the candidates, and reduced weight
+decay, and no condition solves the task. Two hypotheses remain open,
+purification as the task approaches a solution, or a genuinely mixed
+minimum-cost mechanism, which the cost result of \cref{sec:mainline}
+makes coherent (Experiment~12).
 
 \section{Spectral bias in order of the Casimir eigenvalue}
 \label{sec:spectral}
 
-Ranking requires a single faithful character, so it leaves the allocation
-of capacity across isotypic components unobserved. Regression onto the
-$\SU(2)$ heat kernel $K_t(g) = \sum_j (2j+1) e^{-t\,j(j+1)} \chi_j(g)$,
-evaluated at $ab\,c^{-1}$, requires every component that the envelope
-keeps above the noise. \Cref{fig:main}(b) reports the fraction of score
-variance per component, sequentially orthogonalized in order of Casimir
-eigenvalue, divided by the same fraction for the exact target, so a value
-of $1$ means a component at its required weight (per-checkpoint values in
-\cref{tab:recovery}).
+We regress the same architecture onto the $\SU(2)$ heat kernel $K_t(g) =
+\sum_j (2j+1) e^{-t j(j+1)} \chi_j(g)$ evaluated at $ab\,c^{-1}$ and
+measure the recovered character expansion of the learned score
+(\cref{fig:main}b, \cref{app:spectral-exps}).
 
-Three regularities emerge. First, each trained score is a truncated
-character expansion, with recovered components near ratio $1$, components
-beyond a sharp truncation point at $0$, and the truncation at higher
-Casimir eigenvalue for smaller $t$. Second, the truncation advances in
-order of Casimir eigenvalue during training. At $t = 0.05$, the spin-$2$
-recovery climbs from $0.12$ to $1.20$ over $70$k steps while spin
-$\tfrac52$ stays at $0$. Third, the truncation moves with the
-regularization strength. On the band-limited target
-$\chi_1 + \tfrac12 \chi_2$, weight decay $1.0$ prunes the spin-$2$ part,
-the abandoned $12.6\%$ of target variance equals the final test error, and
-weight decay $0.1$ recovers the target with profile
-$(1.00, 1.01, 0.94, 0.95)$ and out-of-support components at $0.000$. A
-component survives when its variance contribution exceeds its norm cost,
-so the truncation is a cost boundary of the same kind that selects the
-representation in \cref{sec:carriers}. The central character of the target
-governs the parity of the learned features as well. The band-limited
-target is invariant under the center, and the model builds an integer-spin
-representation even on the faithful $\SU(2)$ encoding, with the spinor
-component at $1\%$.
+\textbf{The learned score is a truncated character expansion that fills
+in Casimir order.} Recovered subspaces sit at ratio near $1$ and
+subspaces beyond a sharp truncation sit at $0$, with the truncation at higher Casimir eigenvalue for smaller $t$ and
+advancing in Casimir order during training, so that at $t = 0.05$ the
+spin-$2$ recovery climbs from $0.12$ to $1.20$ while spin~$\tfrac52$
+stays at $0$.
 
-\section{A negative finding, and a selection conjecture}
-\label{sec:limits}
+\textbf{The truncation is a cost boundary set by regularization.} On the
+band-limited target $\chi_1 + \tfrac12\chi_2$, weight decay $1.0$ prunes
+the spin-$2$ part, and the abandoned $12.6\%$ of target variance equals
+the final test error. Weight decay $0.1$ recovers the target with profile $(1.00, 1.01, 0.94,
+0.95)$ and out-of-support subspaces at $0.000$, which also calibrates
+the measurement. A subspace survives when its variance contribution
+exceeds its norm cost, the cost-boundary logic of \cref{sec:mainline},
+and the center-invariant target forces integer spins even on the
+faithful $\SU(2)$ encoding (Experiment~15).
 
-On $\SO(5)$, the learned features occupy a mixture, the vector
-$\mathbf{5}$ at $0.68$--$0.70$ of variance and the adjoint $\mathbf{10}$
-at $0.21$--$0.23$, stable across five seeds, doubled training, four times
-the candidates, and reduced weight decay. The adjoint fraction falls only
-when generalization improves, from $0.23$ at held-out accuracy $0.55$ to
-$0.17$ at $0.73$ under tripled data, and no condition solves the task. The
-minimal-representation description therefore fails as stated in one of the
-ten group forms. Both faithful components ranking correctly is consistent
-with \cref{lem:character}, and two hypotheses remain open, purification as
-the task approaches a solution, or a genuinely mixed minimum-cost
-mechanism for this group, which the cost result of \cref{sec:block} makes
-coherent. Separating them requires a condition that solves $\SO(5)$.
+\section{Discussion and conclusion}
+\label{sec:discussion}
 
-The structural results suggest a selection principle that we can state but
-cannot yet prove.
+Small generic networks trained on compact group composition learn the
+irreducible representations of the exact global form the data determine,
+store them as full matrix-coefficient spaces because that is the
+cheapest complete mechanism, and allocate spectral capacity in Casimir
+order under a regularization-set truncation. The results suggest a selection principle we can state but not yet
+prove, that among near-optimal parameter settings the minimum-norm one
+realizes the full coefficient space of a cost-minimizing faithful
+representation with a monotone character score (\cref{app:questions}
+states the conjecture precisely).
 
-\begin{conjecture}
-In the factorized architecture with weight decay, among parameter settings
-achieving population ranking loss within $\varepsilon$ of the optimum, the
-minimum-norm setting realizes, as $\varepsilon \to 0$, the full real
-coefficient space of a faithful representation minimizing the total
-regularized cost of features, composition, and scoring, with score a
-monotone function of $\operatorname{Re}\chi_V(ab\,c^{-1})$.
-\end{conjecture}
-
-The missing ingredients are a norm lower bound tying any
-$\varepsilon$-optimal score to the effective dimension of the functions it
-computes on $G$, and the exclusion of solutions outside the character
-algebra, the compact-group analogue of the alternative circuits documented
-for finite groups \cite{stander2024, zhong2023}. Every quotient condition
-in our experiments generalizes below its cover, and disentangling
-representation selection from the conditioning of the quotient encoding is
-left as future work.
+\textbf{Limitations and future work.} Every quotient condition
+generalizes below its cover, and we have not yet separated
+representation selection from the conditioning of the quotient encoding.
+Causal interventions carry weaker positive than negative evidence
+\cite{wu2024}, which we mitigate with the two-sided test, exact no-op
+controls, and matched retraining. Solving $\SO(5)$ would separate the
+two open hypotheses, and proving the conjecture would give the first
+selection theorem for a continuous group.
 
 \bibliographystyle{unsrtnat}
 \bibliography{refs}
 
 \appendix
 
+\section{Structure of the appendix}
+\label{app:structure}
+
+\Cref{app:priorwork} details the relation to prior work on group
+composition. \Cref{app:details} specifies the task, encodings,
+architecture, and training. \Cref{app:background} develops the
+representation theory and harmonic analysis the paper uses, including
+the concrete representation theory of the five groups.
+\Cref{app:proofs} proves the three results. \Cref{app:methods}
+documents the analysis methods in the detail needed to reimplement
+them, including the failure mode that motivated the function-space
+ablation. \Cref{app:mainline-exps} is the experimental record for the
+mainline $\SU(2)$ and $\SO(3)$ program, organized as
+Experiments~1--9. \Cref{app:universality-exps} covers the remaining
+group forms as Experiments~10--12, and \cref{app:spectral-exps} the
+heat-kernel program as Experiments~13--15. \Cref{app:tables} collects
+the summary tables referenced from the main text, and
+\cref{app:questions} answers questions the record raises.
+
+\section{Relation to prior work on group composition}
+\label{app:priorwork}
+
+\textbf{What transfers from the finite-group analyses.} The GCR
+description of \citet{chughtai2023} has three components, embeddings
+that hold representation matrices, an interaction that multiplies them,
+and a character read-off. All three transfer to our setting and all
+three are verified here, with matrix coefficients of the continuous
+group in place of finite representation matrices
+(Experiments~1, 4--7). The character identity behind the read-off is
+the same Hilbert--Schmidt pairing in both settings.
+
+\textbf{What has no finite analogue.} A finite model owns one embedding
+row per group element, so its representation content is a property of a
+learned table, and the analysis cannot hold elements out of the
+representation itself. Our elements enter through a frozen map, the
+encoder is a function on the group manifold, and all of its structure
+generalizes to fresh Haar samples by construction. Two consequences
+matter. First, T2 evaluation on never-seen elements
+(\cref{app:details}) has no finite-group counterpart. Second, the
+quotient construction, which averages the encoding over a central
+subgroup, turns the global form of the group into an experimental
+variable with the Lie algebra held fixed. Nothing analogous exists for
+a finite multiplication table presented through free embeddings,
+because free embeddings carry no topology to quotient.
+
+\textbf{Determinism against arbitrariness.} \citet{chughtai2023} find
+that which irreps a finite-group model learns varies by seed, and
+\citet{zhong2023} find qualitatively different algorithms under small
+hyperparameter changes. Our selection is deterministic in all fifty
+mainline-program seeds and all forty universality seeds. A plausible
+reason is that $\SU(2)$ has one irrep per dimension, so the
+equivalent-choice degeneracy that drives finite-group arbitrariness is
+absent. We state this as an observation, and the determinism itself is
+one of our findings.
+
+\textbf{The adjudication lesson.} \citet{stander2024} and
+\citet{wu2024} show that observational evidence on these tasks
+underdetermines the mechanism, and \citet{wu2024} show that causal
+interventions can pass on models where the tested explanation cannot
+hold. We adopt three safeguards. The quotient conditions provide exact
+no-op controls, interventions that provably act as the identity and
+measure as such (Experiments~4 and~10). The two-sided translation test
+is a structural discriminator with competing feature systems evaluated
+under the same fit (Experiment~8). The frame-versus-coefficient
+comparison replaces inference from a trained model by matched
+retraining (Experiment~9).
+
+\section{Task, encodings, architecture, and training}
+\label{app:details}
+
+\textbf{Task construction.} A dataset is built from a pool of $N =
+2048$ Haar elements of $G$. A training example is an ordered pair
+$(a,b)$ from a frozen random fraction $f$ of the $N^2$ pairs, together
+with $K = 64$ candidates, namely one positive $(ab)\exp(\xi)$ with
+$\xi \sim \mathcal N(0, \sigma^2 I)$ on the Lie algebra at
+$\sigma = 0.2$, and $63$ negatives drawn from Haar measure and
+resampled until their distance to the positive class exceeds $0.5$.
+Candidates are frozen at dataset construction. The loss is
+cross-entropy over the $K$ scores. Under this construction the
+Bayes-optimal rule ranks by distance to $ab$, with Monte-Carlo accuracy
+$0.951$ for $\SU(2)$ at $K = 64$, falling to $0.936$ at $K = 128$ and
+$0.922$ at $K = 256$.
+
+\textbf{Evaluation tiers.} T1 is ranking accuracy on held-out pairs of
+pool elements, the analogue of held-out cells of a multiplication
+table. T2 is accuracy on pairs of fresh Haar elements never seen in
+training, which has no finite-group analogue and is the headline
+metric. T3 places the $63$ negatives at a fixed geodesic radius $r$
+from the product and profiles resolution as a function of $r$.
+
+\textbf{Encodings.} The mainline encoding is
+$\Psi(g)_i = \exp(\alpha\langle g, h_i \rangle)$, $i = 1, \dots, 32$,
+with fixed Haar landmarks $h_i$ and $\alpha = 3$, standardized to zero
+mean and unit variance under Haar statistics. The two robustness
+encodings are a frozen random two-layer tanh network of the raw
+coordinates, and the values of a fixed random band-limited function at
+$32$ translated probe points. Quotient conditions replace the encoding
+by its average over the quotiented central subgroup, namely the
+antipodal average for $\SO(3)$ and $\SO(5)$, the order-three orbit
+average for $\PSU(3)$, and the three sign-pair averages for the
+quotients of $\Spin(4)$. Each average is exactly invariant under the
+quotiented subgroup and distinguishes all other center elements, which
+we verify numerically at construction.
+
+\textbf{Architecture.} The shared argument encoder is a two-layer GELU
+network $\R^{32} \to \R^{256} \to \R^{128}$ producing $z(a)$ and
+$z(b)$. The interaction network is an MLP on the concatenation,
+$\R^{256} \to \R^{512} \to \R^{128}$, producing $h(a,b)$. A separate
+candidate encoder with the encoder architecture produces $z_c(c)$, and
+the score is the inner product $\langle h(a,b), z_c(c)\rangle$. The
+model has about $0.3$M parameters.
+
+\textbf{Training.} AdamW with learning rate $10^{-3}$, weight decay
+$1.0$, batch size $4096$ ($2048$ for $\SU(3)$, $\Spin(4)$, and
+$\Spin(5)$), and $100$k--$200$k steps, with $f = 0.01$ unless stated.
+Heat-kernel and band-limited regressions replace the cross-entropy by
+mean squared error on standardized targets, with candidates drawn half
+near the product at uniform geodesic radius and half from Haar measure.
+All runs use a single NVIDIA T4 GPU, PyTorch 2.11, and complete in
+hours (mainline conditions) to about two days (the largest groups).
+Five seeds per reported condition throughout.
+
+\textbf{Groups and exact coefficients.} Elements of $\SU(2)$ are unit
+quaternions, of $\SU(3)$ Haar-random special unitary matrices, of
+$\Spin(4) = \SU(2) \times \SU(2)$ pairs of unit quaternions, and of
+$\Spin(5) = \Sp(2)$ quaternionic $2 \times 2$ unitaries sampled by
+quaternionic Gram--Schmidt. Matrix coefficients for half-integer spins
+of $\SU(2)$ are computed exactly through the action on homogeneous
+polynomials, for $\SU(3)$ through symmetric powers of the fundamental
+and the adjoint action on the Gell-Mann frame, and for $\Sp(2)$ through
+the complex embedding together with the conjugation actions on
+Hermitian and anti-Hermitian quaternion matrices. The primitives pass a
+unit-test suite covering the homomorphism property, unitarity,
+characters, central characters, Schur orthogonality,
+planted-component recovery, and exact invariance of the quotient
+encodings.
+
+\textbf{Reproducibility.} A tracked results bundle records, for every
+run, the configuration, seed, checkpoint hash, final metrics, and
+analysis outputs, and every table in this paper regenerates from the
+bundle. Code and the bundle are included as anonymized supplementary
+material.
+
 \section{Background: representation theory and harmonic analysis on compact groups}
 \label{app:background}
 
-This appendix collects the facts the paper uses, with references in place
-of proofs. Standard sources are \cite{brocker1985} for compact groups and
-the Peter--Weyl theorem, \cite{sepanski2007} for the real Schur lemma and
-the type classification, \cite{folland1995} for harmonic analysis, and
-\cite{fulton1991} for the representation theory of the classical groups.
-Throughout, $G$ is a compact Lie group and all representations are
-finite-dimensional and continuous.
+This appendix collects the facts the paper uses, with references in
+place of proofs. Standard sources are \cite{brocker1985} for compact
+groups and the Peter--Weyl theorem, \cite{sepanski2007} for the real
+Schur lemma and the type classification, \cite{folland1995} for
+harmonic analysis, and \cite{fulton1991} for the representation theory
+of the classical groups. Throughout, $G$ is a compact Lie group and all
+representations are finite-dimensional and continuous.
 
 \paragraph{Haar measure and unitarity.}
-A compact group carries a unique translation-invariant Borel probability
-measure, its Haar measure, and every expectation over group elements in
-this paper is taken with respect to it. Averaging an arbitrary inner
-product over the group makes any representation unitary, and every unitary
-representation decomposes as a finite orthogonal direct sum of irreducible
-ones \cite[Ch.~II]{brocker1985}. The set of isomorphism classes of complex
-irreducible representations is denoted $\widehat G$, and for
-$\rho \in \widehat G$ we write $d_\rho = \dim V_\rho$ and
+A compact group carries a unique translation-invariant Borel
+probability measure, its Haar measure, and every expectation over group
+elements in this paper is taken with respect to it. Averaging an
+arbitrary inner product over the group makes any representation
+unitary, and every unitary representation decomposes as a finite
+orthogonal direct sum of irreducible ones \cite[Ch.~II]{brocker1985}.
+The set of isomorphism classes of complex irreps is denoted
+$\widehat G$, and for $\rho \in \widehat G$ we write
+$d_\rho = \dim V_\rho$ and
 $\chi_\rho(g) = \operatorname{tr}\rho(g)$ for its character.
 
 \paragraph{Matrix coefficients and orthogonality.}
 For $\rho \in \widehat G$ and vectors $u, v \in V_\rho$, the function
-$g \mapsto \langle u, \rho(g) v\rangle$ is a matrix coefficient of $\rho$.
-Schur's lemma states that a linear map commuting with two irreducible
-representations is zero or an isomorphism, and that the self-intertwiners
-of a complex irreducible representation are the scalars
+$g \mapsto \langle u, \rho(g) v\rangle$ is a matrix coefficient of
+$\rho$. Schur's lemma states that a linear map commuting with two
+irreducible representations is zero or an isomorphism, and that the
+self-intertwiners of a complex irrep are the scalars
 \cite[Ch.~I]{fulton1991}. Its integrated form is the orthogonality of
 coefficients. In a unitary basis,
 \[
@@ -485,57 +625,57 @@ coefficients. In a unitary basis,
 \;=\; \delta_{\rho\sigma}
 \]
 for $\rho, \sigma \in \widehat G$ \cite[Ch.~II]{brocker1985}. These
-relations underlie the isotypic decomposition of \cref{sec:setup}. They
-make the coefficient spans of distinct irreducible representations
-orthogonal in $L^2(G)$, so variance fractions per component are well
-defined, and our implementation verifies them numerically on the sampled
-probe sets.
+relations make the coefficient spans of distinct irreps orthogonal in
+$L^2(G)$, so the per-subspace variance fractions of
+\cref{app:methods} are well defined, and our implementation verifies
+them numerically on the sampled probe sets.
 
 \paragraph{The Peter--Weyl theorem.}
-The matrix coefficients of all $\rho \in \widehat G$ span a dense subspace
-of $L^2(G)$, and as a representation of $G \times G$ acting by left and
-right translation,
+The matrix coefficients of all $\rho \in \widehat G$ span a dense
+subspace of $L^2(G)$, and as a representation of $G \times G$ acting by
+left and right translation,
 \[
 L^2(G) \;\cong\; \bigoplus_{\rho \in \widehat G} M_\rho,
 \qquad M_\rho \;\cong\; V_\rho^* \boxtimes V_\rho,
 \]
 an orthogonal Hilbert-space direct sum in which each coefficient space
 $M_\rho$ has dimension $d_\rho^2$ \cite[Ch.~III]{brocker1985}. Every
-function a network computes on $G$ therefore has a spectral decomposition
-over $\widehat G$, and the structural question of this paper, which
-components a trained model occupies and whether it occupies them fully, is
-a question about this decomposition. \Cref{lem:twosided} records the
-two-sided irreducibility of $M_\rho$ and its real form.
+function a network computes on $G$ therefore has a spectral
+decomposition over $\widehat G$, and the structural question of this
+paper, which subspaces a trained model occupies and whether it occupies
+them fully, is a question about this decomposition.
+\Cref{lem:twosided} records the two-sided irreducibility of $M_\rho$
+and its real form.
 
 \paragraph{Real representations and Schur type.}
-The networks compute with real numbers, so the relevant decomposition is
-that of real representations. For an irreducible real representation $W$,
-the real Schur lemma states that the commutant $\End_G(W)$ is a real
-division algebra, hence isomorphic to $\R$, $\C$, or $\HH$
+The networks compute with real numbers, so the relevant decomposition
+is that of real representations. For an irreducible real representation
+$W$, the real Schur lemma states that the commutant $\End_G(W)$ is a
+real division algebra, hence isomorphic to $\R$, $\C$, or $\HH$
 \cite[Ch.~III]{sepanski2007}, and the three cases correspond to the
-classical trichotomy for a complex irreducible representation $V$. The
-representation $V$ has real type when it admits an invariant real
-structure, quaternionic type when it admits an invariant quaternionic
-structure, and complex type when $V \not\cong \bar V$. Realification acts
-on dimensions as follows. A real-type $V$ of dimension $d$ yields
-$\dim_\R W = d$ with commutant $\R$. A complex-type or quaternionic-type
-$V$ of dimension $d$ yields $\dim_\R W = 2d$ with commutant $\C$ or $\HH$,
-and in the complex case $V$ and $\bar V$ realify to the same $W$, which is
-why a complex irreducible representation and its conjugate span a single
-real isotypic component in our measurements. In all three cases, the real
-coefficient space has dimension
+classical trichotomy for a complex irrep $V$. The irrep $V$ has real
+type when it admits an invariant real structure, quaternionic type when
+it admits an invariant quaternionic structure, and complex type when
+$V \not\cong \bar V$. Realification acts on dimensions as follows. A
+real-type $V$ of dimension $d$ yields $\dim_\R W = d$ with commutant
+$\R$. A complex-type or quaternionic-type $V$ of dimension $d$ yields
+$\dim_\R W = 2d$ with commutant $\C$ or $\HH$, and in the complex case
+$V$ and $\bar V$ realify to the same $W$, which is why a complex irrep
+and its conjugate span a single real isotypic subspace in our
+measurements. In all three cases the real coefficient space has
+dimension
 \[
 \dim_\R M_W \;=\; \frac{(\dim_\R W)^2}{\dim_\R \End_G(W)},
 \]
 which evaluates to $d^2$, $2d^2$, and $d^2$ in the real, complex, and
 quaternionic cases. The three dimensions measured in the paper are
-instances, namely $9$ for the real-type vector representation of $\SO(3)$,
-$18$ for the complex-type fundamental pair of $\SU(3)$, and $4$ for the
+instances, namely $9$ for the real-type vector irrep of $\SO(3)$, $18$
+for the complex-type fundamental pair of $\SU(3)$, and $4$ for the
 quaternionic spinor of $\SU(2)$.
 
-\paragraph{Characters, class functions, and the scoring identity.}
-Characters are conjugation-invariant, and the irreducible characters form
-an orthonormal basis of the class functions in $L^2(G)$
+\paragraph{Characters and the scoring identity.}
+Characters are conjugation-invariant, and the irreducible characters
+form an orthonormal basis of the class functions in $L^2(G)$
 \cite[Ch.~II]{brocker1985}. Two identities are used throughout, namely
 $\chi_\rho(g^{-1}) = \overline{\chi_\rho(g)}$ and, for unitary $\rho$,
 \[
@@ -543,250 +683,665 @@ $\chi_\rho(g^{-1}) = \overline{\chi_\rho(g)}$ and, for unitary $\rho$,
 \;=\; \operatorname{tr}\bigl(\rho(a)\rho(b)\rho(c)^{*}\bigr)
 \;=\; \bigl\langle \rho(c),\, \rho(a)\rho(b) \bigr\rangle_{\mathrm{HS}},
 \]
-so a character evaluated at $ab\,c^{-1}$ is a Hilbert--Schmidt pairing of
-the candidate's coefficients against the product of the arguments'
-coefficients. This identity supports the statement in \cref{sec:block}
-that composition and scoring become bilinear on the coefficient space, and
-it is the form in which the finite-group mechanism of \cite{chughtai2023}
-extends to the compact case.
+so a character evaluated at $ab\,c^{-1}$ is a Hilbert--Schmidt pairing
+of the candidate's coefficients against the product of the arguments'
+coefficients. This identity is what makes composition bilinear and
+scoring linear on a coefficient space, and it is the form in which the
+finite-group GCR mechanism extends to the compact case.
 
 \paragraph{Central characters and descent to quotients.}
-By Schur's lemma, the center $Z(G)$ acts in any $\rho \in \widehat G$ by a
-character $\omega_\rho \colon Z(G) \to U(1)$, called the central
-character. For a closed central subgroup $Z$, the irreducible
-representations of the quotient $G/Z$ are exactly those $\rho$ with
-$\omega_\rho$ trivial on $Z$, and the spectral support of a $Z$-invariant
-function on $G$ consists of such $\rho$ alone. This is the descent rule of
-\cref{sec:carriers}. The orbit-averaged encoding is $Z$-invariant, so
-every component carrying a nontrivial central character of $Z$ is
-forbidden, and the measured floors on those components are the empirical
-form of the rule. One consequence used for $\Spin(4)$ deserves a proof,
-since it forces the direct-sum representations of \cref{tab:carriers}.
+By Schur's lemma, the center $Z(G)$ acts in any $\rho \in \widehat G$
+by a character $\omega_\rho \colon Z(G) \to U(1)$, called the central
+character. For a closed central subgroup $Z$, the irreps of the
+quotient $G/Z$ are exactly those $\rho$ with $\omega_\rho$ trivial on
+$Z$, and the spectral support of a $Z$-invariant function on $G$
+consists of such $\rho$ alone. This is the descent rule. The
+orbit-averaged encoding is $Z$-invariant, so every isotypic subspace
+carrying a nontrivial central character of $Z$ is forbidden, and the
+measured floors on those subspaces are the empirical form of the rule.
+One consequence deserves a proof, since it forces the direct-sum
+selections of \cref{tab:carriers}.
 
 \begin{fact}
 \label{fact:cyclic}
-If a compact group admits a faithful irreducible complex representation,
-its center is isomorphic to a closed subgroup of $U(1)$. In particular,
-$\Spin(4)$, with center $\Z_2 \times \Z_2$, has no faithful irreducible
-representation.
+If a compact group admits a faithful irreducible complex
+representation, its center is isomorphic to a closed subgroup of
+$U(1)$. In particular, $\Spin(4)$, with center $\Z_2 \times \Z_2$, has
+no faithful irrep.
 \end{fact}
 
 \begin{proof}
 Under a faithful irreducible $\rho$, the center acts by the scalars
 $\omega_\rho$, and faithfulness makes $z \mapsto \omega_\rho(z)$
-injective, so $Z(G)$ embeds in $U(1)$. Every finite subgroup of $U(1)$ is
-cyclic, and $\Z_2 \times \Z_2$ is not.
+injective, so $Z(G)$ embeds in $U(1)$. Every finite subgroup of $U(1)$
+is cyclic, and $\Z_2 \times \Z_2$ is not.
 \end{proof}
 
 \paragraph{The Casimir element and the heat kernel.}
 Fix a bi-invariant metric on $G$. The quadratic Casimir element of the
-universal enveloping algebra acts in each irreducible representation
-$\rho$ as a scalar $C(\rho) \geq 0$, and the matrix coefficients of $\rho$
-are eigenfunctions of the Laplace--Beltrami operator on $G$ with
-eigenvalue $C(\rho)$ \cite[Ch.~5]{sepanski2007}. The Casimir eigenvalue
-therefore plays the role of a squared frequency, and ordering components
-by Casimir eigenvalue in this paper is the compact-group analogue of
-ordering Fourier modes by frequency. The heat kernel at the identity-based
-variable $g$ is the class function
+universal enveloping algebra acts in each irrep $\rho$ as a scalar
+$C(\rho) \geq 0$, and the matrix coefficients of $\rho$ are
+eigenfunctions of the Laplace--Beltrami operator on $G$ with eigenvalue
+$C(\rho)$ \cite[Ch.~5]{sepanski2007}. The Casimir eigenvalue therefore
+plays the role of a squared frequency, and ordering isotypic subspaces
+by Casimir eigenvalue is the compact-group analogue of ordering Fourier
+modes by frequency. The heat kernel at the identity-based variable $g$
+is the class function
 \[
 K_t(g) \;=\; \sum_{\rho \in \widehat G} d_\rho\, e^{-t\,C(\rho)}\,
 \chi_\rho(g),
 \]
 the fundamental solution of the heat equation on $G$
-\cite[Ch.~1]{folland1995}, and its envelope $e^{-t\,C(\rho)}$ determines
-the required component weights in \cref{sec:spectral}.
+\cite[Ch.~1]{folland1995}, and its envelope $e^{-t\,C(\rho)}$
+determines the required subspace weights in Experiment~15.
 
 \paragraph{The groups of the experiments.}
-The irreducible representations of $\SU(2)$ are the spin representations
-$D^j$ of dimension $2j+1$ for
-$j \in \{0, \tfrac12, 1, \tfrac32, \dots\}$, with Casimir eigenvalue
-$C(D^j) = j(j+1)$, quaternionic type for half-integer $j$ and real type
-for integer $j$, and central character $(-1)^{2j}$ at $-1 \in \SU(2)$
-\cite[Ch.~II]{brocker1985}. The quotient $\SO(3) = \SU(2)/\{\pm 1\}$
-therefore carries exactly the integer spins, which yields the double-cover
-diagnostic of \cref{sec:carriers}. The irreducible representations of
-$\SU(3)$ are labeled by highest weights $(p, q)$ with dimension
-$\tfrac12 (p+1)(q+1)(p+q+2)$ and central character $\omega^{\,p-q}$ at the
-central element $\omega I$ for $\omega$ a primitive cube root of unity, so
-descent to $\PSU(3)$ requires $p \equiv q \pmod 3$. The components tracked
-in the experiments are the fundamental pair
-$\mathbf{3} \oplus \bar{\mathbf{3}}$ at $(1,0)$ and $(0,1)$, the adjoint
-$\mathbf{8}$ at $(1,1)$, and the pairs $\mathbf{6} \oplus \bar{\mathbf{6}}$
-and $\mathbf{10} \oplus \bar{\mathbf{10}}$ \cite[Ch.~13]{fulton1991}. The
-group $\Spin(4)$ is isomorphic to $\SU(2) \times \SU(2)$, its irreducible
-representations are the outer products $(j_L, j_R)$ with central character
-$\bigl((-1)^{2j_L}, (-1)^{2j_R}\bigr)$ on the center $\Z_2 \times \Z_2$,
-and its three central quotients are $\SO(4)$ from the diagonal $\Z_2$,
-retaining $j_L + j_R \in \Z$, the product $\SO(3) \times \SU(2)$ from one
-factor's $\Z_2$, and $\PSO(4)$ from the full center, retaining
-$j_L, j_R \in \Z$. The group $\Spin(5)$ is isomorphic to the quaternionic
-unitary group $\Sp(2)$, with quaternionic spinor representation
-$\mathbf{4}$, real vector representation $\mathbf{5}$, and adjoint
-$\mathbf{10}$, and $\SO(5) = \Spin(5)/\{\pm 1\}$ retains the
-representations with trivial central character, among them $\mathbf{5}$
-and $\mathbf{10}$ \cite[Ch.~16]{fulton1991}.
+The irreps of $\SU(2)$ are the spin representations $D^j$ of dimension
+$2j+1$ for $j \in \{0, \tfrac12, 1, \tfrac32, \dots\}$, with Casimir
+eigenvalue $C(D^j) = j(j+1)$, quaternionic type for half-integer $j$
+and real type for integer $j$, and central character $(-1)^{2j}$ at
+$-1 \in \SU(2)$ \cite[Ch.~II]{brocker1985}. The quotient
+$\SO(3) = \SU(2)/\{\pm 1\}$ therefore carries exactly the integer
+spins, which yields the double-cover diagnostic. The irreps of $\SU(3)$
+are labeled by highest weights $(p, q)$ with dimension
+$\tfrac12 (p+1)(q+1)(p+q+2)$ and central character $\omega^{\,p-q}$ at
+the central element $\omega I$ for $\omega$ a primitive cube root of
+unity, so descent to $\PSU(3)$ requires $p \equiv q \pmod 3$. The
+subspaces tracked in the experiments are the fundamental pair
+$\mathbf{3} \oplus \bar{\mathbf{3}}$ at $(1,0)$ and $(0,1)$, the
+adjoint $\mathbf{8}$ at $(1,1)$, and the pairs
+$\mathbf{6} \oplus \bar{\mathbf{6}}$ and
+$\mathbf{10} \oplus \bar{\mathbf{10}}$ \cite[Ch.~13]{fulton1991}. The
+group $\Spin(4)$ is isomorphic to $\SU(2) \times \SU(2)$, its irreps
+are the outer products $(j_L, j_R)$ with central character
+$\bigl((-1)^{2j_L}, (-1)^{2j_R}\bigr)$ on the center
+$\Z_2 \times \Z_2$, and its three central quotients are $\SO(4)$ from
+the diagonal $\Z_2$, retaining $j_L + j_R \in \Z$, the product
+$\SO(3) \times \SU(2)$ from one factor's $\Z_2$, and $\PSO(4)$ from the
+full center, retaining $j_L, j_R \in \Z$. The group $\Spin(5)$ is
+isomorphic to the quaternionic unitary group $\Sp(2)$, with
+quaternionic spinor irrep $\mathbf{4}$, real vector irrep $\mathbf{5}$,
+and adjoint $\mathbf{10}$, and $\SO(5) = \Spin(5)/\{\pm 1\}$ retains
+the irreps with trivial central character, among them $\mathbf{5}$ and
+$\mathbf{10}$ \cite[Ch.~16]{fulton1991}.
 
 \section{Proofs}
 \label{app:proofs}
 
 \begin{proof}[Proof of \cref{lem:character}]
-Each eigenvalue of the unitary matrix $V(g)$ lies on the unit circle, so
-$\operatorname{Re}\operatorname{tr} V(g) \leq \dim V$, with equality
+Each eigenvalue of the unitary matrix $V(g)$ lies on the unit circle,
+so $\operatorname{Re}\operatorname{tr} V(g) \leq \dim V$, with equality
 exactly when every eigenvalue equals $1$, that is, when $V(g)$ is the
-identity. By faithfulness, this occurs only at $g = e$. For the expansion,
-write $A = dV(X)$, an anti-Hermitian matrix with eigenvalues
+identity. By faithfulness, this occurs only at $g = e$. For the
+expansion, write $A = dV(X)$, an anti-Hermitian matrix with eigenvalues
 $i\lambda_1, \dots, i\lambda_{\dim V}$. Then
-$\operatorname{Re}\operatorname{tr}\exp(tA) = \sum_k \cos(t\lambda_k) =
-\dim V - \tfrac{t^2}{2}\sum_k \lambda_k^2 + O(t^4)$, and
+$\operatorname{Re}\operatorname{tr}\exp(tA) = \sum_k \cos(t\lambda_k)
+= \dim V - \tfrac{t^2}{2}\sum_k \lambda_k^2 + O(t^4)$, and
 $\sum_k \lambda_k^2 = \lVert A\rVert_F^2$. The trace of $A$ is purely
 imaginary and contributes nothing to the real part. If
 $\lVert dV(X)\rVert_F = 0$, then the one-parameter subgroup $\exp(tX)$
-lies in the kernel of $V$, which is trivial, so $X = 0$, proving positive
-definiteness.
+lies in the kernel of $V$, which is trivial, so $X = 0$, proving
+positive definiteness.
 \end{proof}
 
 \begin{lemma}
 \label{lem:necessity}
 Let $H$ be a compact group. Assume the score factors as
-$s(a,b,c) = S(\varphi(a), \varphi(b), \varphi(c))$ where $\varphi$ factors
-through the matrix coefficients of a representation $V$ of $H$ with
-nontrivial closed kernel $N$, the function $c \mapsto s(a,b,c)$ is
-continuous, negatives are sampled from a distribution assigning positive
-probability to every open subset of the admissible region, and the
-exclusion radius is smaller than $\min_{n \in N,\, n \neq e} d(e, n)$.
-Then the population ranking loss is bounded away from its optimum.
+$s(a,b,c) = S(\varphi(a), \varphi(b), \varphi(c))$ where $\varphi$
+factors through the matrix coefficients of a representation $V$ of $H$
+with nontrivial closed kernel $N$, the function $c \mapsto s(a,b,c)$
+is continuous, negatives are sampled from a distribution assigning
+positive probability to every open subset of the admissible region,
+and the exclusion radius is smaller than
+$\min_{n \in N,\, n \neq e} d(e, n)$. Then the population ranking loss
+is bounded away from its optimum.
 \end{lemma}
 
 \begin{proof}
-Fix $n \in N$ with $n \neq e$. By the radius hypothesis, $ab\,n$ lies in
-the admissible negative region. Since $\varphi$ is constant on $N$-cosets,
-$s(a, b, ab\,n) = s(a, b, ab)$, which is at least the score of the noisy
-positive up to the continuity modulus of $s$ over the positive
-displacement. By continuity, there is a ball around $ab\,n$ on which the
-score stays within any prescribed gap of this value, and by the sampling
-hypothesis that ball receives positive probability, so with positive
-probability a sampled negative ties or exceeds the positive.
+Fix $n \in N$ with $n \neq e$. By the radius hypothesis, $ab\,n$ lies
+in the admissible negative region. Since $\varphi$ is constant on
+$N$-cosets, $s(a, b, ab\,n) = s(a, b, ab)$, which is at least the
+score of the noisy positive up to the continuity modulus of $s$ over
+the positive displacement. By continuity, there is a ball around
+$ab\,n$ on which the score stays within any prescribed gap of this
+value, and by the sampling hypothesis that ball receives positive
+probability, so with positive probability a sampled negative ties or
+exceeds the positive.
 \end{proof}
 
-The hypotheses of \cref{lem:necessity} are needed. With a finite kernel
-and a continuous candidate distribution, the exact ambiguous points have
-measure zero, and without continuity of the score no positive lower bound
-follows from non-separation alone.
+The hypotheses are needed. With a finite kernel and a continuous
+candidate distribution, the exact ambiguous points have measure zero,
+and without continuity of the score no positive lower bound follows
+from non-separation alone.
 
 \begin{proof}[Proof of \cref{lem:twosided}]
-The map $V_\rho^* \otimes V_\rho \to L^2(G)$ sending $u^* \otimes v$ to
-$g \mapsto \langle u, \rho(g) v \rangle$ intertwines the
-$G \times G$-action by left and right translation with the outer tensor
-product action and is injective by the orthogonality of matrix
+The map $V_\rho^* \otimes V_\rho \to L^2(G)$ sending $u^* \otimes v$
+to $g \mapsto \langle u, \rho(g) v \rangle$ intertwines the
+$G \times G$-action by left and right translation with the outer
+tensor product action and is injective by the orthogonality of matrix
 coefficients (\cref{app:background}). The outer tensor product of
 irreducible representations is an irreducible representation of the
 product group, so $M_\rho$ has no proper nonzero two-sided invariant
-subspace, and $\dim_\C M_\rho = (\dim V_\rho)^2$. For the real form, the
-real Schur lemma gives $\End_G(W) \in \{\R, \C, \HH\}$, and the real
-matrix-coefficient span of $W$ is identified with $W^* \otimes_{D} W$, of
-real dimension $(\dim_\R W)^2/\dim_\R D$. Minimality follows from
-irreducibility of the two-sided action on this space, by the same
-outer-tensor argument applied over $D$.
+subspace, and $\dim_\C M_\rho = (\dim V_\rho)^2$. For the real form,
+the real Schur lemma gives $\End_G(W) \in \{\R, \C, \HH\}$, and the
+real matrix-coefficient span of $W$ is identified with
+$W^* \otimes_{D} W$, of real dimension $(\dim_\R W)^2/\dim_\R D$.
+Minimality follows from irreducibility of the two-sided action on this
+space, by the same outer-tensor argument applied over $D$.
 \end{proof}
 
-\section{Experimental details}
-\label{app:details}
+\section{Analysis methods in detail}
+\label{app:methods}
 
-\textbf{Groups and sampling.} Elements of $\SU(2)$ are unit quaternions,
-of $\SU(3)$ Haar-random special unitary matrices, of
-$\Spin(4) = \SU(2) \times \SU(2)$ pairs of unit quaternions, and of
-$\Spin(5) = \Sp(2)$ quaternionic $2 \times 2$ unitaries sampled by
-quaternionic Gram--Schmidt. Matrix coefficients for half-integer spins of
-$\SU(2)$ are computed exactly through the action on homogeneous
-polynomials, for $\SU(3)$ through symmetric powers of the fundamental
-representation and the adjoint action on the Gell-Mann frame, and for
-$\Sp(2)$ through the complex embedding of the quaternionic matrices
-together with the conjugation actions on Hermitian and anti-Hermitian
-quaternion matrices.
+\textbf{Isotypic FVE.} For a fixed probe set of $2048$ Haar elements,
+we compute the fraction of variance explained (FVE) of the centered
+activations $z(g)$ by the sampled spans of exact matrix coefficients,
+one isotypic subspace at a time. The sampled spans of different
+subspaces are jointly orthonormalized by QR in order of Casimir
+eigenvalue, which bounds cross-subspace leakage, and the residual
+finite-sample leakage puts the measurement floor near $0.2\%$ of
+variance. We verified the floor on white noise and on planted
+single-subspace features, which the method recovers exactly.
 
-\textbf{Quotient encodings.} Quotient conditions average the encoding
-over the central subgroup being quotiented, namely the antipodal average
-for $\SO(3)$ and $\SO(5)$, the order-three orbit average for $\PSU(3)$,
-and the three sign-pair averages for the quotients of $\Spin(4)$. Each
-average is exactly invariant under the quotiented subgroup and
-distinguishes all other center elements, which we verify numerically at
-construction. The two further encodings under which the headline results
-reproduce are a frozen random two-layer tanh network of the raw
-coordinates and the values of a fixed random Fourier function at $32$
-translated probe points, each with its orbit-averaged quotient variant.
+\textbf{Function-space ablation.} To ablate an isotypic subspace, we
+subtract from $z$ the part linearly predictable from that subspace's
+exact matrix coefficients, with the predictor fitted on an independent
+probe set. We adopted this after a failure. Subspace estimates of
+near-floor components are noise-dominated, and ablating an estimated
+subspace spuriously damages the model because the estimate overlaps
+the dominant directions. For example, the estimated spin-$\tfrac12$
+subspace of an $\SO(3)$ model overlaps its spin-$1$ directions. The
+function-space ablation is exact for subspaces at the floor, and the
+quotient conditions supply built-in controls, since the center-orbit
+average is the identity on quotient models by construction and
+measures as such (Experiments~4 and~10).
 
-\textbf{Training.} Batch size $4096$ ($2048$ for the larger groups),
-learning rate $10^{-3}$, weight decay $1.0$, $100$k--$200$k steps,
-training fraction $0.01$ of the pair table unless stated. The ranking
-results of \cref{tab:carriers} use five seeds per condition. Heat-kernel
-and band-limited regressions replace the cross-entropy by mean squared
-error on standardized targets, with candidates drawn half near the
-product at uniform geodesic radius and half from Haar measure. Under the
-$\SU(2)$ sampling, the Bayes-optimal ranking rule attains accuracy
-$0.951$.
+\textbf{Center discriminations.} $D_c$ is the probability that the
+true product outscores its center translate, $D_\omega$ that it
+outscores both order-three translates, and $D_L, D_R, D_{LR}$ the
+analogous quantities for the three center elements of $\Spin(4)$. On
+center-invariant models, the compared scores are equal to numerical
+precision, and a naive argmax reads spurious wins from floating-point
+noise. We therefore count winners within $10^{-6}$ of the maximum and
+split credit, so an exact tie reads its chance value.
 
-\textbf{Analyses.} Isotypic variance fractions use jointly orthonormalized
-sampled coefficient spans processed in order of Casimir eigenvalue, which
-bounds cross-component leakage at the sampling floor. Ablations subtract
-the part of $z$ linearly predictable from a component's exact matrix
-coefficients, fitted on an independent probe set. Subspace estimates of
-near-floor components are noise-dominated and ablate incorrectly, which
-is why the function-space form is the reported intervention. Ridge probes
-select the regularization strength on a validation split and report on a
-disjoint test split. Translation operators are fitted by ridge regression
-in a PCA frame retaining $99.9\%$ of activation variance, with
-homomorphism and commutator defects evaluated on held-out elements. The
-recovery profiles regress both the learned score and the exact target on
-the same sequentially orthogonalized character design, so standardization
-and collinearity cancel in the reported ratios. Raw per-character
-least-squares coefficients are unidentifiable under this sampling because
-high-Casimir characters are near-collinear near the identity, and the
-sequentially orthogonalized profile is the identifiable replacement.
+\textbf{Translation operators.} We fit affine maps for left
+translation ($z(g) \mapsto z(kg)$) and right translation
+($z(g) \mapsto z(gk)$) by ridge regression in a PCA frame retaining
+$99.9\%$ of activation variance, with the regularization strength
+selected on a validation split, and evaluate $R^2$, homomorphism
+defects, and the commutator $\lVert [M^L_a, M^R_b]\rVert$ on held-out
+elements.
 
-\textbf{Verification.} The representation-theoretic primitives pass a
-unit-test suite covering the homomorphism property, unitarity, characters,
-central characters, Schur orthogonality, planted-component recovery, and
-exact invariance of the quotient encodings. The recovery analysis
-reproduces the known support and coefficients of the band-limited target
-at weight decay $0.1$, which calibrates the method. The orbit-average
-intervention acts as the identity on quotient models by construction and
-measures as one, which confirms the intervention machinery. Software
-versions are PyTorch 2.11 and NumPy on a single T4 GPU. A tracked results
-bundle records, for every run, the configuration, seed, checkpoint hash,
-final metrics, and analysis outputs, and every table in this paper
-regenerates from the bundle. Code and the bundle are included as
-anonymized supplementary material.
+\textbf{Patching.} The patching experiments replace the interaction
+output $h(a,b)$ at inference time by a ridge reconstruction of $h$
+from chosen coordinates of a counterfactual product, with the
+reconstruction fitted on a probe set disjoint from evaluation, and
+measure how often the model then selects the counterfactual product
+among $64$ candidates.
 
-\section{Complete results}
+\textbf{Character regression and recovery.} Raw least-squares
+regression of the score on characters is unidentifiable under our
+sampling, because high-Casimir characters are near-collinear near the
+identity. We therefore regress both the learned score and the exact
+target on the same sequentially orthogonalized character design in
+Casimir order and report, per subspace, the model's incremental
+variance fraction divided by the target's. Standardization and
+collinearity cancel in the ratio, and a value of $1$ means the
+subspace is carried at its required relative weight. The band-limited
+calibration in Experiment~15 recovers known support and coefficients
+exactly, which validates the method.
+
+\textbf{Ridge probes.} All decoding probes select their regularization
+on a validation split and report on a disjoint test split.
+
+\section{Experimental record: the mainline \texorpdfstring{$\SU(2)$ and $\SO(3)$}{SU(2) and SO(3)} program}
+\label{app:mainline-exps}
+
+Each experiment below opens with its purpose, states the protocol, and
+reports the result. Unless stated, models are the mainline
+configuration of \cref{app:details}, all numbers are mean $\pm$
+standard deviation over five seeds, and evaluation is at step $100$k.
+
+\subsection{Experiment 1: isotypic decomposition and parity diagnostics}
+
+The first question is which isotypic subspaces the trained encoder
+occupies. \Cref{tab:seeds} reports the decomposition together with
+four diagnostics that probe the same distinction independently, namely
+the cosine between $z(g)$ and $z(-g)$, the sign of the holonomy of $z$
+along a $2\pi$ rotation, and held-out ridge decoding of the quaternion
+(an odd, spin-$\tfrac12$ target) and of $qq^\top$ (an even, spin-$1$
+target).
+
+The $\SU(2)$ encoder concentrates in spin~$\tfrac12$
+($0.835 \pm 0.010$ at $f = 0.01$, $0.964 \pm 0.010$ at $f = 0.002$),
+is odd under the center, reverses sign under a $2\pi$ rotation, and
+decodes the quaternion at $R^2 = 0.995$. The $\SO(3)$ encoder
+concentrates in spin~$1$ ($0.917 \pm 0.008$), holds every half-integer
+subspace at the $0.2\%$ floor, is exactly even with positive holonomy,
+fails to decode the quaternion ($R^2 \approx 0$), and decodes
+$qq^\top$ at $R^2 \geq 0.99$. All four diagnostics agree with the
+decomposition in every seed. Beyond the dominant subspace, the
+$f = 0.01$ models carry a smaller spin-$1$ admixture ($0.148 \pm
+0.010$) on the $\SU(2)$ side and spin-$2$ ($0.084$ at seed~0) on the
+$\SO(3)$ side, whose role Experiment~3 clarifies.
+
+\textbf{Robustness across encodings.} With the landmark encoding
+replaced by a frozen random tanh network of the raw coordinates, the
+pattern reproduces at $60$k steps, with $\SU(2)$ spin-$\tfrac12$ at
+$0.898$, quaternion decode $R^2 = 0.993$, and the quotient condition
+concentrating in spin~$1$ at $0.876$ with the spinor at the floor.
+With the function-value encoding, $\SU(2)$ carries spin~$\tfrac12$ at
+$0.691$ plus spin~$1$ at $0.214$ with quaternion decode
+$R^2 = 0.990$, and the quotient again pins the spinor at the floor.
+Across three qualitatively different encodings, the selected irrep is
+a property of the task and the group.
+
+\subsection{Experiment 2: training-fraction sweep and the absence of
+delayed generalization}
+
+Grokking on finite algebraic tasks is a delayed transition from
+memorization to generalization \cite{power2022, nanda2023}. We test
+for it across training fractions
+$f \in \{0.0002, 0.0005, 0.001, 0.002, 0.01\}$, $300$k steps, with
+evaluations every $500$ steps.
+
+There is no delayed transition at any $f$. Every run reaches $90\%$
+of its final T2 accuracy within the first $500$--$1000$ steps and is
+statistically flat for the remaining steps. Lowering $f$ increases
+the persistent train--test gap, from $0.06$ at $f = 0.01$ to $0.27$
+at $f = 0.0002$ for $\SU(2)$, and only the level of generalization
+depends on the data budget. Memorization and the group-structured
+representation coexist rather than compete. At $f = 0.0002$, with
+$839$ training pairs and train accuracy $1.000$, the encoder still
+holds $0.976$ of its variance in spin~$\tfrac12$ with quaternion
+decode $R^2 = 0.993$, and $300$k steps of weight decay neither remove
+the memorized component nor improve test accuracy. We attribute the
+absence of the delay to the smooth structured encoding. The encoder
+is a continuous function of the observation, so partial
+generalization is available immediately, and the free-embedding
+mechanism prior work assigns to the delay is absent. The quotient
+condition is more data-hungry at every $f$, with the deficit widening
+from $4$ to $9$ points of T2 as $f$ falls.
+
+\subsection{Experiment 3: candidate-count sweep and a revised
+interpretation}
+
+More candidates make ranking harder, and the Bayes ceiling falls from
+$0.951$ at $K = 64$ to $0.922$ at $K = 256$. We predicted before the
+sweep that harder ranking would broaden the spin spectrum. The
+prediction was wrong. At $K = 256$, the $\SU(2)$ encoder concentrates
+harder ($0.975$ in spin~$\tfrac12$), the score--character fit rises
+to $R^2 = 0.989$ on the fundamental character alone, fine resolution
+improves markedly (T3 at $r = 0.2$ rises from $0.618$ to $0.921$),
+and held-out accuracy tracks the falling ceiling at a roughly
+constant $0.96$ fraction.
+
+The revision follows from \cref{lem:character}. The fundamental
+character is monotone in distance to the product, so ranking by it is
+Bayes-optimal at any resolution, and fine resolution does not require
+higher-spin content. The spin-$1$ admixture that accumulates at
+$K = 64$ coincides with slightly declining fine resolution over
+training, consistent with drift rather than mechanism. Questions
+about spectral bandwidth therefore need a regression target, which is
+the design rationale for Experiments~13--15. The causal suite of
+Experiment~4 replicates on the $K = 256$ checkpoints, with the
+spin-$\tfrac12$ ablation collapsing the task to $0.027$ and the
+composition diagnostics strengthening.
+
+\subsection{Experiment 4: interventions and the double dissociation}
+
+If the model computes with the selected irrep, ablating that
+subspace should destroy the task and the center discrimination, and
+ablating anything else of equal rank should do nothing. Both
+directions hold, and \cref{tab:su2causal} reports the full grid. For
+the $\SU(2)$ model, function-ablating spin~$\tfrac12$ collapses
+ranking to chance ($0.026 \pm 0.002$ against $0.016$) and $D_c$ to
+$0.503 \pm 0.006$, while ablating spin~$1$ leaves the task at
+$1.000$ and costs only fine resolution ($0.596$ to $0.378$ at
+$r = 0.2$, seed~0). For the $\SO(3)$ model the roles transpose
+exactly, ablating spin~$1$ is fatal ($0.027 \pm 0.003$) and ablating
+the absent spin~$\tfrac12$ is a no-op. Parity projections agree, and
+the even projection on the $\SO(3)$ model is an exact identity by
+construction and measures as one, which validates the intervention
+machinery. Random rank-matched ablations move nothing. Every cell
+replicates over five seeds with standard deviations below $0.006$.
+
+\subsection{Experiment 5: the score is a single character}
+
+Regressing the trained score on characters
+$\chi_j(ab\,c^{-1})$ over triples with candidates at mixed distances,
+the fundamental character alone explains $0.974 \pm 0.006$ of score
+variance for the $\SU(2)$ models at $f = 0.01$ ($0.894 \pm 0.024$ at
+$f = 0.002$), with no measurable gain from any character up to
+$j = 3$. For $\SO(3)$, the spinor character explains nothing and
+$\chi_1$ brings the fit to $0.876 \pm 0.014$. The learned decision
+rule is a monotone function of a single faithful character, which is
+the form \cref{lem:character} rewards and the compact-group form of
+the GCR logit.
+
+\subsection{Experiment 6: translation operators realize the
+representation}
+
+The claim that activations carry a representation, and correlate with
+its coefficients, are different claims. We fit affine operators $T_k$
+with $z(kg) \approx T_k z(g)$ for Haar-random $k$ and test the
+algebra they generate. The activations concentrate on $9$--$14$ PCA
+dimensions holding $99.9\%$ of variance, and the dominant isotypic
+subspace has exactly the real coefficient-space dimension in every
+seed, $4$ for $\SU(2)$ and $9$ for $\SO(3)$, as \cref{lem:twosided}
+prescribes. On that subspace, the fitted operators match the irrep up
+to a fixed change of basis, measured basis-invariantly. The trace of
+$T_k$ against $d_j\,\chi_j(k)$ has correlation
+$1.0000 \pm 0.0000$ with relative error $1.1 \pm 0.1\%$, and the
+eigenvalue phases match those of $d_j$ copies of $D^j(k)$ to
+$0.0014 \pm 0.0001$ radians for $\SU(2)$ and $0.012$--$0.021$ for
+$\SO(3)$. Globally, held-out equivariance is $R^2 = 0.90$--$0.98$,
+the homomorphism defect
+$\lVert T_k T_h - T_{kh}\rVert$ is $0.04$--$0.16$ relative, and
+$T_e$ recovers the identity to numerical precision. Left translation
+acts on the latent space by the representation.
+
+\textbf{Seeds differ by an intertwiner.} Affine stitches between
+seeds reach held-out $R^2 = 0.96$--$0.99$ and approximately
+intertwine the fitted actions, with relative defect $0.07$--$0.15$.
+Universality across seeds is a statement about a shared
+representation up to gauge.
+
+\subsection{Experiment 7: patching, composition, and the
+representation ring}
+
+If the interaction network implements the composition law, the
+product state $h(a,b)$ should be controllable through the composed
+coefficients alone. Replacing $h(a,b)$ by its ridge reconstruction
+from $D^{1/2}(a'b')$ redirects the $\SU(2)$ model to select $a'b'$
+with probability $0.996$--$0.999$ in every seed, equal to or better
+than patching the full activation ($0.92$--$0.98$), while the
+wrong-irrep reconstruction redirects at chance ($0.016 \pm 0.008$).
+The eight realified spinor coefficients of the product are causally
+sufficient to control the output.
+
+Probes agree. The quaternion decodes from $h$ at $R^2 = 0.988$ for
+the product $ab$ on fresh pairs, against a pair-shuffled control of
+$-1.03$, and composing element probes algebraically matches truth at
+median cosine $0.998$. Under the two-variable decomposition of
+functions on $G \times G$, the state $h$ places $89.9 \pm 1.4\%$ of
+its variance in the diagonal $(\tfrac12, \tfrac12)$ subspace, and
+$98.2 \pm 0.3\%$ of that energy lies in the $4$-of-$16$-dimensional
+contraction subspace spanned by the matrix product
+$D^{1/2}(a) D^{1/2}(b)$. The corresponding $\SO(3)$ numbers are
+$77.5 \pm 1.6\%$ and $93.9 \pm 0.9\%$ of $9$ of $81$ dimensions. The
+hidden layer occupies exactly the channels tensor-generated from the
+encoder content, pass-through $(\tfrac12, 0)$ and $(0, \tfrac12)$ at
+about $25\%$ each and the bilinear $(\tfrac12, \tfrac12)$ at $22\%$,
+with all other channels at the floor. The interaction is the specific
+Clebsch--Gordan contraction that implements the group product, and
+the network's internal algebra follows the representation ring.
+
+\subsection{Experiment 8: the two-sided translation test}
+
+\Cref{lem:twosided} separates full coefficient spaces from every
+proper subspace. We fit left and right translation operators on six
+feature systems and evaluate held-out $R^2$, the right-homomorphism
+defect, and the commutator defect (\cref{tab:twosided}). The trained
+features pass everything, matching the exact coefficient space at
+$R^2 = 0.989 \pm 0.001$ per side with commutator $0.012 \pm 0.001$
+($\SU(2)$, both sides $0.978 \pm 0.003$, commutator
+$0.010 \pm 0.001$). The two-column frame passes the left test exactly
+and fails right closure at $R^2 = 0.638$, close to the $2/3$ that the
+Haar-uncorrelated missing column $g e_3 = (g e_1) \times (g e_2)$
+predicts. A random truncation at the frame's dimension fails both
+sides. The raw encoding and a random-initialization encoder fit both
+sides loosely with commutator defects an order of magnitude above the
+trained value, so the sharp two-sided closure is learned.
+
+A Schur-type observation makes $\SU(2)$ its own control. The
+quaternionic spinor's coefficient space has real dimension $4$, so
+its minimal faithful frame coincides with the full space, and the
+$\SU(2)$ features pass two-sided closure exactly as the lemma
+predicts. For $\SO(3)$, real type separates the two notions at $6$
+against $9$ dimensions, and the trained model chooses the full space.
+
+\subsection{Experiment 9: frame against coefficient space in matched
+training}
+
+Experiment~8 shows the learned features have the closure property.
+Whether the property is why they win is a training question, so we
+retrain with the representation content fixed by hand. Two arms share
+architecture, task, and hyperparameters, and differ only in the
+encoding, the exact $6$-dimensional two-column frame against the
+exact $9$-dimensional coefficient space, both even and standardized,
+with the encoder trainable so the frame arm is free to reconstruct
+the missing column nonlinearly. \Cref{tab:cost} reports the result.
+At statistically equal accuracy ($0.891 \pm 0.002$ against
+$0.889 \pm 0.003$), the coefficient arm attains margin
+$7.29 \pm 0.16$ against $6.49 \pm 0.05$ at $17\%$ lower total
+parameter norm, cheaper in every module, for $31\%$ more margin per
+unit norm with non-overlapping seed distributions. The frame's saved
+input coordinates are repaid with interest by the composition cost
+its one-sided closure forces. This closes the mechanism-selection
+loop. Two-sided closure makes composition bilinear and scoring
+linear, bilinearity is cheap under weight decay, and weight decay
+selects the full coefficient space.
+
+\section{Experimental record: universality across group forms}
+\label{app:universality-exps}
+
+\subsection{Experiment 10: \texorpdfstring{$\SU(3)$ and
+$\PSU(3)$}{SU(3) and PSU(3)}}
+
+The center of $\SU(3)$ has order three, so the double-cover
+diagnostic generalizes to a $\Z_3$ discrimination, and real
+activations track conjugate-pair subspaces since a real feature
+cannot distinguish an irrep from its conjugate. The $\SU(3)$ encoder
+places $0.971 \pm 0.009$ of variance in the fundamental pair
+$\mathbf{3} \oplus \bar{\mathbf{3}}$, with the center cosine at
+$-0.484 \pm 0.005$ against the exact triality prediction
+$\cos(2\pi/3) = -0.5$ and the fundamental coefficients decoding at
+$R^2 = 0.978 \pm 0.006$. The $\PSU(3)$ encoder places
+$0.934 \pm 0.007$ in the adjoint $\mathbf{8}$, the smallest faithful
+irrep of the quotient, with every charged subspace at the floor and
+the charged-energy fraction exactly $0$.
+
+The interventions repeat the double dissociation in the $\Z_3$ form
+(\cref{tab:su3causal}). Orbit averaging collapses the $\SU(3)$ model
+to chance and is an exact no-op on $\PSU(3)$, removing the invariant
+part transposes the pattern, and the per-subspace ablations land
+accordingly. Composition transfers, with fundamental probes composing
+algebraically at median cosine $0.977$. One caveat is on the record.
+The $\PSU(3)$ model solves its task only partially at this budget
+(T2 $= 0.685 \pm 0.020$), so the selection statement concerns the
+representation it builds rather than a solved task, and
+\cref{app:questions} discusses the quotient-hardness pattern.
+
+\subsection{Experiment 11: the \texorpdfstring{$\Spin(4)$}{Spin(4)}
+family}
+
+$\Spin(4) = \SU(2) \times \SU(2)$ has center $\Z_2 \times \Z_2$ and
+no faithful irrep (\cref{fact:cyclic}), and its three central
+quotients realize different global forms on one Lie algebra. We
+recorded competing selection hypotheses in the module docstring
+before running. In two conditions, the minimal-total-dimension
+choice and the minimal-summand-count choice disagree, which makes
+them discovery runs.
+
+The minimal-total-dimension choice wins both. The
+$\SO(3){\times}\SU(2)$ models select $(1,0) \oplus (0,\tfrac12)$ with
+$5$ dimensions over the faithful irrep $(1,\tfrac12)$ with $6$, and
+the $\PSO(4)$ models select $(1,0) \oplus (0,1)$ with $6$ over
+$(1,1)$ with $9$, with the rejected alternatives at
+$0.0076 \pm 0.0002$ and $0.0094 \pm 0.0011$ of variance. The learned
+representation holds $0.973$--$0.984$ of encoder variance in every
+condition and every seed. In the $\SO(4)$ condition, the encoding
+distinguishes $(q_L, q_R)$ from $(-q_L, q_R)$, yet single-factor
+content is absent ($R^2(q_L) \approx 0$), so only the task group is
+represented.
+
+The intervention map is summand-resolved
+(\cref{tab:spin4causal}). Ablating $(\tfrac12, 0)$ in the $\Spin(4)$
+model collapses $D_L$ to $0.507 \pm 0.007$ with $D_R$ at
+$1.000 \pm 0.000$, and the mirror ablation transposes it. The joint
+discrimination $D_{LR}$ survives either single ablation, since the
+remaining summand still sees the joint flip. In the $\SO(4)$
+condition, only the $(\tfrac12,\tfrac12)$ ablation matters, and
+$D_{LR}$ is an exact tie as the quotient requires. In
+$\SO(3){\times}\SU(2)$, the two summands separate causally, with
+$(0,\tfrac12)$ carrying the center charge and $(1,0)$ carrying
+geometry (task falls to $0.853 \pm 0.036$ with discriminations
+intact). Each learned summand is necessary for exactly the center
+elements its central character detects.
+
+\subsection{Experiment 12: \texorpdfstring{$\Spin(5)$, $\SO(5)$}{Spin(5), SO(5)},
+and the precommitted stress test}
+
+$\Spin(5) = \Sp(2)$ behaves like every other cover, with the
+quaternionic spinor $\mathbf{4}$ at $0.964$--$0.973$ of variance and
+T2 $= 0.969$--$0.989$ across five seeds. The quotient does not. The
+$\SO(5)$ encoder splits between the vector $\mathbf{5}$ and the
+adjoint $\mathbf{10}$, and before running the replications we
+precommitted to a decision rule, namely that if the mixture survives
+replication and conditioning variations it must be reported as a
+failure of the minimal-representation description rather than
+explained away.
+
+The mixture survives everything
+(\cref{tab:so5}). Five seeds at $f = 0.01$ give vector
+$0.680$--$0.695$ and adjoint $0.211$--$0.233$, and a $200$k
+extension, $K = 256$, and weight decay $0.1$ move neither the
+mixture nor performance in a helpful direction. The one systematic
+trend is that tripled data raises T2 from $0.55$ to $0.731$ and
+lowers the adjoint fraction to $0.173$. The mixture is not
+initialization drift, since the encoding's initial spectrum (vector
+$0.29$, adjoint $0.56$) is inverted by step $15$k and constant
+thereafter. Per the rule, the minimal-representation description
+holds in nine of ten group forms and fails as stated for $\SO(5)$.
+Two hypotheses remain open. The data trend is consistent with
+purification as the task approaches a solution, and the cost framing
+of Experiment~9 makes a genuinely mixed minimum-cost mechanism
+respectable, since the selected object is the cheapest complete
+mechanism rather than the smallest representation. Deciding requires
+a condition that solves $\SO(5)$.
+
+\begin{table}[t]
+\centering
+\caption{The $\SO(5)$ mixture across conditions (Experiment~12).
+Vector and adjoint columns are fractions of encoder variance. The
+mixture survives every condition, and only added data moves it,
+together with generalization.}
+\label{tab:so5}
+\small
+\begin{tabular}{lccc}
+\toprule
+condition & T2 & vector $\mathbf{5}$ & adjoint $\mathbf{10}$ \\
+\midrule
+$f = 0.01$, five seeds & $0.55$--$0.64$ & $0.680$--$0.695$ & $0.211$--$0.233$ \\
+$200$k steps & $0.620$ & $0.688$ & $0.214$ \\
+$K = 256$ & $0.469$ & $0.664$ & $0.224$ \\
+weight decay $0.1$ & $0.518$ & $0.660$ & $0.240$ \\
+$f = 0.03$ & $0.731$ & $0.707$ & $0.173$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Experimental record: heat-kernel regression and spectral bias}
+\label{app:spectral-exps}
+
+\subsection{Experiment 13: bandwidth is forced and allocated in
+Casimir order}
+
+Ranking never needs more than one character (Experiment~3), so we
+switch the objective to mean squared error on the standardized heat
+kernel $K_t(ab\,c^{-1})$ for $t \in \{0.3, 0.1, 0.05\}$, whose
+envelope $(2j+1)e^{-t j(j+1)}$ requires spectral content that grows
+as $t$ falls. The single-irrep concentration of ranking is a
+property of the objective, and the same architecture develops a
+genuinely multi-spin representation the moment the target requires
+one. At $t = 0.3$, the encoder spreads over
+$j \in \{\tfrac12, 1, \tfrac32\}$ and the model reaches test MSE
+$0.051$. At $t = 0.1$ and $0.05$, the model fits the lowest-Casimir
+subspaces the envelope demands, leaves the higher tail unfit, and
+pays the corresponding error ($0.324$ and $0.459$ of target
+variance). The allocation is bottom-up in Casimir order throughout
+training.
+
+\subsection{Experiment 14: what limits the bandwidth}
+
+Three manipulations separate the candidate limits. Doubling training
+time at default width improves test MSE from $0.459$ to $0.383$
+while the spectrum extends to $j = 2$ at $60\%$ of candidate-encoder
+variance, so the truncation is not a converged optimum. Doubling
+width at unchanged hyperparameters never escapes the mean predictor
+(MSE $0.997$ through $120$k steps), and retuning weight decay to
+$0.1$ lets the wide model train normally and extend its spectrum to
+$j = 3$ above floor, so the original collapse was a regularization
+pathology rather than a capacity limit. The retuned wide model
+lands in a memorization regime (train MSE $0.18$--$0.24$ against
+test $0.56$--$0.63$). The verdict is a data and regularization
+trade-off. Width extends the representable spectrum, longer
+training keeps improving the default model, and extra capacity at
+this data budget is spent memorizing frozen targets rather than
+sharpening the generalizing expansion.
+
+\subsection{Experiment 15: score-level recovery and the
+regularization frontier}
+
+The activation-level spectra of Experiment~13 leave open whether the
+score itself is a truncated character expansion. The sequentially
+orthogonalized recovery analysis of \cref{app:methods} answers at
+the score level, and \cref{tab:recovery} reports the profiles.
+Recovered subspaces sit near ratio $1$, subspaces beyond a sharp
+truncation sit at exactly $0$, and the truncation advances in
+Casimir order during training, with the $t = 0.05$ spin-$2$
+recovery climbing from $0.12$ through $0.83$ to $1.20$ across
+$50$k--$120$k steps while $j \geq \tfrac52$ stays at $0$.
+
+The band-limited target $\chi_1 + \tfrac12\chi_2$ calibrates the
+method and isolates the role of regularization. At weight decay
+$1.0$, every out-of-support subspace sits at a $0.0000$ floor, and
+the model prunes the in-support spin-$2$ remainder, whose $12.6\%$
+of target variance matches the final test MSE of $0.131$. Partial
+spin-$2$ recovery at $25$k--$50$k steps ($0.33$--$0.44$) is removed
+by $60$k, so the pruning is an optimization decision rather than a
+failure to reach the subspace. At weight decay $0.1$ on the same
+target, test MSE falls to $0.004$ and the recovery profile is
+$(1.00, 1.01, 0.94, 0.95)$ with out-of-support floors intact. The
+truncation frontier is a cost boundary set by regularization, and
+under weight decay $1.0$ the $25$-real-dimensional spin-$2$
+coefficient space costs more norm than its variance contribution is
+worth. The target's central character also controls parity. The
+band-limited target is center-invariant, and the model on the
+faithful $\SU(2)$ encoding builds integer spins only, with spin~$1$
+at $0.987$ of encoder variance and the spinor at $0.01$, so the
+target's central character overrides the encoding's.
+
+\section{Summary tables}
 \label{app:tables}
 
 \Cref{fig:appendix} shows the training dynamics of the isotypic
-decomposition and the per-group component fractions behind
-\cref{tab:carriers}. \Cref{tab:seeds} lists the seed statistics for the
-four principal conditions.
-\Cref{tab:su2causal,tab:su3causal,tab:spin4causal} list the intervention
-results, \cref{tab:twosided} the two-sided translation test,
-\cref{tab:cost} the frame comparison, and \cref{tab:recovery} the recovery
-of the character expansion per checkpoint.
+decomposition and the per-group subspace fractions behind
+\cref{tab:carriers}.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{figureA1.pdf}
-\caption{(a, b) Fraction of encoder variance per spin component during
-training for the $\SU(2)$ and $\SO(3)$ conditions (seed 0, log scale, with
-the dotted floor marking the sampling limit). (c, d, e) Final component
-fractions for $\SU(3)$/$\PSU(3)$, the $\Spin(4)$ family, and
-$\Spin(5)$/$\SO(5)$ (means over five seeds).}
+\caption{(a, b) Fraction of encoder variance per spin subspace during
+training for the mainline $\SU(2)$ and $\SO(3)$ conditions (seed 0,
+log scale, dotted line at the sampling floor). The two conditions
+separate within the first evaluations and never cross. (c, d, e)
+Final subspace fractions for $\SU(3)$/$\PSU(3)$, the $\Spin(4)$
+family, and $\Spin(5)$/$\SO(5)$, means over five seeds. Panel (d)
+includes the rejected faithful alternatives of the two discovery
+conditions at under $1\%$.}
 \label{fig:appendix}
 \end{figure}
 
 \begin{table}[t]
 \centering
-\caption{Seed statistics for the principal conditions (five seeds, mean
-$\pm$ standard deviation, evaluated at $100$k steps). $D$ denotes the
-center discrimination appropriate to the condition, the probability that
-the true product outscores its center translates, with tie value $0.5$
-($\SU(2)$/$\SO(3)$) or $1/3$ ($\SU(3)$/$\PSU(3)$).}
+\caption{Seed statistics for the four principal conditions
+(Experiments~1, 4, 5, and 10). Five seeds, mean $\pm$ standard
+deviation, step $100$k. $D$ denotes the center discrimination
+appropriate to the condition, with tie value $0.5$ for the $\Z_2$
+centers and $1/3$ for $\Z_3$.}
 \label{tab:seeds}
 \scriptsize
 \setlength{\tabcolsep}{4pt}
@@ -794,12 +1349,12 @@ the true product outscores its center translates, with tie value $0.5$
 \toprule
  & $\SU(2)$ & $\SO(3)$ & $\SU(3)$ & $\PSU(3)$ \\
 \midrule
-held-out accuracy & $0.921 \pm 0.003$ & $0.883 \pm 0.003$ & $0.994 \pm 0.001$ & $0.685 \pm 0.020$ \\
-learned-representation variance & $0.835 \pm 0.010$ & $0.917 \pm 0.008$ & $0.971 \pm 0.009$ & $0.934 \pm 0.007$ \\
-forbidden-component variance & $0.0023 \pm 0.0004$ & $0.0023 \pm 0.0004$ & $0.0059 \pm 0.0004$ & $0.0000$ \\
+held-out accuracy (T2) & $0.921 \pm 0.003$ & $0.883 \pm 0.003$ & $0.994 \pm 0.001$ & $0.685 \pm 0.020$ \\
+learned-representation FVE & $0.835 \pm 0.010$ & $0.917 \pm 0.008$ & $0.971 \pm 0.009$ & $0.934 \pm 0.007$ \\
+forbidden-subspace FVE & $0.0023 \pm 0.0004$ & $0.0023 \pm 0.0004$ & $0.0059 \pm 0.0004$ & $0.0000$ \\
 center cosine & $-0.72 \pm 0.02$ & $+1.000$ & $-0.484 \pm 0.005$ & $+1.000$ \\
 coefficient decode $R^2$ & $0.995$ & $0.999$ & $0.978 \pm 0.006$ & $0.699 \pm 0.012$ \\
-$D$, intact & $1.0000$ & $0.5000$ & $1.0000$ & $0.3333$ \\
+$D$, intact model & $1.0000$ & $0.5000$ & $1.0000$ & $0.3333$ \\
 score--character $R^2$ & $0.974 \pm 0.006$ & $0.876 \pm 0.014$ & $0.700$ & \\
 \bottomrule
 \end{tabular}
@@ -807,11 +1362,12 @@ score--character $R^2$ & $0.974 \pm 0.006$ & $0.876 \pm 0.014$ & $0.700$ & \\
 
 \begin{table}[t]
 \centering
-\caption{Interventions on the argument encoders for the $\SU(2)$ and
-$\SO(3)$ conditions (five seeds, mean $\pm$ standard deviation). Task is
-ranking accuracy against $63$ excluded Haar negatives (chance $0.016$),
-$D_c$ the probability that the true product outscores its antipode (tie
-$0.5$).}
+\caption{Interventions on the argument encoders for the mainline
+conditions (Experiment~4). Five seeds, mean $\pm$ standard deviation.
+Task is ranking accuracy against $63$ excluded Haar negatives with
+chance $0.016$, and $D_c$ is the antipode discrimination with tie
+$0.5$. Ablating the selected subspace is fatal, everything else is
+inert, and the pattern transposes exactly between the conditions.}
 \label{tab:su2causal}
 \scriptsize
 \begin{tabular}{lcccc}
@@ -830,9 +1386,10 @@ random subspace, equal rank & $1.000$ & $1.0000$ & $1.000$ & $0.5000$ \\
 
 \begin{table}[t]
 \centering
-\caption{Interventions for the $\SU(3)$ and $\PSU(3)$ conditions (five
-seeds). $D_\omega$ is the probability that the true product outscores both
-of its center translates (tie $1/3$).}
+\caption{Interventions for the $\SU(3)$ and $\PSU(3)$ conditions
+(Experiment~10). Five seeds. $D_\omega$ is the probability that the
+true product outscores both of its center translates, with tie
+$1/3$.}
 \label{tab:su3causal}
 \scriptsize
 \begin{tabular}{lcccc}
@@ -851,11 +1408,12 @@ ablate adjoint $\mathbf{8}$ & $0.997$ & $1.000$ & $0.014 \pm 0.003$ & $0.333$ \\
 
 \begin{table}[t]
 \centering
-\caption{Interventions resolved by summand for the $\Spin(4)$ family
-(five seeds, representative cells with seed statistics). $D_L$, $D_R$,
-$D_{LR}$ are the discriminations of the three center elements (tie $0.5$).
-Each learned summand is necessary for exactly the center elements its
-central character detects.}
+\caption{Summand-resolved interventions for the $\Spin(4)$ family
+(Experiment~11). Five seeds, representative cells with seed
+statistics. $D_L$ and $D_R$ are the discriminations of the two
+single-factor center flips, tie $0.5$. Each learned summand is
+necessary for exactly the center elements its central character
+detects.}
 \label{tab:spin4causal}
 \scriptsize
 \begin{tabular}{llccc}
@@ -875,11 +1433,13 @@ $\PSO(4)$ & ablate $(1, 0)$ or $(0, 1)$ & $0.809 \pm 0.016$ & $0.500$ & $0.500$ 
 
 \begin{table}[t]
 \centering
-\caption{The two-sided translation test on the $\SO(3)$ condition (five
-seeds for the trained and random-initialization systems). Left and right
-columns are held-out $R^2$ of fitted affine translation operators, hom-$R$
-the right-homomorphism defect, and $[L,R]$ the commutator defect, both
-relative to activation norm.}
+\caption{The two-sided translation test on the $\SO(3)$ condition
+(Experiment~8). Five seeds for the trained and random-initialization
+systems. Left and right columns are held-out $R^2$ of fitted affine
+translation operators, hom-$R$ the right-homomorphism defect, and
+$[L,R]$ the commutator defect, both relative to activation norm. The
+trained features match the full coefficient space, the frame passes
+left and fails right, and the random truncation fails both.}
 \label{tab:twosided}
 \scriptsize
 \begin{tabular}{lccccc}
@@ -898,9 +1458,11 @@ random-initialization encoder & $16$ & $0.892 \pm 0.008$ & $0.890 \pm 0.008$ & $
 
 \begin{table}[t]
 \centering
-\caption{Frame against coefficient space in matched training on $\SO(3)$
-(five seeds per arm, $60$k steps). Norms are Frobenius norms of module
-parameters at the end of training.}
+\caption{Frame against coefficient space in matched training on
+$\SO(3)$ (Experiment~9). Five seeds per arm, $60$k steps. Norms are
+Frobenius norms of module parameters at the end of training. At
+matched accuracy, the coefficient arm wins margin at lower norm in
+every module.}
 \label{tab:cost}
 \scriptsize
 \begin{tabular}{lcccccc}
@@ -915,10 +1477,13 @@ coefficients, $9$ dims & $0.889 \pm 0.003$ & $7.29 \pm 0.16$ & $16.7$ & $9.8$ & 
 
 \begin{table}[t]
 \centering
-\caption{Recovery of the character expansion of the score per checkpoint
-(sequentially orthogonalized profile, model divided by target, with
-components beyond spin $2$ at $0.000$ throughout and omitted). The
-band-limited target is $\chi_1 + \tfrac12\chi_2$.}
+\caption{Recovery of the character expansion of the score per
+checkpoint (Experiment~15). Sequentially orthogonalized profile,
+model divided by target, with subspaces beyond spin $2$ at $0.000$
+throughout and omitted. The band-limited target is
+$\chi_1 + \tfrac12\chi_2$. The truncation advances in Casimir order
+during training, and weight decay $0.1$ recovers the band-limited
+target exactly.}
 \label{tab:recovery}
 \scriptsize
 \begin{tabular}{llcccc}
@@ -936,5 +1501,66 @@ band-limited, wd $0.1$ & $60$k & $1.00$ & $1.01$ & $0.94$ & $0.95$ \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\section{The conjecture, and questions the record raises}
+\label{app:questions}
+
+\begin{conjecture}
+\label{conj:selection}
+In the factorized architecture with weight decay, among parameter
+settings achieving population ranking loss within $\varepsilon$ of the
+optimum, the minimum-norm setting realizes, as $\varepsilon \to 0$, the
+full real coefficient space of a faithful representation minimizing the
+total regularized cost of features, composition, and scoring, with
+score a monotone function of $\operatorname{Re}\chi_V(ab\,c^{-1})$.
+\end{conjecture}
+
+The missing ingredients are a norm lower bound tying
+$\varepsilon$-optimal scores to the effective dimension of the
+functions they compute on $G$, and the exclusion of mechanisms outside
+the character algebra, the compact-group analogue of the alternative
+circuits documented for finite groups \cite{stander2024, zhong2023}.
+Experiments~8 and~9 supply the empirical content, two-sided closure
+and the cost verdict, and the $\SO(5)$ mixture of Experiment~12 marks
+the boundary of what the conjecture may claim.
+
+\textbf{Why do the quotient models generalize worse than their
+covers?} The pattern is uniform, with $\SO(3)$ below $\SU(2)$,
+$\PSU(3)$ well below $\SU(3)$, and $\SO(5)$ far below $\Spin(5)$,
+and it widens with the size of the center. We do not yet know the
+cause. Candidates include information loss and poor conditioning of
+the averaged encoding near its fold locus, and the intrinsic
+geometry of the quotient manifold. Until conditioning is matched,
+with Gram spectra and candidate-hardness diagnostics, the hardness
+pattern should not be read as a statement about representation
+selection, and we flag it as the main confound of the quotient
+program.
+
+\textbf{Why are some recovery ratios above 1?} The $t = 0.05$
+profiles in \cref{tab:recovery} overshoot on low spins while the
+tail is unfit. The model compensates for missing high-Casimir
+variance by overweighting the subspaces it does carry, and the
+overshoot relaxes as the next subspace fills ($1.81$ to $1.55$ on
+$j \leq \tfrac32$ while $j = 2$ climbs). The calibration run shows
+the analysis reads exact weights when the model carries them, so the
+overshoot is a property of the truncated solution rather than of the
+method.
+
+\textbf{Why is there no grokking?} Our encoders are continuous
+functions of a structured observation rather than free per-element
+embeddings, and Experiment~2 shows immediate partial generalization
+at every data budget. This is consistent with accounts that locate
+the delay in the embedding table. A deliberate attempt to restore
+the delay, by roughening the encoding kernel or inflating the
+initialization scale, is a controlled experiment we have not run.
+
+\textbf{Does the $\SO(5)$ failure infect the other nine forms?} The
+nine successes rest on within-condition replication, exact no-op
+controls, and interventions that land where central characters
+predict, and none of that changes. What the failure removes is the
+claim that minimal-total-dimension selection is a law. The cost
+picture of Experiment~9 predicts selection of the cheapest complete
+mechanism, and whether the $\SO(5)$ mixture is that mechanism or a
+transient of an unsolved task is exactly the open question.
 
 \end{document}
