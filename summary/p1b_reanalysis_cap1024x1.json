@@ -1,0 +1,513 @@
+{
+  "envelope": {
+    "schema_name": "p1b-reanalysis",
+    "schema_version": 1,
+    "generated_at_utc": "2026-09-02T18:49:18.544123+00:00",
+    "code_commit": "71a460747e832acdbc9fe499991c3e5ce6975995+dirty",
+    "analysis_source_sha256": "597436431efa666656ca2e01cc47f849d6907882e074bffb6b786ed54226b579",
+    "source_checkpoint": null,
+    "run_config_sha256": null,
+    "training_seed": null,
+    "analysis_seed": 0,
+    "analysis_args": {
+      "cell": "cap1024x1",
+      "frame_glob": "data/su2/so3_so3frame_cap1024x1_f0.01_s{s}",
+      "block_glob": "data/su2/so3_so3block_cap1024x1_f0.01_s{s}",
+      "out": "summary/p1b_reanalysis_cap1024x1.json",
+      "traj_out": "summary/p1b_trajectories_cap1024x1.json",
+      "acc_floor": 0.85,
+      "analysis_seed": 0
+    },
+    "environment": {
+      "python": "3.12.6",
+      "platform": "Linux-6.1.158-180.294.amzn2023.x86_64-x86_64-with-glibc2.34",
+      "torch": "2.11.0+cu130",
+      "cuda": "13.0",
+      "device": "Tesla T4",
+      "numpy": "2.4.4"
+    }
+  },
+  "results": {
+    "cell": "cap1024x1",
+    "seeds_analyzed": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "acc_floor": 0.85,
+    "norm_functionals": {
+      "total": "sqrt(sum of squared module Frobenius norms)",
+      "product": "product of module Frobenius norms",
+      "caveat": "neither functional is invariant to rescaling symmetries of the non-homogeneous network; values are measured functionals of the trained parameters, not intrinsic complexity"
+    },
+    "held_out_loss_note": "T1/T2 loss was not logged; equal-loss matching uses train loss",
+    "per_seed": {
+      "0": {
+        "final": {
+          "frame": {
+            "step": 60000.0,
+            "loss": 0.047074392437934875,
+            "acc_train": 0.9853515625,
+            "acc_T1": 0.883544921875,
+            "acc_T2": 0.8836669921875,
+            "margin_T2": 7.046970367431641,
+            "norm_enc": 19.995264053344727,
+            "norm_int": 17.42854881286621,
+            "norm_encc": 12.302457809448242,
+            "wall_s": 8541.3,
+            "norm_total": 29.238935795249013,
+            "norm_product": 4287.264275801944,
+            "margin_per_norm": 0.24101323033024655
+          },
+          "block": {
+            "step": 60000.0,
+            "loss": 0.02414991706609726,
+            "acc_train": 0.9962158203125,
+            "acc_T1": 0.88916015625,
+            "acc_T2": 0.89453125,
+            "margin_T2": 8.72393798828125,
+            "norm_enc": 15.542290687561035,
+            "norm_int": 16.674360275268555,
+            "norm_encc": 11.667884826660156,
+            "wall_s": 8540.1,
+            "norm_total": 25.6073549343603,
+            "norm_product": 3023.8228305941275,
+            "margin_per_norm": 0.3406809493070817
+          }
+        },
+        "floor_ok": true,
+        "equal_wall_time": {
+          "wall_s": 8540.1,
+          "frame": {
+            "acc_T2": 0.8837283683222765,
+            "margin_T2": 7.047999784267147,
+            "norm_total": 29.239187422348486,
+            "norm_product": 4287.059460531598,
+            "loss": 0.04708458383323093
+          },
+          "block": {
+            "acc_T2": 0.89453125,
+            "margin_T2": 8.72393798828125,
+            "norm_total": 25.6073549343603,
+            "norm_product": 3023.8228305941275,
+            "loss": 0.02414991706609726
+          }
+        },
+        "equal_T2_accuracy": {
+          "level": 0.8836669921875,
+          "frame": {
+            "margin_T2": 5.481152620606145,
+            "norm_total": 21.439292858160155,
+            "loss": 0.17693444633252733,
+            "step": 1901.9390581717453
+          },
+          "block": {
+            "margin_T2": 6.642414096756431,
+            "norm_total": 20.563414729195095,
+            "loss": 0.12867157463765683,
+            "step": 1932.5119014281718
+          }
+        },
+        "matched_norm": {
+          "norm_overlap": null,
+          "note": "no norm overlap between arms after step 20k; block frontier evaluated at its max norm vs frame at its min norm",
+          "mean_margin_diff_block_minus_frame": 2.358912467956543
+        }
+      },
+      "1": {
+        "final": {
+          "frame": {
+            "step": 60000.0,
+            "loss": 0.045533567667007446,
+            "acc_train": 0.9869384765625,
+            "acc_T1": 0.88427734375,
+            "acc_T2": 0.8826904296875,
+            "margin_T2": 7.050276756286621,
+            "norm_enc": 19.67367172241211,
+            "norm_int": 18.235877990722656,
+            "norm_encc": 12.416369438171387,
+            "wall_s": 8527.3,
+            "norm_total": 29.559547275946517,
+            "norm_product": 4454.579605716743,
+            "margin_per_norm": 0.23851098565449413
+          },
+          "block": {
+            "step": 60000.0,
+            "loss": 0.06229855865240097,
+            "acc_train": 0.9803466796875,
+            "acc_T1": 0.880615234375,
+            "acc_T2": 0.8780517578125,
+            "margin_T2": 8.735681533813477,
+            "norm_enc": 15.846264839172363,
+            "norm_int": 15.940936088562012,
+            "norm_encc": 12.565853118896484,
+            "wall_s": 8437.5,
+            "norm_total": 25.751081867340826,
+            "norm_product": 3174.188468721199,
+            "margin_per_norm": 0.33923551557236237
+          }
+        },
+        "floor_ok": true,
+        "equal_wall_time": {
+          "wall_s": 8437.5,
+          "frame": {
+            "acc_T2": 0.8864864281967756,
+            "margin_T2": 7.00680222393346,
+            "norm_total": 29.499873834949504,
+            "norm_product": 4420.9169538279075,
+            "loss": 0.041780285110743255
+          },
+          "block": {
+            "acc_T2": 0.8780517578125,
+            "margin_T2": 8.735681533813477,
+            "norm_total": 25.751081867340826,
+            "norm_product": 3174.188468721199,
+            "loss": 0.06229855865240097
+          }
+        },
+        "equal_T2_accuracy": {
+          "level": 0.8780517578125,
+          "frame": {
+            "margin_T2": 5.356144129682814,
+            "norm_total": 21.28898488417489,
+            "loss": 0.18638942903205646,
+            "step": 1886.2308762169682
+          },
+          "block": {
+            "margin_T2": 6.548378255609909,
+            "norm_total": 20.51105389062694,
+            "loss": 0.11857864642915253,
+            "step": 1916.3162321278385
+          }
+        },
+        "matched_norm": {
+          "norm_overlap": null,
+          "note": "no norm overlap between arms after step 20k; block frontier evaluated at its max norm vs frame at its min norm",
+          "mean_margin_diff_block_minus_frame": 2.029949188232422
+        }
+      },
+      "2": {
+        "final": {
+          "frame": {
+            "step": 60000.0,
+            "loss": 0.04476424306631088,
+            "acc_train": 0.9893798828125,
+            "acc_T1": 0.885986328125,
+            "acc_T2": 0.88720703125,
+            "margin_T2": 7.158149719238281,
+            "norm_enc": 19.719099044799805,
+            "norm_int": 18.08425521850586,
+            "norm_encc": 11.937800407409668,
+            "wall_s": 8436.3,
+            "norm_total": 29.29836569697756,
+            "norm_product": 4257.081938274391,
+            "margin_per_norm": 0.24431907886168278
+          },
+          "block": {
+            "step": 60000.0,
+            "loss": 0.02169633097946644,
+            "acc_train": 0.995849609375,
+            "acc_T1": 0.8834228515625,
+            "acc_T2": 0.884033203125,
+            "margin_T2": 8.812175750732422,
+            "norm_enc": 15.661125183105469,
+            "norm_int": 15.685937881469727,
+            "norm_encc": 12.206262588500977,
+            "wall_s": 8382.7,
+            "norm_total": 25.30439360272571,
+            "norm_product": 2998.583592632496,
+            "margin_per_norm": 0.34824686531050486
+          }
+        },
+        "floor_ok": true,
+        "equal_wall_time": {
+          "wall_s": 8382.7,
+          "frame": {
+            "acc_T2": 0.8882235941913842,
+            "margin_T2": 7.1461733370850995,
+            "norm_total": 29.286545220753066,
+            "norm_product": 4248.547298334478,
+            "loss": 0.04472458857180035
+          },
+          "block": {
+            "acc_T2": 0.884033203125,
+            "margin_T2": 8.812175750732422,
+            "norm_total": 25.30439360272571,
+            "norm_product": 2998.583592632496,
+            "loss": 0.02169633097946644
+          }
+        },
+        "equal_T2_accuracy": {
+          "level": 0.884033203125,
+          "frame": {
+            "margin_T2": 5.514884887048048,
+            "norm_total": 21.218774774645166,
+            "loss": 0.17091270435111755,
+            "step": 1925.2414951700966
+          },
+          "block": {
+            "margin_T2": 6.725535238907903,
+            "norm_total": 20.624169708336748,
+            "loss": 0.1255624513679163,
+            "step": 1945.2792741706835
+          }
+        },
+        "matched_norm": {
+          "norm_overlap": null,
+          "note": "no norm overlap between arms after step 20k; block frontier evaluated at its max norm vs frame at its min norm",
+          "mean_margin_diff_block_minus_frame": 1.9956045150756836
+        }
+      },
+      "3": {
+        "final": {
+          "frame": {
+            "step": 60000.0,
+            "loss": 0.04447047412395477,
+            "acc_train": 0.9913330078125,
+            "acc_T1": 0.8863525390625,
+            "acc_T2": 0.889404296875,
+            "margin_T2": 7.328969478607178,
+            "norm_enc": 19.695032119750977,
+            "norm_int": 17.802894592285156,
+            "norm_encc": 12.22394847869873,
+            "wall_s": 8419.1,
+            "norm_total": 29.227765266470847,
+            "norm_product": 4286.065707098009,
+            "margin_per_norm": 0.25075367246823815
+          },
+          "block": {
+            "step": 60000.0,
+            "loss": 0.021789316087961197,
+            "acc_train": 0.9962158203125,
+            "acc_T1": 0.8846435546875,
+            "acc_T2": 0.89013671875,
+            "margin_T2": 8.749098777770996,
+            "norm_enc": 15.610625267028809,
+            "norm_int": 15.880473136901855,
+            "norm_encc": 12.044441223144531,
+            "wall_s": 8400.8,
+            "norm_total": 25.316982692596742,
+            "norm_product": 2985.8665445417055,
+            "margin_per_norm": 0.3455822079591432
+          }
+        },
+        "floor_ok": true,
+        "equal_wall_time": {
+          "wall_s": 8400.8,
+          "frame": {
+            "acc_T2": 0.8901174043632895,
+            "margin_T2": 7.318129227444333,
+            "norm_total": 29.211432424946146,
+            "norm_product": 4269.730231300131,
+            "loss": 0.04489236306412035
+          },
+          "block": {
+            "acc_T2": 0.89013671875,
+            "margin_T2": 8.749098777770996,
+            "norm_total": 25.316982692596742,
+            "norm_product": 2985.8665445417055,
+            "loss": 0.021789316087961197
+          }
+        },
+        "equal_T2_accuracy": {
+          "level": 0.889404296875,
+          "frame": {
+            "margin_T2": 5.573473400495689,
+            "norm_total": 21.523728518992364,
+            "loss": 0.16875136109601946,
+            "step": 1926.6972094960438
+          },
+          "block": {
+            "margin_T2": 6.816424918235069,
+            "norm_total": 20.694049184895093,
+            "loss": 0.11403239326955295,
+            "step": 1954.4560022490864
+          }
+        },
+        "matched_norm": {
+          "norm_overlap": null,
+          "note": "no norm overlap between arms after step 20k; block frontier evaluated at its max norm vs frame at its min norm",
+          "mean_margin_diff_block_minus_frame": 2.117725372314453
+        }
+      },
+      "4": {
+        "final": {
+          "frame": {
+            "step": 60000.0,
+            "loss": 0.04880640655755997,
+            "acc_train": 0.9891357421875,
+            "acc_T1": 0.8944091796875,
+            "acc_T2": 0.8863525390625,
+            "margin_T2": 7.06141471862793,
+            "norm_enc": 19.59436798095703,
+            "norm_int": 18.983383178710938,
+            "norm_encc": 11.80492115020752,
+            "wall_s": 8400.3,
+            "norm_total": 29.72649082629055,
+            "norm_product": 4391.045774646317,
+            "margin_per_norm": 0.23754619271719452
+          },
+          "block": {
+            "step": 60000.0,
+            "loss": 0.019053585827350616,
+            "acc_train": 0.9949951171875,
+            "acc_T1": 0.888671875,
+            "acc_T2": 0.8824462890625,
+            "margin_T2": 8.506574630737305,
+            "norm_enc": 15.573443412780762,
+            "norm_int": 16.33606719970703,
+            "norm_encc": 11.871233940124512,
+            "wall_s": 4596.1,
+            "norm_total": 25.50147890898864,
+            "norm_product": 3020.1465963571036,
+            "margin_per_norm": 0.3335718160149115
+          }
+        },
+        "floor_ok": true,
+        "equal_wall_time": {
+          "wall_s": 4596.1,
+          "frame": {
+            "acc_T2": 0.8869857896921808,
+            "margin_T2": 7.0301196786034295,
+            "norm_total": 29.131022002951227,
+            "norm_product": 4213.010170644441,
+            "loss": 0.05238854972255037
+          },
+          "block": {
+            "acc_T2": 0.8824462890625,
+            "margin_T2": 8.506574630737305,
+            "norm_total": 25.50147890898864,
+            "norm_product": 3020.1465963571036,
+            "loss": 0.019053585827350616
+          }
+        },
+        "equal_T2_accuracy": {
+          "level": 0.8824462890625,
+          "frame": {
+            "margin_T2": 5.4290167253042005,
+            "norm_total": 21.38180038205071,
+            "loss": 0.16250991214074006,
+            "step": 1905.1267762607972
+          },
+          "block": {
+            "margin_T2": 6.640799261603052,
+            "norm_total": 20.576402214266537,
+            "loss": 0.11451555534257046,
+            "step": 1937.9005839623987
+          }
+        },
+        "matched_norm": {
+          "norm_overlap": null,
+          "note": "no norm overlap between arms after step 20k; block frontier evaluated at its max norm vs frame at its min norm",
+          "mean_margin_diff_block_minus_frame": 2.2367773056030273
+        }
+      }
+    },
+    "paired_statistics": {
+      "margin_at_matched_norm": {
+        "paired_diffs_block_minus_frame": [
+          2.358912467956543,
+          2.029949188232422,
+          1.9956045150756836,
+          2.117725372314453,
+          2.2367773056030273
+        ],
+        "mean": 2.147793769836426,
+        "p_one_sided": 0.03125,
+        "p_two_sided": 0.0625,
+        "n_assignments": 32,
+        "ci95": [
+          2.0337665557861326,
+          2.2686927795410154
+        ]
+      },
+      "final_margin": {
+        "paired_diffs_block_minus_frame": [
+          1.6769676208496094,
+          1.6854047775268555,
+          1.6540260314941406,
+          1.4201292991638184,
+          1.445159912109375
+        ],
+        "mean": 1.5763375282287597,
+        "p_one_sided": 0.03125,
+        "p_two_sided": 0.0625,
+        "n_assignments": 32,
+        "ci95": [
+          1.4765030860900878,
+          1.6757541656494142
+        ]
+      },
+      "final_total_norm": {
+        "paired_diffs_block_minus_frame": [
+          -3.6315808608887146,
+          -3.8084654086056915,
+          -3.9939720942518484,
+          -3.910782573874105,
+          -4.225011917301909
+        ],
+        "mean": -3.9139625709844537,
+        "p_one_sided": 1.0,
+        "p_two_sided": 0.0625,
+        "n_assignments": 32,
+        "ci95": [
+          -4.095494650952654,
+          -3.743261546082871
+        ]
+      },
+      "final_margin_per_norm": {
+        "paired_diffs_block_minus_frame": [
+          0.09966771897683516,
+          0.10072452991786823,
+          0.10392778644882208,
+          0.09482853549090503,
+          0.09602562329771697
+        ],
+        "mean": 0.0990348388264295,
+        "p_one_sided": 0.03125,
+        "p_two_sided": 0.0625,
+        "n_assignments": 32,
+        "ci95": [
+          0.09624715193766006,
+          0.10179447034204317
+        ]
+      },
+      "final_T2_accuracy": {
+        "paired_diffs_block_minus_frame": [
+          0.0108642578125,
+          -0.004638671875,
+          -0.003173828125,
+          0.000732421875,
+          -0.00390625
+        ],
+        "mean": -2.44140625e-05,
+        "p_one_sided": 0.53125,
+        "p_two_sided": 1.0,
+        "n_assignments": 32,
+        "ci95": [
+          -0.004052734375,
+          0.0057373046875
+        ]
+      },
+      "final_train_loss": {
+        "paired_diffs_block_minus_frame": [
+          -0.022924475371837616,
+          0.016764990985393524,
+          -0.023067912086844444,
+          -0.022681158035993576,
+          -0.02975282073020935
+        ],
+        "mean": -0.016332275047898293,
+        "p_one_sided": 0.96875,
+        "p_two_sided": 0.125,
+        "n_assignments": 32,
+        "ci95": [
+          -0.02697281911969185,
+          0.0008892044425010681
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "schema_name": "p1b-decision-rules",
+  "schema_version": 1,
+  "preregistration": "preregistration/p1b_wd_sweep_2026-09-01.md",
+  "cells": [
+    "wd0.1",
+    "wd0.3",
+    "wd1.0",
+    "wd3.0",
+    "cap1024x1",
+    "cap512x2"
+  ],
+  "D1": {
+    "fired": true,
+    "statement": "matched-norm margin advantage positive in all 5 seeds of all four wd cells at exact paired p=0.0312, no sign reversal: advantage holds over the 0.1-3.0 regularization range"
+  },
+  "D2": {
+    "fired": false,
+    "statement": "moot given D1"
+  },
+  "D3": {
+    "fired": false,
+    "statement": "no Pareto frontier crossing in any cell or seed"
+  },
+  "D4": {
+    "fired": false,
+    "statement": "every arm in every cell exceeds the 0.85 accuracy floor (min 0.858)"
+  },
+  "D5": {
+    "fired": true,
+    "statement": "block advantage survives both frame-favorable capacity controls (2x interaction width: +2.15, p=0.0312; extra interaction layer: +3.80, p=0.0312), all seeds positive, norm lower in every seed: architecture-robust evidence"
+  },
+  "honest_notes": [
+    "final-margin at equal step (secondary endpoint) has negative seeds at wd0.1 (1/5) and cap512x2 (2/5); the preregistered primary endpoint is margin at matched norm",
+    "at wd3.0 the block arm is also more accurate (+0.031, all seeds, p=0.0312)",
+    "raw parameter norm remains parameterization-dependent as declared"
+  ]
+}
