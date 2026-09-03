@@ -42,7 +42,10 @@ def main():
         tgt = rows[0]["target_coefficients"]
         supp = [j for j in JS if abs(tgt[j]) > 1e-6]
         oos = [j for j in JS if abs(tgt[j]) <= 1e-6]
-        oos_zero = all(lo < 0 < hi for j in oos for lo, hi in cis[j])
+        # heat-kernel targets have full support (every coefficient nonzero),
+        # so the out-of-support test is defined only for band-limited cells
+        oos_zero = (all(lo < 0 < hi for j in oos for lo, hi in cis[j])
+                    if oos else None)
         # normalized per-seed profile over support (scale removed per seed)
         profs = []
         for r in rows:
@@ -55,7 +58,8 @@ def main():
                                         float(np.std(coef[j], ddof=1))]
                                     for j in JS},
             "target": tgt,
-            "out_of_support_cis_cover_zero_all_seeds": oos_zero,
+            "out_of_support_cis_cover_zero_all_seeds":
+                (oos_zero if oos else "not_applicable_full_support"),
             "normalized_profile_per_seed": profs,
             "r2_haar": [r["reconstruction_r2_haar"] for r in rows],
             "nuisance_fraction": [r["nuisance_fraction"] for r in rows],
@@ -83,15 +87,21 @@ def main():
     g1 = all(abs(x) < 0.15 for x in bl1["ratio_a2_over_a1_per_seed"])
     g2 = all(0.35 < x < 0.65 for x in bl01["ratio_a2_over_a1_per_seed"])
     g3 = all(out["cells"][c]["out_of_support_cis_cover_zero_all_seeds"]
-             for c in CELLS)
+             is True for c in CELLS
+             if out["cells"][c]["out_of_support_cis_cover_zero_all_seeds"]
+             != "not_applicable_full_support")
     lo = out["cells"]["hk_t0.05"].get("learning_order_25k_to_60k", {})
+    # mean spin-2 growth, NOT growth in every seed and NOT full Casimir
+    # ordering: per-seed increments are heterogeneous (some seeds flat,
+    # spin-3/2 overshoot relaxes in some seeds)
     g4 = (bool(lo) and np.mean(lo.get("2.0", [0])) > 0
           and abs(np.mean(lo.get("2.5", [1]))) < 0.1)
     out["gate"] = {
         "bl_wd1.0_prunes_spin2_all_seeds": bool(g1),
         "bl_wd0.1_retains_spin2_near_half_all_seeds": bool(g2),
-        "out_of_support_zero_all_cells_all_seeds": bool(g3),
-        "casimir_learning_order_t0.05": bool(g4),
+        "out_of_support_zero_bandlimited_cells_only": bool(g3),
+        "mean_spin2_growth_t0.05_positive_spin52_flat": bool(g4),
+        "spin2_growth_per_seed_t0.05": [float(x) for x in lo.get("2.0", [])],
         "headline_gate_passed": bool(g1 and g2 and g3 and g4),
     }
     env = make_envelope("p4-aggregate", 1, analysis_file=__file__,

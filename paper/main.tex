@@ -118,10 +118,11 @@ beats that frame on margin at $17\%$ lower parameter norm.
 
 \textbf{A preliminary spectral-bias result.} Trained to regress
 heat-kernel targets, whose required isotypic subspaces and weights are
-known, the model fills subspaces in order of Casimir eigenvalue in all
-five seeds. The strength of the regularization-induced truncation is
-seed-dependent, so we report the spectral results as preliminary and
-keep them out of the headline claims (\cref{sec:spectral}).
+known, the model carries the required subspaces, and the marginal
+spin-$2$ subspace fills late in the seed mean. The strength of the
+regularization-induced truncation is seed-dependent, so we report the
+spectral results as preliminary and keep them out of the headline claims
+(\cref{sec:spectral}).
 
 \textbf{One finding is negative.} On $\SO(5)$, a stable
 vector-plus-adjoint mixture survives five seeds, doubled training, four
@@ -403,13 +404,14 @@ target's, an order- and measure-dependent statistic calibrated on a
 band-limited target with known support (\cref{fig:main}b,
 \cref{app:methods}, \cref{app:spectral-exps}).
 
-\textbf{The learned score fills isotypic subspaces in Casimir order.}
-Signed Haar projection of the score (the calibrated estimator of
-\cref{app:methods}) shows carried subspaces at their target
-coefficients, out-of-support coefficients with intervals covering zero
-in every heat-kernel seed, and, at $t = 0.05$, the spin-$2$ coefficient
-rising between the $25$k and $60$k checkpoints while spin~$\tfrac52$
-stays at zero, in all five seeds.
+\textbf{The marginal subspace fills late, in the seed mean.} Signed Haar
+projection of the score (the calibrated estimator of \cref{app:methods})
+shows carried subspaces near their target coefficients in every
+heat-kernel seed, and at $t = 0.05$ the spin-$2$ coefficient grows
+between the $25$k and $60$k checkpoints in the seed mean, with three
+seeds growing and two flat, while spin~$\tfrac52$ stays at zero in every
+seed. Out-of-support evidence exists only for the band-limited target,
+since every heat-kernel coefficient is nonzero.
 
 \textbf{Regularization suppresses the marginal subspace, with
 seed-dependent strength.} On the band-limited target $\chi_1 +

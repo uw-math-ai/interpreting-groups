@@ -2,9 +2,9 @@
   "envelope": {
     "schema_name": "p1b-reanalysis",
     "schema_version": 1,
-    "generated_at_utc": "2026-09-02T18:48:43.241497+00:00",
-    "code_commit": "71a460747e832acdbc9fe499991c3e5ce6975995+dirty",
-    "analysis_source_sha256": "597436431efa666656ca2e01cc47f849d6907882e074bffb6b786ed54226b579",
+    "generated_at_utc": "2026-09-03T02:34:17.036048+00:00",
+    "code_commit": "43a9b724a142746f8a62e32cc79621a8046d5058+dirty",
+    "analysis_source_sha256": "85f69d91329f3695b7806f45c0392f0ff9abf96d29685416614c9fd433fce54d",
     "source_checkpoint": null,
     "run_config_sha256": null,
     "training_seed": null,
@@ -110,19 +110,21 @@
             "step": 1944.0239897186923
           }
         },
-        "matched_norm": {
+        "norm_budget": {
+          "regime": "matched_achieved_norm",
           "norm_overlap": [
-            33.4259748066583,
+            22.308977591188523,
             34.81777322107105
           ],
-          "mean_margin_diff_block_minus_frame": 10.365723335913978,
+          "margin_diff_block_minus_frame": 1.4247794260942037,
           "margin_diff_at_quantiles": {
-            "0.00": 12.237319946289062,
-            "0.25": 11.683638121577632,
-            "0.50": 10.753819251547892,
-            "0.75": 9.630324481116023,
-            "1.00": 6.47930937466038
-          }
+            "0.00": 0.3840733489663961,
+            "0.25": 0.918666853076922,
+            "0.50": 2.2443542227997266,
+            "0.75": -0.23815884114213937,
+            "1.00": 3.7015419006347656
+          },
+          "cutoff20k_sensitivity_diff": 10.365723335913978
         }
       },
       "1": {
@@ -191,10 +193,21 @@
             "step": 1906.2366813467822
           }
         },
-        "matched_norm": {
-          "norm_overlap": null,
-          "note": "no norm overlap between arms after step 20k; block frontier evaluated at its max norm vs frame at its min norm",
-          "mean_margin_diff_block_minus_frame": 11.178680419921875
+        "norm_budget": {
+          "regime": "matched_achieved_norm",
+          "norm_overlap": [
+            22.25988620823449,
+            33.91087056317934
+          ],
+          "margin_diff_block_minus_frame": 1.993424868666362,
+          "margin_diff_at_quantiles": {
+            "0.00": 0.2857262534322765,
+            "0.25": 0.881531527276568,
+            "0.50": 0.526742614562572,
+            "0.75": 1.4561777114868164,
+            "1.00": 4.138591766357422
+          },
+          "cutoff20k_sensitivity_diff": 11.178680419921875
         }
       },
       "2": {
@@ -263,19 +276,21 @@
             "step": 1955.84004602992
           }
         },
-        "matched_norm": {
+        "norm_budget": {
+          "regime": "matched_achieved_norm",
           "norm_overlap": [
-            31.375608926919416,
+            22.327269650770717,
             32.42046715904081
           ],
-          "mean_margin_diff_block_minus_frame": 15.34882043296393,
+          "margin_diff_block_minus_frame": 2.304846480418342,
           "margin_diff_at_quantiles": {
-            "0.00": 15.212647438049316,
-            "0.25": 15.059482584013878,
-            "0.50": 15.68230344775188,
-            "0.75": 15.456842451138312,
-            "1.00": 15.231381454524751
-          }
+            "0.00": 0.5517299524029102,
+            "0.25": 0.8394187194110101,
+            "0.50": 1.9123235901716322,
+            "0.75": 2.222199703384952,
+            "1.00": 6.078971862792969
+          },
+          "cutoff20k_sensitivity_diff": 15.34882043296393
         }
       },
       "3": {
@@ -344,10 +359,21 @@
             "step": 1959.2391304347825
           }
         },
-        "matched_norm": {
-          "norm_overlap": null,
-          "note": "no norm overlap between arms after step 20k; block frontier evaluated at its max norm vs frame at its min norm",
-          "mean_margin_diff_block_minus_frame": 7.566804885864258
+        "norm_budget": {
+          "regime": "matched_achieved_norm",
+          "norm_overlap": [
+            22.320229654906605,
+            32.92691506520433
+          ],
+          "margin_diff_block_minus_frame": 2.1705106486825465,
+          "margin_diff_at_quantiles": {
+            "0.00": 0.2770410955944047,
+            "0.25": 0.7804460795532808,
+            "0.50": 0.8263040635547441,
+            "0.75": 2.1679725646972656,
+            "1.00": 6.001758575439453
+          },
+          "cutoff20k_sensitivity_diff": 7.566804885864258
         }
       },
       "4": {
@@ -416,29 +442,40 @@
             "step": 1908.1981212638775
           }
         },
-        "matched_norm": {
-          "norm_overlap": null,
-          "note": "no norm overlap between arms after step 20k; block frontier evaluated at its max norm vs frame at its min norm",
-          "mean_margin_diff_block_minus_frame": 5.507265090942383
+        "norm_budget": {
+          "regime": "matched_achieved_norm",
+          "norm_overlap": [
+            22.30749306614078,
+            32.364311068475814
+          ],
+          "margin_diff_block_minus_frame": 1.7043088573285887,
+          "margin_diff_at_quantiles": {
+            "0.00": 0.5074491535847601,
+            "0.25": 0.8267706355008198,
+            "0.50": 0.9575517063090153,
+            "0.75": 3.5189118538337425,
+            "1.00": 4.941793441772461
+          },
+          "cutoff20k_sensitivity_diff": 5.507265090942383
         }
       }
     },
     "paired_statistics": {
-      "margin_at_matched_norm": {
+      "margin_at_norm_budget": {
         "paired_diffs_block_minus_frame": [
-          10.365723335913978,
-          11.178680419921875,
-          15.34882043296393,
-          7.566804885864258,
-          5.507265090942383
+          1.4247794260942037,
+          1.993424868666362,
+          2.304846480418342,
+          2.1705106486825465,
+          1.7043088573285887
         ],
-        "mean": 9.993458833121284,
+        "mean": 1.9195740562380088,
         "p_one_sided": 0.03125,
         "p_two_sided": 0.0625,
         "n_assignments": 32,
         "ci95": [
-          7.302772657905452,
-          12.958389320935584
+          1.6298315568587494,
+          2.1888278253736275
         ]
       },
       "final_margin": {

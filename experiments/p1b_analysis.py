@@ -2,7 +2,9 @@
 
 Reads log.jsonl for each arm/seed, computes the declared norm functionals,
 and reports paired comparisons at equal step, equal wall time, interpolated
-equal T2 accuracy, and matched total norm (trajectory Pareto frontiers),
+equal T2 accuracy, and a common norm budget via trajectory Pareto
+frontiers (matched achieved norm where the arms overlap, strict
+dominance where they never do),
 with exact paired sign-flip permutation tests and paired bootstrap
 intervals. See preregistration/p1b_wd_sweep_2026-09-01.md for endpoint
 declarations.
@@ -66,8 +68,14 @@ def first_step_reaching(t, key, level, smooth=3):
     return float(x0 + (x1 - x0) * (level - y0) / max(y1 - y0, 1e-12))
 
 
-def frontier(t, min_step=20000):
-    """Best margin achievable at total norm <= n, over late-training points."""
+def frontier(t, min_step=0):
+    """Best margin achievable at total norm <= n.
+
+    The frontier is the running maximum of margin over points sorted by
+    norm, so early low-margin transients can never displace later points
+    and no burn-in cutoff is needed; min_step is retained only for the
+    sensitivity check reported alongside the primary analysis.
+    """
     m = t["step"] >= min_step
     norms, margins = t["norm_total"][m], t["margin_T2"][m]
     order = np.argsort(norms)
@@ -127,7 +135,15 @@ def analyze_pair(frame_t, block_t, acc_floor=0.85):
                                      ["margin_T2", "norm_total", "loss"]),
                            step=s))
     out["equal_T2_accuracy"] = {"level": float(level), **rows}
-    # matched total norm via trajectory frontiers
+    # margin at a common norm budget, via trajectory frontiers. Two
+    # regimes, labeled distinctly: where the arms' achieved-norm ranges
+    # overlap, the comparison averages the frontier difference over the
+    # shared range (matched achieved norm). Where the block arm's entire
+    # norm range lies strictly below the frame arm's, the arms never
+    # achieve a common norm, and the honest statement is strict
+    # norm-budget (Pareto) dominance: at the smallest budget the frame
+    # ever achieves, the block frontier is already complete, so the
+    # reported number is the margin difference at that budget.
     nf, mf = frontier(frame_t)
     nb, mb = frontier(block_t)
     lo = max(nf[0], nb[0])
@@ -136,21 +152,42 @@ def analyze_pair(frame_t, block_t, acc_floor=0.85):
         grid = np.linspace(lo, hi, 21)
         dm = [frontier_margin_at(nb, mb, n) - frontier_margin_at(nf, mf, n)
               for n in grid]
-        out["matched_norm"] = {
+        out["norm_budget"] = {
+            "regime": "matched_achieved_norm",
             "norm_overlap": [float(lo), float(hi)],
-            "mean_margin_diff_block_minus_frame": float(np.mean(dm)),
+            "margin_diff_block_minus_frame": float(np.mean(dm)),
             "margin_diff_at_quantiles": {
                 f"{q:.2f}": float(np.interp(np.quantile(grid, q), grid, dm))
                 for q in (0.0, 0.25, 0.5, 0.75, 1.0)}}
-    else:
-        # frontiers do not overlap in norm: compare at the nearest endpoints
-        out["matched_norm"] = {
+    elif nb[-1] <= nf[0]:
+        out["norm_budget"] = {
+            "regime": "strict_dominance",
             "norm_overlap": None,
-            "note": ("no norm overlap between arms after step 20k; block "
-                     "frontier evaluated at its max norm vs frame at its "
-                     "min norm"),
-            "mean_margin_diff_block_minus_frame":
+            "frame_min_norm": float(nf[0]),
+            "block_max_norm": float(nb[-1]),
+            "note": ("the block arm's entire achieved-norm range lies "
+                     "below the frame arm's; margin difference evaluated "
+                     "at the frame's minimum achieved norm budget, where "
+                     "the block frontier is complete"),
+            "margin_diff_block_minus_frame":
                 float(mb[-1] - frontier_margin_at(nf, mf, nf[0]))}
+    else:
+        out["norm_budget"] = {
+            "regime": "frame_dominates",
+            "norm_overlap": None,
+            "margin_diff_block_minus_frame":
+                float(frontier_margin_at(nb, mb, nb[0]) - mf[-1])}
+    # sensitivity of the frontier comparison to a 20k burn-in cutoff
+    nf2, mf2 = frontier(frame_t, min_step=20000)
+    nb2, mb2 = frontier(block_t, min_step=20000)
+    lo2, hi2 = max(nf2[0], nb2[0]), min(nf2[-1], nb2[-1])
+    if hi2 > lo2:
+        g2 = np.linspace(lo2, hi2, 21)
+        d2 = float(np.mean([frontier_margin_at(nb2, mb2, n)
+                            - frontier_margin_at(nf2, mf2, n) for n in g2]))
+    else:
+        d2 = float(mb2[-1] - frontier_margin_at(nf2, mf2, nf2[0]))
+    out["norm_budget"]["cutoff20k_sensitivity_diff"] = d2
     return out
 
 
@@ -180,8 +217,8 @@ def main():
     complete = [v for v in per_seed.values() if "missing" not in v]
     stats = {}
     endpoints = {
-        "margin_at_matched_norm":
-            lambda v: v["matched_norm"]["mean_margin_diff_block_minus_frame"],
+        "margin_at_norm_budget":
+            lambda v: v["norm_budget"]["margin_diff_block_minus_frame"],
         "final_margin":
             lambda v: v["final"]["block"]["margin_T2"]
             - v["final"]["frame"]["margin_T2"],

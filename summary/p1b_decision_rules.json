@@ -1,7 +1,8 @@
 {
   "schema_name": "p1b-decision-rules",
-  "schema_version": 1,
+  "schema_version": 2,
   "preregistration": "preregistration/p1b_wd_sweep_2026-09-01.md",
+  "revision_note": "v2 corrects the primary-endpoint construction: the frontier now uses the full trajectory (the running-maximum frontier needs no burn-in cutoff; the previous 20k cutoff manufactured no-overlap comparisons that were mislabeled matched-norm and inflated the wd0.1 endpoint to +9.99). With the full trajectory every cell-seed is a genuine matched-achieved-norm comparison; the 20k numbers are retained as a labeled sensitivity column.",
   "cells": [
     "wd0.1",
     "wd0.3",
@@ -10,17 +11,26 @@
     "cap1024x1",
     "cap512x2"
   ],
+  "primary_endpoint": "paired margin difference at a common achieved-norm budget (frontier mean over the overlap range)",
+  "endpoint_means": {
+    "wd0.1": 1.92,
+    "wd0.3": 1.695,
+    "wd1.0": 1.281,
+    "wd3.0": 1.848,
+    "cap1024x1": 1.818,
+    "cap512x2": 2.304
+  },
   "D1": {
     "fired": true,
-    "statement": "matched-norm margin advantage positive in all 5 seeds of all four wd cells at exact paired p=0.0312, no sign reversal: advantage holds over the 0.1-3.0 regularization range"
+    "statement": "matched-achieved-norm margin advantage positive in all 5 seeds of all four wd cells at exact paired p=0.0312, no sign reversal: advantage holds over the 0.1-3.0 range"
   },
   "D2": {
     "fired": false,
     "statement": "moot given D1"
   },
   "D3": {
-    "fired": false,
-    "statement": "no Pareto frontier crossing in any cell or seed"
+    "fired": true,
+    "statement": "frontier crossings within overlap ranges: [('wd0.1', '0', -0.238), ('wd0.3', '0', -0.062), ('wd0.3', '3', -0.446)]"
   },
   "D4": {
     "fired": false,
@@ -28,11 +38,12 @@
   },
   "D5": {
     "fired": true,
-    "statement": "block advantage survives both frame-favorable capacity controls (2x interaction width: +2.15, p=0.0312; extra interaction layer: +3.80, p=0.0312), all seeds positive, norm lower in every seed: architecture-robust evidence"
+    "statement": "advantage survives both frame-favorable capacity controls (+1.82 at 2x width, +2.30 at extra layer, each p=0.0312, all seeds positive): architecture-robust evidence"
   },
   "honest_notes": [
-    "final-margin at equal step (secondary endpoint) has negative seeds at wd0.1 (1/5) and cap512x2 (2/5); the preregistered primary endpoint is margin at matched norm",
-    "at wd3.0 the block arm is also more accurate (+0.031, all seeds, p=0.0312)",
-    "raw parameter norm remains parameterization-dependent as declared"
+    "equal-step final margin (secondary) has negative seeds at wd0.1 (1/5) and cap512x2 (2/5)",
+    "at wd3.0 the block arm is also more accurate (+0.031, all seeds)",
+    "raw parameter norm remains parameterization-dependent as declared",
+    "the 20k-cutoff sensitivity column shows the cutoff-induced dominance comparisons ranged to +15.3"
   ]
 }

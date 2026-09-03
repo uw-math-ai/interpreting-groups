@@ -2,9 +2,9 @@
   "envelope": {
     "schema_name": "p4-aggregate",
     "schema_version": 1,
-    "generated_at_utc": "2026-09-03T00:26:22.322382+00:00",
-    "code_commit": "4e5da186ba0d7fee39b0b6761912f8eb9b759b7c+dirty",
-    "analysis_source_sha256": "1a7bde6f3f97a2a4d19b4e05229db2180613805b4824c8840d6c833a0410100d",
+    "generated_at_utc": "2026-09-03T02:35:41.587808+00:00",
+    "code_commit": "43a9b724a142746f8a62e32cc79621a8046d5058+dirty",
+    "analysis_source_sha256": "71615fbcace695374613f005fa0e2c295d5e0332590d1e948b60e4c81bb012ce",
     "source_checkpoint": null,
     "run_config_sha256": null,
     "training_seed": null,
@@ -66,7 +66,7 @@
           "2.5": 0.43463854220550874,
           "3.0": 0.191266057131048
         },
-        "out_of_support_cis_cover_zero_all_seeds": true,
+        "out_of_support_cis_cover_zero_all_seeds": "not_applicable_full_support",
         "normalized_profile_per_seed": [
           {
             "0.5": 1.341162366569928,
@@ -184,7 +184,7 @@
           "2.5": 2.50117211807105,
           "3.0": 2.108359483385414
         },
-        "out_of_support_cis_cover_zero_all_seeds": true,
+        "out_of_support_cis_cover_zero_all_seeds": "not_applicable_full_support",
         "normalized_profile_per_seed": [
           {
             "0.5": 1.8261326275494634,
@@ -302,7 +302,7 @@
           "2.5": 3.8738911585673526,
           "3.0": 3.8416814526581846
         },
-        "out_of_support_cis_cover_zero_all_seeds": true,
+        "out_of_support_cis_cover_zero_all_seeds": "not_applicable_full_support",
         "normalized_profile_per_seed": [
           {
             "0.5": 1.001468809360524,
@@ -551,8 +551,15 @@
     "gate": {
       "bl_wd1.0_prunes_spin2_all_seeds": false,
       "bl_wd0.1_retains_spin2_near_half_all_seeds": true,
-      "out_of_support_zero_all_cells_all_seeds": false,
-      "casimir_learning_order_t0.05": true,
+      "out_of_support_zero_bandlimited_cells_only": false,
+      "mean_spin2_growth_t0.05_positive_spin52_flat": true,
+      "spin2_growth_per_seed_t0.05": [
+        0.8926442254511294,
+        0.12367656758711183,
+        -0.0006689002979387845,
+        0.7436856960657914,
+        -0.0011262852293647326
+      ],
       "headline_gate_passed": false
     }
   }
