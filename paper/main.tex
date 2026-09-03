@@ -55,19 +55,20 @@ no per-element parameters. Nine of the ten concentrate $93$--$98\%$ of
 encoder variance on the matrix coefficients of a smallest faithful
 representation of the task group, identically in all five seeds, and
 half-integer spins appear exactly when the encoding separates $g$ from
-$-g$. The learned features therefore tell apart groups with isomorphic
-Lie algebras, $\SU(2)$ from $\SO(3)$ and $\Spin(5)$ from $\SO(5)$.
+$-g$. The learned features therefore tell apart groups with isomorphic Lie
+algebras, such as $\SU(2)$ from $\SO(3)$.
 Ablations, activation patching, and a two-sided translation test show
-that the features span the full matrix-coefficient space of the selected
-representation, of the real dimension the real Schur lemma prescribes.
+that the features span the full matrix-coefficient space, at the real
+dimension the real Schur lemma prescribes.
 Trained on exact features at weight decay $1.0$, the $9$-dimensional
 $\SO(3)$ coefficient space attains a larger margin than the
 $6$-dimensional two-column frame at matched accuracy and $17\%$ lower
-parameter norm. One finding is negative. On
-$\SO(5)$ a vector-plus-adjoint mixture persists across five seeds,
-doubled training, four times the candidates, weaker regularization, and
-tripled data, so the minimal-representation description holds in nine
-group forms and fails in the tenth.
+parameter norm. On $\SO(5)$, selection depends on the observation map. Under the
+averaged cover encoding a vector-plus-adjoint mixture persists at
+accuracy at most $0.73$, while under an intrinsic quotient observation
+every seed solves the task and concentrates $0.97$ of variance on the
+vector, so the minimal-representation description holds in every
+high-performing condition.
 \end{abstract}
 
 \section{Introduction}
@@ -124,11 +125,12 @@ regularization-induced truncation is seed-dependent, so we report the
 spectral results as preliminary and keep them out of the headline claims
 (\cref{sec:spectral}).
 
-\textbf{One finding is negative.} On $\SO(5)$, a stable
-vector-plus-adjoint mixture survives five seeds, doubled training, four
-times the candidates, reduced weight decay, and tripled data, so the
-minimal-representation description fails as stated in one of ten group
-forms (\cref{sec:universality}).
+\textbf{Selection on $\SO(5)$ depends on the observation map.} A stable
+vector-plus-adjoint mixture survives every stress cell of the
+antipodally averaged cover encoding at accuracy at most $0.73$, while
+under an intrinsic quotient observation every seed reaches $0.992$ with
+the vector at $0.97$. High-performing conditions select the minimal
+faithful representation (\cref{sec:universality}).
 
 \textbf{Paper organization.} \Cref{sec:related,sec:setup} cover related
 work and the setup, \cref{sec:algorithm} the character mechanism,
@@ -252,7 +254,7 @@ question into a falsifiable test.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.74\textwidth]{figure1.pdf}
+\includegraphics[width=0.63\textwidth]{figure1.pdf}
 \caption{(a) Fraction of encoder variance per isotypic subspace for the
 mainline conditions, five seeds. The conditions differ only in whether
 the encoding distinguishes $\pm g$, and each concentrates on the
@@ -271,9 +273,8 @@ Every claim below replicates in five seeds per condition, and
 \textbf{The encoder learns the smallest faithful irrep, and the double
 cover is visible.} The $\SU(2)$ encoder places $0.84 \pm 0.01$ of its variance in the
 spin-$\tfrac12$ isotypic subspace, with the quaternion linearly
-decodable at held-out $R^2 = 0.995$. The $\SO(3)$ encoder places $0.92
-\pm 0.01$ in spin~$1$, every half-integer subspace sits at the $0.2\%$
-sampling floor, and the quaternion is not decodable. The $\SU(2)$ features are odd under the center, with $\cos(z(g), z(-g))
+decodable at held-out $R^2 = 0.995$. The $\SO(3)$ encoder places $0.92 \pm 0.01$ in spin~$1$, with every
+half-integer subspace at the $0.2\%$ sampling floor. The $\SU(2)$ features are odd under the center, with $\cos(z(g), z(-g))
 = -0.72 \pm 0.02$, and the $\SO(3)$ features are exactly even
 (\cref{fig:main}a), so the learned features separate the two sheets of
 the double cover exactly when the encoding does.
@@ -367,7 +368,8 @@ $\SO(4)$ & $(\tfrac12,\tfrac12)$ & $0.97$ & \\
 $\SO(3){\times}\SU(2)$ & $(1,0) \oplus (0,\tfrac12)$, $5$ dims & $0.98$ & $(1,\tfrac12)$, $6$ dims, at $0.008$ \\
 $\PSO(4)$ & $(1,0) \oplus (0,1)$, $6$ dims & $0.98$ & $(1,1)$, $9$ dims, at $0.011$ \\
 $\Spin(5)$ & spinor $\mathbf{4}$ & $0.97$ & \\
-$\SO(5)$ & vector $\mathbf{5}$ + adjoint $\mathbf{10}$ & $0.69 + 0.22$ & (negative result) \\
+$\SO(5)$, averaged $\Psi$ & vector $\mathbf{5}$ + adjoint $\mathbf{10}$ & $0.69 + 0.22$ & (poorly generalizing) \\
+$\SO(5)$, intrinsic $\Psi$ & vector $\mathbf{5}$ & $0.97$ & \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -388,11 +390,11 @@ $\SU(3)$ (\cref{tab:su3causal}), and on $\Spin(4)$ the summand-resolved
 intervention map lands exactly where the central characters put it
 (\cref{tab:spin4causal}).
 
-\textbf{The exception is $\SO(5)$, and we report it as a failure.} The $\SO(5)$ encoder holds the vector $\mathbf{5}$ at $0.68$--$0.70$ and
-the adjoint $\mathbf{10}$ at $0.21$--$0.23$ of variance, stable across
-five seeds, doubled training, four times the candidates, reduced weight
-decay, and tripled data, and no condition solves the task. Two hypotheses remain open, purification toward the vector as the task
-approaches a solution, or a genuinely mixed minimum-cost mechanism
+\textbf{On $\SO(5)$, selection depends on the observation map.} Under the averaged cover encoding, the encoder holds the vector
+$\mathbf{5}$ at $0.68$--$0.70$ and the adjoint $\mathbf{10}$ at
+$0.21$--$0.23$ of variance, stable across five seeds and every stress
+cell of \cref{tab:so5}, and no such condition exceeds accuracy $0.73$. A preregistered intrinsic quotient observation reaches accuracy $0.992$
+in every seed, with the vector at $0.97$ and the adjoint at the floor
 (Experiment~12).
 
 \section{Spectral bias in order of the Casimir eigenvalue}
@@ -418,29 +420,24 @@ since every heat-kernel coefficient is nonzero.
 seed-dependent strength.} On the band-limited target $\chi_1 +
 \tfrac12\chi_2$, weight decay $0.1$ recovers the target in all five
 seeds, with the spin-$2$ to spin-$1$ coefficient ratio at
-$0.492$--$0.506$ against the exact $0.5$. Weight decay $1.0$ suppresses
-that ratio in every seed, to $0.02$--$0.03$ in two seeds and
-$0.25$--$0.27$ in three, so full pruning is a seed-dependent outcome and
-an earlier single-seed pruning claim did not replicate. The
+$0.492$--$0.506$ against the exact $0.5$. Weight decay $1.0$ suppresses that ratio in every seed, to
+$0.02$--$0.03$ in two seeds and $0.25$--$0.27$ in three, so full pruning
+is seed-dependent and an earlier single-seed claim did not replicate. The
 center-invariant target forces integer spins even on the faithful
 $\SU(2)$ encoding (Experiment~15).
 
 \section{Discussion and conclusion}
 \label{sec:discussion}
 
-In nine of ten group forms, small networks trained on compact group
+Wherever they solve the task, networks trained on compact group
 composition learn the irreducible representations of the global form the
-data determine, store them as full matrix-coefficient spaces, the
-cheaper code in our matched comparison, and fill isotypic subspaces in
-Casimir order under a truncation set by regularization.
-\Cref{app:questions} states the resulting selection conjecture.
-
-\textbf{Limitations and future work.} Every quotient condition
-generalizes below its cover, selection is not yet separated from the
-conditioning of the quotient encoding, and causal interventions carry
-weaker positive than negative evidence \cite{wu2024}, mitigated by the
-two-sided test, no-op controls, and matched retraining. Solving $\SO(5)$
-and proving the conjecture come next.
+data determine, store them as full matrix-coefficient spaces,
+the cheaper code in our matched comparison, and fill isotypic subspaces
+in Casimir order under a truncation set by regularization (\cref{app:questions} states the resulting selection conjecture). Three
+limitations stand. Under the shared averaged encodings every quotient
+condition generalizes below its cover, the cause of the averaged
+$\SO(5)$ failure is not yet isolated, and causal interventions carry
+weaker positive than negative evidence \cite{wu2024}.
 
 \bibliographystyle{unsrtnat}
 \bibliography{refs}
@@ -1226,21 +1223,32 @@ trend is that tripled data raises T2 from $0.55$ to $0.731$ and
 lowers the adjoint fraction to $0.173$. The mixture is not
 initialization drift, since the encoding's initial spectrum (vector
 $0.29$, adjoint $0.56$) is inverted by step $15$k and constant
-thereafter. Per the rule, the minimal-representation description
-holds in nine of ten group forms and fails as stated for $\SO(5)$.
-Two hypotheses remain open. The data trend is consistent with
-purification as the task approaches a solution, and the cost framing of Experiment~9 makes a genuinely mixed
-minimum-cost mechanism a live hypothesis, since the measured selection
-criterion there was a margin-per-norm tradeoff of the complete mechanism
-rather than representation size. Deciding requires
-a condition that solves $\SO(5)$.
+thereafter. Per the rule, under the averaged encoding the minimal-representation
+description fails as stated, and deciding between purification and a
+genuinely mixed mechanism required a condition that solves the task. A
+second preregistered stage supplied one. With an intrinsic quotient
+observation, namely $32$ frozen random features of the $5 \times 5$
+vector-representation matrix, standardized under Haar and exactly
+center-invariant, every seed reaches T2 $\geq 0.992$ and concentrates
+$0.971$--$0.972$ of encoder variance on the vector with the adjoint at
+$0.006$--$0.007$, and a direct vector-matrix control behaves the same at
+T2 $= 0.999$. The preregistered first branch fires. Selection on
+$\SO(5)$ is observation-map dependent, every high-performing condition
+selects the minimal faithful vector representation, and the mixture is a
+property of the poorly generalizing averaged condition. The averaged
+encoding's measured metric-fidelity deficit (Spearman correlation $0.18$
+between intrinsic and observation distances, against $0.51$ for the
+cover encoding) is a correlate of that failure, and demonstrating it as
+the cause would require an intervention on conditioning alone, which we
+have not run.
 
 \begin{table}[t]
 \centering
-\caption{The $\SO(5)$ mixture across conditions (Experiment~12).
-Vector and adjoint columns are fractions of encoder variance. The
-mixture survives every condition, and only added data moves it,
-together with generalization.}
+\caption{$\SO(5)$ across conditions (Experiment~12). Vector and adjoint
+columns are fractions of encoder variance. Under the averaged encoding
+the mixture survives every stress cell, and only added data moves it.
+Under the intrinsic random-feature observation the task is solved and
+the mixture is gone.}
 \label{tab:so5}
 \small
 \begin{tabular}{lccc}
@@ -1252,6 +1260,9 @@ $200$k steps & $0.620$ & $0.688$ & $0.214$ \\
 $K = 256$ & $0.469$ & $0.664$ & $0.224$ \\
 weight decay $0.1$ & $0.518$ & $0.660$ & $0.240$ \\
 $f = 0.03$ & $0.731$ & $0.707$ & $0.173$ \\
+\midrule
+intrinsic $\Psi$, $f = 0.03$, five seeds & $0.992$--$0.995$ & $0.971$--$0.972$ & $0.006$--$0.007$ \\
+vector-matrix control, two seeds & $0.999$ & $0.990$--$0.991$ & $0.002$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1567,13 +1578,15 @@ the delay in the embedding table. A deliberate attempt to restore
 the delay, by roughening the encoding kernel or inflating the
 initialization scale, is a controlled experiment we have not run.
 
-\textbf{Does the $\SO(5)$ failure infect the other nine forms?} The
-nine successes rest on within-condition replication, exact no-op
-controls, and interventions that land where central characters
-predict, and none of that changes. What the failure removes is the
-claim that minimal-total-dimension selection is a law. The cost picture of Experiment~9 measures a margin-per-norm advantage
-for the complete mechanism in one setting, and whether the $\SO(5)$
-mixture is a genuinely mixed minimum-cost mechanism or a transient of an
-unsolved task is exactly the open question.
+\textbf{What does the $\SO(5)$ episode teach about the other nine
+forms?} Their evidence rests on within-condition replication, exact
+no-op controls, and interventions that land where central characters
+predict, and none of that changes. What the episode adds is a scope
+condition. Minimal-representation selection is a property of conditions
+the model actually solves, and a poorly generalizing observation map can
+hold a stable mixture indefinitely. Every selection claim in this paper
+therefore carries its observation map and its achieved accuracy, and the
+averaged-encoding mixture stands in the record as the example of what a
+badly conditioned quotient observation produces.
 
 \end{document}
