@@ -63,9 +63,7 @@ representation, of the real dimension the real Schur lemma prescribes.
 Trained on exact features at weight decay $1.0$, the $9$-dimensional
 $\SO(3)$ coefficient space attains a larger margin than the
 $6$-dimensional two-column frame at matched accuracy and $17\%$ lower
-parameter norm. Under regression onto heat-kernel targets, the same
-architecture fills isotypic subspaces in order of Casimir eigenvalue up
-to a truncation set by the weight decay. One finding is negative. On
+parameter norm. One finding is negative. On
 $\SO(5)$ a vector-plus-adjoint mixture persists across five seeds,
 doubled training, four times the candidates, weaker regularization, and
 tripled data, so the minimal-representation description holds in nine
@@ -118,12 +116,12 @@ the trained features pass it while the $6$-dimensional two-column frame
 of $\SO(3)$ fails linear right closure (\cref{sec:mainline}), and in matched training at weight decay $1.0$ it
 beats that frame on margin at $17\%$ lower parameter norm.
 
-\textbf{Regression reveals a spectral bias in order of the Casimir
-eigenvalue.} One character suffices for ranking, so ranking never shows how a network
-allocates capacity across many isotypic subspaces. Heat-kernel targets require a known set of subspaces
-at known weights, and the model fills them in order of Casimir
-eigenvalue up to a sharp truncation that moves with the weight decay
-(\cref{sec:spectral}).
+\textbf{A preliminary spectral-bias result.} Trained to regress
+heat-kernel targets, whose required isotypic subspaces and weights are
+known, the model fills subspaces in order of Casimir eigenvalue in all
+five seeds. The strength of the regularization-induced truncation is
+seed-dependent, so we report the spectral results as preliminary and
+keep them out of the headline claims (\cref{sec:spectral}).
 
 \textbf{One finding is negative.} On $\SO(5)$, a stable
 vector-plus-adjoint mixture survives five seeds, doubled training, four
@@ -405,20 +403,22 @@ target's, an order- and measure-dependent statistic calibrated on a
 band-limited target with known support (\cref{fig:main}b,
 \cref{app:methods}, \cref{app:spectral-exps}).
 
-\textbf{The learned score is a truncated character expansion that fills
-in Casimir order.} Carried subspaces sit at ratio near $1$ and subspaces
-beyond a sharp truncation sit at $0$, with the truncation at higher Casimir eigenvalue for smaller $t$ and
-advancing in Casimir order during training, so that at $t = 0.05$ the
-spin-$2$ ratio climbs from $0.12$ to $1.20$ while spin~$\tfrac52$ stays
-at $0$.
+\textbf{The learned score fills isotypic subspaces in Casimir order.}
+Signed Haar projection of the score (the calibrated estimator of
+\cref{app:methods}) shows carried subspaces at their target
+coefficients, out-of-support coefficients with intervals covering zero
+in every heat-kernel seed, and, at $t = 0.05$, the spin-$2$ coefficient
+rising between the $25$k and $60$k checkpoints while spin~$\tfrac52$
+stays at zero, in all five seeds.
 
-\textbf{The truncation is a cost boundary set by regularization.} On the
-band-limited target $\chi_1 + \tfrac12\chi_2$, weight decay $1.0$ prunes
-the spin-$2$ part, and the abandoned $12.6\%$ of target variance equals
-the final test error. Weight decay $0.1$ recovers the target, with profile $(1.00, 1.01, 0.94,
-0.95)$ and out-of-support subspaces at $0.000$, which also calibrates
-the measurement. A subspace survives when its variance contribution exceeds its norm
-cost, matching the cost logic of \cref{sec:mainline}, and the
+\textbf{Regularization suppresses the marginal subspace, with
+seed-dependent strength.} On the band-limited target $\chi_1 +
+\tfrac12\chi_2$, weight decay $0.1$ recovers the target in all five
+seeds, with the spin-$2$ to spin-$1$ coefficient ratio at
+$0.492$--$0.506$ against the exact $0.5$. Weight decay $1.0$ suppresses
+that ratio in every seed, to $0.02$--$0.03$ in two seeds and
+$0.25$--$0.27$ in three, so full pruning is a seed-dependent outcome and
+an earlier single-seed pruning claim did not replicate. The
 center-invariant target forces integer spins even on the faithful
 $\SU(2)$ encoding (Experiment~15).
 
