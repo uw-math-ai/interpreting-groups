@@ -256,11 +256,12 @@ question into a falsifiable test.
 \caption{(a) Fraction of encoder variance per isotypic subspace for the
 mainline conditions, five seeds. The conditions differ only in whether
 the encoding distinguishes $\pm g$, and each concentrates on the
-smallest faithful irrep of its own group. (b) Sequentially orthogonalized character profile of the learned score,
-divided by the same profile of the exact target, for heat-kernel and
-band-limited targets. Values near $1$ mean a subspace carried at its required relative weight,
-and the dashed curve shows the in-support spin-$2$ subspace pruned at
-weight decay $1.0$ and retained at $0.1$ (\cref{sec:spectral}).}
+smallest faithful irrep of its own group. (b) Signed Haar coefficients of the learned score divided by the target
+coefficients, one marker per seed. Values near $1$ mean a subspace
+carried at its target coefficient. Weight decay $0.1$ retains the
+band-limited target exactly in every seed, and the spread at spin $2$
+under weight decay $1.0$ is the seed-dependent suppression reported in
+\cref{sec:spectral}.}
 \label{fig:main}
 \end{figure}
 

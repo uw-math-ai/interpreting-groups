@@ -53,34 +53,44 @@ axA.set_ylim(0, 1.05)
 axA.legend(frameon=False, loc="upper right", fontsize=8)
 axA.set_title("(a) Isotypic decomposition, 5 seeds", loc="left", fontsize=9.5)
 
-# --- B: score-level spectral recovery vs j ---------------------------------
-series = [
-    ("su2hk_t0.3_N2048_f0.01_s0", r"$K_t$, $t=0.3$", BLUE, "-"),
-    ("su2hk_t0.1_N2048_f0.01_s0", r"$K_t$, $t=0.1$", AQUA, "-"),
-    ("su2hk_t0.05_long_N2048_f0.01_s0", r"$K_t$, $t=0.05$", YELLOW, "-"),
-    ("su2bl_j1j2_f0.01_s0", r"$\chi_1+0.5\,\chi_2$, wd $1.0$", ORANGE, "--"),
-    ("su2bl_j1j2_wd0.1_f0.01_s0", r"$\chi_1+0.5\,\chi_2$, wd $0.1$",
-     ORANGE, "-"),
+# --- B: calibrated signed Haar coefficients, normalized per seed --------
+# Per-seed normalized profiles a_hat_j / (scale * target_j) for the two
+# band-limited cells (5 seeds each), plus the hk t=0.3 seed mean. Values
+# near 1 mean the subspace is carried at its target coefficient; the
+# wd 1.0 spread at j=2 is the seed-dependent suppression reported in the
+# text. Out-of-support coefficients are shown as absolute values near 0.
+def load_profiles(glob):
+    profs = []
+    for s0 in range(5):
+        p = ROOT / f"data/su2/{glob.format(s=s0)}/hk_haar_ckpt_60000.json"
+        d = json.loads(p.read_text())["results"]
+        tc = d["target_comparison"]["normalized_profile"]
+        profs.append({float(k): v for k, v in tc.items()})
+    return profs
+
+cells = [
+    ("su2bl_j1j2_wd0.1_f0.01_s{s}", "band-limited, wd 0.1", AQUA),
+    ("su2bl_j1j2_f0.01_s{s}", "band-limited, wd 1.0", ORANGE),
+    ("su2hk_t0.3_N2048_f0.01_s{s}", r"$K_t$, $t=0.3$", BLUE),
 ]
-jgrid = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
-for run, lab, color, ls in series:
-    d = json.loads((ROOT / f"data/su2/{run}/hk_coefficients.json").read_text())
-    last = d["ckpts"][max(d["ckpts"], key=int)]
-    ys = []
-    for j in jgrid:
-        k = str(j)
-        if k in last["recovery"]:
-            ys.append(last["recovery"][k])
-        else:
-            ys.append(last["out_of_support_frac"].get(k, 0.0))
-    axB.plot(jgrid, ys, ls, marker="o", markersize=3.5, color=color,
-             linewidth=1.6, label=lab)
+rng = np.random.default_rng(0)
+for glob, lab, color in cells:
+    profs = load_profiles(glob)
+    js_cell = sorted(profs[0])
+    first = True
+    for prof in profs:
+        xs = np.array(js_cell) + rng.uniform(-0.03, 0.03, len(js_cell))
+        axB.plot(xs, [prof[j] for j in js_cell], "o", color=color,
+                 markersize=4, alpha=0.65, label=lab if first else None)
+        first = False
 axB.axhline(1.0, color=INK2, linewidth=0.7, linestyle=":")
+axB.axhline(0.0, color=INK2, linewidth=0.5, linestyle="-", alpha=0.4)
 axB.set_xlabel(r"spin $j$")
-axB.set_ylabel("recovered / required weight")
-axB.set_ylim(-0.08, 1.95)
-axB.legend(frameon=False, fontsize=7.5, loc="upper right", ncol=1)
-axB.set_title("(b) Character-expansion recovery", loc="left", fontsize=9.5)
+axB.set_ylabel("coefficient / target")
+axB.set_ylim(-0.1, 1.35)
+axB.legend(frameon=False, fontsize=7.5, loc="lower left")
+axB.set_title("(b) Signed Haar coefficients, 5 seeds", loc="left",
+              fontsize=9.5)
 
 for ax in (axA, axB):
     ax.spines["top"].set_visible(False)
