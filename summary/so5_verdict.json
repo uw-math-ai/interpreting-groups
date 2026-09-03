@@ -1,0 +1,81 @@
+{
+  "envelope": {
+    "schema_name": "so5-verdict",
+    "schema_version": 1,
+    "generated_at_utc": "2026-09-03T03:34:33.935848+00:00",
+    "code_commit": "47700435049e9574d917d687cfc981bf33824208+dirty",
+    "analysis_source_sha256": "494c7e6fb11bf0a76844858fbdd74fd8bb5232edea5eb82979daf2509f829de8",
+    "source_checkpoint": null,
+    "run_config_sha256": null,
+    "training_seed": null,
+    "analysis_seed": 0,
+    "analysis_args": {
+      "runs": "so5rf s0-4, so5vec s0-1, f0.03"
+    },
+    "environment": {
+      "python": "3.12.6",
+      "platform": "Linux-6.1.158-180.294.amzn2023.x86_64-x86_64-with-glibc2.34",
+      "torch": "2.11.0+cu130",
+      "cuda": "13.0",
+      "device": "Tesla T4",
+      "numpy": "2.4.4"
+    }
+  },
+  "results": {
+    "preregistration": "preregistration/so5_observations_2026-09-01.md",
+    "performance_bar": 0.85,
+    "conditions": {
+      "so5_averaged (historical, 5 seeds)": {
+        "T2": "0.55-0.64 (0.731 at f=0.03)",
+        "vector5_fve": "0.680-0.695",
+        "adjoint10_fve": "0.211-0.233"
+      },
+      "so5rf_intrinsic (5 seeds, f=0.03, 100k)": {
+        "T2": [
+          0.994,
+          0.995,
+          0.994,
+          0.993,
+          0.992
+        ],
+        "vector5_fve": [
+          0.972,
+          0.972,
+          0.972,
+          0.971,
+          0.971
+        ],
+        "adjoint10_fve": [
+          0.006,
+          0.007,
+          0.007,
+          0.006,
+          0.007
+        ],
+        "spinor4_fve": [
+          0.005,
+          0.005,
+          0.005,
+          0.005,
+          0.005
+        ]
+      },
+      "so5vec_control (2 seeds)": {
+        "T2": [
+          0.999,
+          0.999
+        ],
+        "vector5_fve": [
+          0.99,
+          0.991
+        ],
+        "adjoint10_fve": [
+          0.002,
+          0.002
+        ]
+      }
+    },
+    "branch_fired": "high-performing generic quotient map + vector purification",
+    "conclusion": "The selected representation on SO(5) is observation-map dependent. Under the antipodally averaged cover encoding the models generalize poorly (T2 <= 0.73) and hold a stable vector+adjoint mixture; under an intrinsic random-feature quotient observation every seed solves the task (T2 >= 0.992) and concentrates 0.971-0.972 of encoder variance on the vector-5 with the adjoint at the floor. High-performing conditions select the minimal faithful vector representation; the averaged condition does not, and its measured metric-fidelity deficit (so5_diagnostics) is a correlate of the failure, not a demonstrated cause. Not every observation of SO(5) yields vector purification."
+  }
+}
