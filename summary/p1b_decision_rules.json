@@ -30,7 +30,7 @@
   },
   "D3": {
     "fired": true,
-    "statement": "frontier crossings within overlap ranges: [('wd0.1', '0', -0.238), ('wd0.3', '0', -0.062), ('wd0.3', '3', -0.446)]"
+    "statement": "frontier crossings within overlap ranges in 3 of 30 cell-seeds (wd0.1 s0 at q0.75: -0.24; wd0.3 s0 at q0.25: -0.06; wd0.3 s3 at q0.25: -0.45): narrow interior dips with both range endpoints positive, so those cells' claims are stated as positive on average over the common budget range rather than uniformly at every budget"
   },
   "D4": {
     "fired": false,
