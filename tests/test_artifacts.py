@@ -38,4 +38,4 @@ def test_manifest_hashes_match_files(tmp_path):
         assert sha256_file(tmp_path / name) == digest, name
     tables = json.loads((tmp_path / "tables.json").read_text())
     assert "SU(2)" in tables["seed_statistics"]
-    assert tables["p1b_wd1.0_paired"]["margin_at_matched_norm"]["mean"] > 0
+    assert tables["p1b_wd1.0_paired"]["margin_at_norm_budget"]["mean"] > 0

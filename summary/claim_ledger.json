@@ -1,0 +1,228 @@
+{
+  "schema_name": "claim-ledger",
+  "schema_version": 1,
+  "note": "anchors are whitespace-normalized substrings of paper/main.tex; experiments/check_claims.py enforces anchor presence and bundle-key existence at build time",
+  "claims": [
+    {
+      "id": "selection-nine-of-ten",
+      "text_anchor": "Nine of the ten concentrate $93$--$98\\%$ of encoder variance",
+      "status": "measured",
+      "bundle_keys": [
+        "seed_summary"
+      ],
+      "seeds": "5 per condition",
+      "checkpoint_rule": "final checkpoint at configured budget",
+      "uncertainty": "mean over five seeds per condition",
+      "locations": [
+        "abstract"
+      ]
+    },
+    {
+      "id": "double-cover-cosine",
+      "text_anchor": "$\\cos(z(g), z(-g)) = -0.72 \\pm 0.02$",
+      "status": "measured",
+      "bundle_keys": [
+        "seed_summary",
+        "su2/su2_N2048_f0.01_s0"
+      ],
+      "seeds": "5",
+      "checkpoint_rule": "final checkpoint at configured budget",
+      "uncertainty": "mean +/- sd over seeds",
+      "locations": [
+        "sec:mainline"
+      ]
+    },
+    {
+      "id": "ablation-dissociation",
+      "text_anchor": "Ablating spin~$\\tfrac12$ collapses",
+      "status": "measured",
+      "bundle_keys": [
+        "su2/su2_N2048_f0.01_s0",
+        "su2/so3_N2048_f0.01_s0"
+      ],
+      "seeds": "5",
+      "checkpoint_rule": "final checkpoint at configured budget",
+      "uncertainty": "mean +/- sd over seeds, tab:su2causal",
+      "locations": [
+        "sec:mainline",
+        "tab:su2causal"
+      ]
+    },
+    {
+      "id": "character-fit",
+      "text_anchor": "explaining $0.97 \\pm 0.01$ of score variance",
+      "status": "measured",
+      "bundle_keys": [
+        "seed_summary"
+      ],
+      "seeds": "5",
+      "checkpoint_rule": "final checkpoint at configured budget",
+      "uncertainty": "mean +/- sd over seeds",
+      "locations": [
+        "sec:mainline"
+      ]
+    },
+    {
+      "id": "two-sided-closure",
+      "text_anchor": "$R^2 = 0.989 \\pm 0.001$ per side with commutator",
+      "status": "measured",
+      "bundle_keys": [
+        "su2/so3_N2048_f0.01_s0"
+      ],
+      "seeds": "5",
+      "checkpoint_rule": "final checkpoint at configured budget",
+      "uncertainty": "mean +/- sd over seeds, tab:twosided",
+      "locations": [
+        "sec:mainline"
+      ]
+    },
+    {
+      "id": "cost-equal-step",
+      "text_anchor": "margin $7.29 \\pm 0.16$ against $6.49 \\pm 0.05$",
+      "status": "measured",
+      "bundle_keys": [
+        "p1b_reanalysis_wd1.0"
+      ],
+      "seeds": "5 per arm",
+      "checkpoint_rule": "final checkpoint at configured budget",
+      "uncertainty": "mean +/- sd; exact paired permutation in the decision record",
+      "locations": [
+        "sec:mainline",
+        "tab:cost"
+      ]
+    },
+    {
+      "id": "cost-range-and-capacity",
+      "text_anchor": "positive in all five seeds of every cell",
+      "status": "measured",
+      "bundle_keys": [
+        "p1b_decision_rules",
+        "p1b_reanalysis_wd0.1",
+        "p1b_reanalysis_wd0.3",
+        "p1b_reanalysis_wd3.0",
+        "p1b_reanalysis_cap1024x1",
+        "p1b_reanalysis_cap512x2"
+      ],
+      "seeds": "5 per arm per cell",
+      "checkpoint_rule": "final checkpoint at configured budget",
+      "uncertainty": "exact paired sign-flip permutation, p=0.0312",
+      "locations": [
+        "app:mainline-exps Experiment 9"
+      ]
+    },
+    {
+      "id": "probes-null",
+      "text_anchor": "no reconstruction mechanism is claimed",
+      "status": "measured",
+      "bundle_keys": [
+        "p1b_probes_wd1.0"
+      ],
+      "seeds": "5 per arm",
+      "checkpoint_rule": "final checkpoint at configured budget",
+      "uncertainty": "per-seed interventions with random-subspace and random-init controls",
+      "locations": [
+        "app:mainline-exps Experiment 9"
+      ]
+    },
+    {
+      "id": "poly-degree-gap",
+      "text_anchor": "irreducible relative error of $1/3$ (measured $0.3329$)",
+      "status": "measured",
+      "bundle_keys": [
+        "poly_compose"
+      ],
+      "seeds": "5 per arm",
+      "checkpoint_rule": "final checkpoint at configured budget",
+      "uncertainty": "closed-form floor; held-out relative MSE",
+      "locations": [
+        "app:mainline-exps Experiment 9"
+      ]
+    },
+    {
+      "id": "spectral-wd01-retention",
+      "text_anchor": "$0.492$--$0.506$ against the exact $0.5$",
+      "status": "measured",
+      "bundle_keys": [
+        "p4_aggregate"
+      ],
+      "seeds": "5",
+      "checkpoint_rule": "final checkpoint at configured budget",
+      "uncertainty": "fold-based per-seed CIs",
+      "locations": [
+        "sec:spectral"
+      ]
+    },
+    {
+      "id": "spectral-wd10-seed-dependence",
+      "text_anchor": "$0.02$--$0.03$ in two seeds",
+      "status": "measured",
+      "bundle_keys": [
+        "p4_aggregate"
+      ],
+      "seeds": "5",
+      "checkpoint_rule": "final checkpoint at configured budget",
+      "uncertainty": "fold-based per-seed CIs",
+      "locations": [
+        "sec:spectral"
+      ]
+    },
+    {
+      "id": "so5-averaged-mixture",
+      "text_anchor": "$0.68$--$0.70$ and the adjoint $\\mathbf{10}$ at",
+      "status": "measured",
+      "bundle_keys": [
+        "so5_verdict",
+        "spin5/so5_N2048_f0.01_s0"
+      ],
+      "seeds": "5 + stress cells",
+      "checkpoint_rule": "final checkpoint at configured budget",
+      "uncertainty": "per-seed ranges",
+      "locations": [
+        "sec:universality",
+        "tab:so5"
+      ]
+    },
+    {
+      "id": "so5-intrinsic-purification",
+      "text_anchor": "$0.971$--$0.972$ of encoder variance on the vector",
+      "status": "measured",
+      "bundle_keys": [
+        "so5_verdict",
+        "spin5/so5rf_f0.03_s0"
+      ],
+      "seeds": "5",
+      "checkpoint_rule": "final checkpoint at configured budget",
+      "uncertainty": "per-seed range under the preregistered rule",
+      "locations": [
+        "sec:universality",
+        "app Experiment 12"
+      ]
+    },
+    {
+      "id": "selection-conjecture",
+      "text_anchor": "the minimum-norm setting realizes",
+      "status": "conjecture",
+      "bundle_keys": [
+        "p1b_decision_rules"
+      ],
+      "seeds": "n/a",
+      "checkpoint_rule": "final checkpoint at configured budget",
+      "uncertainty": "explicitly open",
+      "locations": [
+        "app:questions"
+      ]
+    },
+    {
+      "id": "lemma-character",
+      "text_anchor": "equality only at $g = e$",
+      "status": "theorem",
+      "bundle_keys": [],
+      "seeds": "n/a",
+      "checkpoint_rule": "final checkpoint at configured budget",
+      "uncertainty": "proved in app:proofs",
+      "locations": [
+        "sec:algorithm"
+      ]
+    }
+  ]
+}

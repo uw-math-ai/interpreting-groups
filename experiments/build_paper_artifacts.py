@@ -98,7 +98,7 @@ def p1b_table(bundle, root):
                          "regenerate the bundle first")
     payload = json.loads(path.read_text())
     stats = payload["results"]["paired_statistics"]
-    keep = ("margin_at_matched_norm", "final_margin", "final_total_norm",
+    keep = ("margin_at_norm_budget", "final_margin", "final_total_norm",
             "final_margin_per_norm", "final_T2_accuracy",
             "final_train_loss")
     out = {}
@@ -141,7 +141,7 @@ def tex_so5(rows):
 
 def tex_p1b(stats):
     pretty = {
-        "margin_at_matched_norm": "margin at matched norm",
+        "margin_at_norm_budget": "margin at matched norm",
         "final_margin": "final margin",
         "final_total_norm": "final total norm",
         "final_margin_per_norm": "final margin/norm",

@@ -185,17 +185,21 @@ def appendix_figure():
     sect5 = ["fve_4", "fve_5", "fve_10", "fve_14"]
     lab5 = [r"$\mathbf{4}$", r"$\mathbf{5}$", r"$\mathbf{10}$", r"$\mathbf{14}$"]
     m5 = {}
-    for v in ("spin5", "so5"):
+    runs5 = {"spin5": "data/spin5/spin5_N2048_f0.01_s{s}/log.jsonl",
+             "so5": "data/spin5/so5_N2048_f0.01_s{s}/log.jsonl",
+             "so5rf": "data/spin5/so5rf_f0.03_s{s}/log.jsonl"}
+    for v, pat in runs5.items():
         vals = []
         for s0 in range(5):
-            recs = [json.loads(l) for l in
-                    open(ROOT / f"data/spin5/{v}_N2048_f0.01_s{s0}/log.jsonl")
+            recs = [json.loads(l) for l in open(ROOT / pat.format(s=s0))
                     if "fve_4" in l]
             vals.append([recs[-1][k] for k in sect5])
         m5[v] = np.array(vals).mean(0)
     x = np.arange(4)
-    ax.bar(x - 0.19, m5["spin5"], 0.38, color=BLUE, label="Spin(5)")
-    ax.bar(x + 0.19, m5["so5"], 0.38, color=ORANGE, label="SO(5)")
+    ax.bar(x - 0.25, m5["spin5"], 0.24, color=BLUE, label="Spin(5)")
+    ax.bar(x, m5["so5"], 0.24, color=ORANGE, label=r"SO(5), averaged $\Psi$")
+    ax.bar(x + 0.25, m5["so5rf"], 0.24, color=AQUA,
+           label=r"SO(5), intrinsic $\Psi$")
     ax.set_xticks(x, lab5, fontsize=8.5)
     ax.set_ylim(0, 1.05)
     ax.legend(frameon=False, fontsize=8)

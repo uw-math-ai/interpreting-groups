@@ -1129,10 +1129,86 @@ $7.29 \pm 0.16$ against $6.49 \pm 0.05$ at $17\%$ lower total
 parameter norm, cheaper in every module, for $31\%$ more margin per
 unit norm with non-overlapping seed distributions. The frame's saved
 input coordinates are repaid with interest by the composition cost
-its one-sided closure forces. This closes the mechanism-selection
-loop. Two-sided closure makes composition bilinear and scoring
-linear, bilinearity is cheap under weight decay, and weight decay
-selects the full coefficient space.
+its one-sided closure forces. \subsection*{Experiment 9b: preregistered regularization and capacity
+program} The preregistered replication program
+(\texttt{preregistration/p1b\_wd\_sweep}) hardens the comparison. Across
+weight decays $0.1$, $0.3$, $1.0$, and $3.0$ and two frame-favorable
+capacity controls, doubled interaction width and an extra interaction
+layer, the primary endpoint is the paired margin difference at a common
+achieved-norm budget, read from full-trajectory Pareto frontiers. The
+frontier is the running maximum of margin over points sorted by norm, so
+early transients cannot displace later points and no burn-in cutoff is
+needed. An earlier $20$k-step cutoff manufactured no-overlap comparisons
+that were mislabeled matched-norm and inflated the weight-decay-$0.1$
+endpoint to $+9.99$; the corrected construction makes every cell-seed a
+genuine matched-achieved-norm comparison, and the cutoff numbers survive
+only as a labeled sensitivity column in the analysis record.
+\Cref{tab:p1bcells} lists the per-seed endpoint. It is positive in all
+five seeds of every cell (exact sign-flip $p = 0.031$ each), every arm
+clears the preregistered accuracy floor of $0.85$ (minimum $0.858$), and
+three of thirty cell-seeds show narrow interior frontier dips with
+positive range endpoints, so those cells are stated as positive on
+average over the budget range. Honest secondary notes stand in the
+decision record. The equal-step final margin has negative seeds at
+weight decay $0.1$ (one of five) and the extra-layer control (two of
+five), and at weight decay $3.0$ the block arm is also more accurate in
+every seed.
+
+\begin{table}[t]
+\centering
+\caption{Experiment 9b, primary endpoint per cell: paired margin
+difference (block minus frame) at a common achieved-norm budget, one
+column per seed, with the cell mean and the exact one-sided sign-flip
+$p$. Every value is positive; the permutation floor at five seeds is
+$1/32$.}
+\label{tab:p1bcells}
+\scriptsize
+\begin{tabular}{lccccccc}
+\toprule
+cell & s0 & s1 & s2 & s3 & s4 & mean & $p$ \\
+\midrule
+weight decay $0.1$ & $+1.42$ & $+1.99$ & $+2.30$ & $+2.17$ & $+1.70$ & $+1.92$ & $0.0312$ \\
+weight decay $0.3$ & $+1.48$ & $+1.88$ & $+1.99$ & $+1.35$ & $+1.79$ & $+1.70$ & $0.0312$ \\
+weight decay $1.0$ & $+1.29$ & $+1.20$ & $+1.32$ & $+1.36$ & $+1.24$ & $+1.28$ & $0.0312$ \\
+weight decay $3.0$ & $+1.84$ & $+1.84$ & $+1.87$ & $+1.88$ & $+1.81$ & $+1.85$ & $0.0312$ \\
+capacity, $2\times$ width & $+1.86$ & $+1.72$ & $+1.80$ & $+1.89$ & $+1.81$ & $+1.82$ & $0.0312$ \\
+capacity, extra layer & $+2.58$ & $+2.12$ & $+2.17$ & $+2.32$ & $+2.33$ & $+2.30$ & $0.0312$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{Experiment 9c: the reconstruction hypothesis fails its
+causal test} If the frame arm compensated for its missing column by
+reconstructing it, the reconstruction should be localizable. Layer-wise
+ridge probes with train/validation/test splits decode the missing column
+linearly at $R^2 \geq 0.999$ from the first hidden layer onward, but the
+same probes succeed equally on a random-initialization control, so
+decodability reflects the random-feature expansion of the six input
+coordinates and cannot support a reconstruction claim. The causal step
+fails in both directions. Ablating the cross-fitted unique subspace of
+the column-three predictor changes task accuracy by no more than the
+equal-rank random control in every seed, and patching that subspace from
+counterfactual inputs redirects the model's product selection in no seed
+(rate $0.000$ against chance $0.016$). The verdict recorded in the
+analysis is that information is present from the first layer, trivially
+and already at initialization, it is not localized in any causally
+load-bearing low-rank linear subspace, and no reconstruction mechanism
+is claimed.
+
+\subsection*{Experiment 9d: the degree gap in an explicit polynomial
+model class} A controlled model family makes the structural cost of the
+frame explicit. A general bilinear map on the two full coefficient
+blocks represents composition exactly (held-out relative mean squared
+error $4 \times 10^{-30}$), a structured degree-three frame interaction,
+which first reconstructs the third column with an exact quadratic layer,
+is exact as well, and the best degree-two frame interaction has an
+irreducible relative error of $1/3$ (measured $0.3329$), because the
+missing column is quadratic in the first frame alone, so generic frame
+composition is degree three overall. Trained on the ranking task with
+matched scorers and scale normalization, the two exact-degree arms reach
+positive margins ($0.557$ and $0.443$) while the best degree-two frame
+arm fails to separate at all (margin $-0.200$). The claim is scoped to
+this explicit model class and proves no universal lower bound.
 
 \section{Experimental record: universality across group forms}
 \label{app:universality-exps}

@@ -143,6 +143,21 @@ def build_bundle(root=ROOT):
         analyses[Path(rel).stem] = {"path": rel, "sha256": sha256_file(p),
                                     "schema_name": name,
                                     "schema_version": version}
+    # every enveloped or self-versioned analysis tracked under summary/
+    for p in sorted((root / "summary").glob("*.json")):
+        if p.name in ("results_bundle.json",) or p.stem in analyses:
+            continue
+        payload = json.loads(p.read_text())
+        if isinstance(payload, dict) and ("envelope" in payload
+                                          or "schema_name" in payload):
+            name, version = analysis_schema(payload)
+            if name == LEGACY_SCHEMA and "schema_name" in payload:
+                name = payload["schema_name"]
+                version = payload.get("schema_version")
+            analyses[p.stem] = {"path": str(p.relative_to(root)),
+                                "sha256": sha256_file(p),
+                                "schema_name": name,
+                                "schema_version": version}
 
     queues = {}
     for qf in sorted((root / "data").glob("queue_v*_cmds.txt")):

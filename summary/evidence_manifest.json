@@ -1,0 +1,33 @@
+{
+  "schema_name": "evidence-manifest",
+  "schema_version": 1,
+  "frozen_at_commit": "106d73a31db9eb477a0b4fbb68ad5ceafc7621e6+dirty",
+  "bundle": {
+    "path": "summary/results_bundle.json",
+    "sha256": "dadb8e2c3093daa609f2987d73122f25e20be4f77b53f6a728175fedfe6bb623",
+    "runs": 174,
+    "analyses": 20
+  },
+  "claim_ledger": {
+    "path": "summary/claim_ledger.json",
+    "sha256": "4eb347e86fe5dd51074ed1a29d12d3d1de0d88a603e6bf0b3f95155ffd1d8aa6",
+    "claims": 15
+  },
+  "paper_artifacts_manifest": {
+    "path": "paper/generated/manifest.json",
+    "sha256": "7d189aaf5471de0055acc3817ce128b9920882e4e6b008b55bf8f2108a5bf6f2"
+  },
+  "verdicts": {
+    "p1b": "summary/p1b_decision_rules.json (v2: D1 and D5 fired, D3 three narrow dips, D4 clean)",
+    "p4": "summary/p4_aggregate.json (headline gate failed; demoted to preliminary)",
+    "so5": "summary/so5_verdict.json (observation-map dependence; first preregistered branch)",
+    "probes": "summary/p1b_probes_wd1.0.json (reconstruction claim removed)",
+    "poly": "summary/poly_compose.json (degree gap; scoped to explicit class)"
+  },
+  "preregistrations": [
+    "preregistration/p1b_wd_sweep_2026-09-01.md",
+    "preregistration/so5_observations_2026-09-01.md",
+    "preregistration/poly_compose_2026-09-01.md"
+  ],
+  "build_gate": "paper/build.sh (artifacts + claim check before compile, fails closed)"
+}
