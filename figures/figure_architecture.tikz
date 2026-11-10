@@ -51,8 +51,8 @@
 \draw[flow] (pa) -- node[above,annot,pos=0.25] {$p$} (ea);
 \draw[flow] (pb) -- node[above,annot,pos=0.25] {$p$} (eb);
 \draw[flow] (pc) -- node[above,annot,pos=0.25] {$p$} (ec);
-\draw[flow] (ea.east) -- node[above,annot,pos=0.48] {$z(a)$} (cat.150);
-\draw[flow] (eb.east) -- node[below,annot,pos=0.48] {$z(b)$} (cat.210);
+\draw[flow] (ea.east) -- node[above,annot,pos=0.67] {$z(a)$} (cat.150);
+\draw[flow] (eb.east) -- node[below,annot,pos=0.67] {$z(b)$} (cat.210);
 \draw[flow] (cat) -- (interaction);
 \draw[flow] (interaction) -- (h);
 \draw[flow] (h.east) -| (dot.north);
