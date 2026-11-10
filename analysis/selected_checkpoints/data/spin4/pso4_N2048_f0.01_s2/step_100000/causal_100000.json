@@ -1,0 +1,66 @@
+{
+  "variant": "pso4",
+  "step": 100000,
+  "interventions": {
+    "none": {
+      "task_acc": 1.0,
+      "D_L": 0.5,
+      "D_R": 0.5,
+      "D_LR": 0.5
+    },
+    "remove_char_-+": {
+      "task_acc": 1.0,
+      "D_L": 0.5,
+      "D_R": 0.5,
+      "D_LR": 0.5
+    },
+    "remove_char_+-": {
+      "task_acc": 1.0,
+      "D_L": 0.5,
+      "D_R": 0.5,
+      "D_LR": 0.5
+    },
+    "remove_char_--": {
+      "task_acc": 1.0,
+      "D_L": 0.5,
+      "D_R": 0.5,
+      "D_LR": 0.5
+    },
+    "fablate_0.5_0": {
+      "task_acc": 1.0,
+      "D_L": 0.5,
+      "D_R": 0.5,
+      "D_LR": 0.5
+    },
+    "fablate_0_0.5": {
+      "task_acc": 1.0,
+      "D_L": 0.5,
+      "D_R": 0.5,
+      "D_LR": 0.5
+    },
+    "fablate_0.5_0.5": {
+      "task_acc": 1.0,
+      "D_L": 0.5,
+      "D_R": 0.5,
+      "D_LR": 0.5
+    },
+    "fablate_1_0": {
+      "task_acc": 0.824462890625,
+      "D_L": 0.5,
+      "D_R": 0.5,
+      "D_LR": 0.5
+    },
+    "fablate_0_1": {
+      "task_acc": 0.802001953125,
+      "D_L": 0.5,
+      "D_R": 0.5,
+      "D_LR": 0.5
+    },
+    "ablate_random_k8": {
+      "task_acc": 1.0,
+      "D_L": 0.5,
+      "D_R": 0.5,
+      "D_LR": 0.5
+    }
+  }
+}

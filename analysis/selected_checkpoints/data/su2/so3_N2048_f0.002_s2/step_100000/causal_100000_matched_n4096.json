@@ -1,0 +1,83 @@
+{
+  "run_dir": "selected_checkpoints/data/su2/so3_N2048_f0.002_s2/step_100000",
+  "variant": "so3",
+  "step": 100000,
+  "interventions": {
+    "none": {
+      "task_acc": 0.9951171875,
+      "fine_acc_r0.2": 0.301025390625,
+      "center_disc": 0.5
+    },
+    "even_projection": {
+      "task_acc": 0.9951171875,
+      "fine_acc_r0.2": 0.301025390625,
+      "center_disc": 0.5
+    },
+    "odd_projection": {
+      "task_acc": 0.026123046875,
+      "fine_acc_r0.2": 0.000244140625,
+      "center_disc": 0.5
+    },
+    "fablate_spin_half": {
+      "task_acc": 0.994384765625,
+      "fine_acc_r0.2": 0.299560546875,
+      "center_disc": 0.5
+    },
+    "fablate_spin_one": {
+      "task_acc": 0.02783203125,
+      "fine_acc_r0.2": 0.0009765625,
+      "center_disc": 0.5
+    },
+    "ablate_spin_half_k4": {
+      "task_acc": 0.258544921875,
+      "fine_acc_r0.2": 0.009033203125,
+      "center_disc": 0.5
+    },
+    "ablate_spin_one_k9": {
+      "task_acc": 0.029052734375,
+      "fine_acc_r0.2": 0.00048828125,
+      "center_disc": 0.5
+    },
+    "ablate_top_pca_k4": {
+      "task_acc": 0.270263671875,
+      "fine_acc_r0.2": 0.008544921875,
+      "center_disc": 0.5
+    },
+    "ablate_random_k4": {
+      "task_acc": 0.992919921875,
+      "fine_acc_r0.2": 0.26513671875,
+      "center_disc": 0.5
+    }
+  },
+  "character_fit": {
+    "js": [
+      0.0,
+      0.5,
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0
+    ],
+    "r2_upto_j0.0": 5.428855143208011e-10,
+    "r2_upto_j0.5": 0.0006727370859079818,
+    "r2_upto_j1.0": 0.6143820927749024,
+    "r2_upto_j1.5": 0.6144590222692713,
+    "r2_upto_j2.0": 0.6144783747708176,
+    "r2_upto_j2.5": 0.6145638065696271,
+    "r2_upto_j3.0": 0.6145638071335016,
+    "coeffs": {
+      "0.0": 0.0,
+      "0.5": -0.07689188020309734,
+      "1.0": 18.228919767351073,
+      "1.5": -0.04801614383571534,
+      "2.0": 0.09297663777254772,
+      "2.5": -0.20831861750349073,
+      "3.0": -0.0005342520263463279
+    }
+  },
+  "composition": {
+    "r2_h_to_product": 0.9076982879536574,
+    "r2_h_to_product_shuffled": -0.8721940698158823
+  }
+}

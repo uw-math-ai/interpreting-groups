@@ -1,0 +1,23 @@
+{
+  "variant": "so5",
+  "N": 2048,
+  "frac": 0.01,
+  "sigma": 0.15,
+  "excl_radius": 0.7,
+  "K": 64,
+  "m": 48,
+  "alpha": 2.0,
+  "enc_seed": 0,
+  "steps": 200000,
+  "batch": 2048,
+  "lr": 0.001,
+  "wd": 1.0,
+  "seed": 0,
+  "n_eval": 4096,
+  "eval_every": 1000,
+  "spec_every": 5000,
+  "ckpt_every": 25000,
+  "save_dir": "data/spin5/so5_N2048_f0.01_s0",
+  "resume": true,
+  "device": "cuda"
+}

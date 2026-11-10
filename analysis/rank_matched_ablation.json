@@ -1,0 +1,108 @@
+{
+  "records": [
+    {
+      "variant": "su2",
+      "seed": 0,
+      "step": 100000,
+      "rank": 4,
+      "n": 8192,
+      "task_acc": 1.0,
+      "center_disc": 1.0
+    },
+    {
+      "variant": "su2",
+      "seed": 1,
+      "step": 100000,
+      "rank": 4,
+      "n": 8192,
+      "task_acc": 0.9998779296875,
+      "center_disc": 1.0
+    },
+    {
+      "variant": "su2",
+      "seed": 2,
+      "step": 100000,
+      "rank": 4,
+      "n": 8192,
+      "task_acc": 1.0,
+      "center_disc": 1.0
+    },
+    {
+      "variant": "su2",
+      "seed": 3,
+      "step": 100000,
+      "rank": 4,
+      "n": 8192,
+      "task_acc": 0.9998779296875,
+      "center_disc": 1.0
+    },
+    {
+      "variant": "su2",
+      "seed": 4,
+      "step": 100000,
+      "rank": 4,
+      "n": 8192,
+      "task_acc": 1.0,
+      "center_disc": 1.0
+    },
+    {
+      "variant": "so3",
+      "seed": 0,
+      "step": 100000,
+      "rank": 9,
+      "n": 8192,
+      "task_acc": 1.0,
+      "center_disc": 0.5
+    },
+    {
+      "variant": "so3",
+      "seed": 1,
+      "step": 100000,
+      "rank": 9,
+      "n": 8192,
+      "task_acc": 1.0,
+      "center_disc": 0.5
+    },
+    {
+      "variant": "so3",
+      "seed": 2,
+      "step": 100000,
+      "rank": 9,
+      "n": 8192,
+      "task_acc": 0.9998779296875,
+      "center_disc": 0.5
+    },
+    {
+      "variant": "so3",
+      "seed": 3,
+      "step": 100000,
+      "rank": 9,
+      "n": 8192,
+      "task_acc": 1.0,
+      "center_disc": 0.5
+    },
+    {
+      "variant": "so3",
+      "seed": 4,
+      "step": 100000,
+      "rank": 9,
+      "n": 8192,
+      "task_acc": 1.0,
+      "center_disc": 0.5
+    }
+  ],
+  "protocol": {
+    "training_fraction": 0.01,
+    "step": 100000,
+    "fit_probe_seed": 123,
+    "fit_n": 4096,
+    "evaluation_seed": 7,
+    "evaluation_n": 8192,
+    "positive": "exact ab",
+    "negative": "63 Haar negatives with original exclusion",
+    "locus": "both argument encoders",
+    "checkpoint_source": "original transferred weights",
+    "rank": "4 for SU(2), 9 for SO(3)",
+    "inference_batch": 256
+  }
+}

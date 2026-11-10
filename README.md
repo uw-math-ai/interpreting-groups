@@ -1,127 +1,80 @@
-# Grokking finite groups → recovering their geometry
+# Compact Lie group composition
 
-When a small network groks a finite group's multiplication table, where does the
-group's **geometry** go? This repo trains 1-layer transformers and MLPs on the
-Cayley tables of order-12 … 384 groups and shows that the grokked embedding
-concentrates almost all of its energy in the group's lowest-dimensional faithful
-("geometric") irrep — so a *linear* read-out of the embedding reconstructs the
-group's defining **polytope / root system**, verified out-of-sample.
+Code and lightweight results for *To Infinite and Beyond: How Neural Networks Learn Compact Lie Groups, a Mechanistic Study*.
 
-The headline picture: the embedding of **I_h = A5 × C2** crystallizing onto the
-12 vertices of an **icosahedron** as it groks.
+Camera-ready release for the Interp4Discovery workshop at NeurIPS 2026.
 
-![I_h grokking into an icosahedron](gallery/grokking_gifs/I_h_icosahedron.gif)
+This camera-ready update includes the group-family trainers, mechanistic analyses, corrected figure generation, and verified statistics. Checkpoints and Python environments are not included.
 
-…and the 4-dimensional groups, projected to 3-D shadows of their "x-cells":
+## Setup and checks
 
-![3-D shadows of the 4-polytopes](gallery/shadows_3d/00_xcells_montage.png)
+From this directory:
 
-## Results at a glance
-
-Held-out R² of a cross-validated ridge map *embedding → true polytope coordinates*
-(tautology-proof: it predicts the coordinates of group elements held out of the
-fit). High R² ⇒ the geometry is really there, not an artifact of the projection.
-
-| Group | order | recovered object | dim | held-out R² |
-|---|---|---|---|---|
-| **I_h = A5×C2** | 120 | icosahedron | 3 | **0.999** |
-| **W(B4)** | 384 | 16-cell (4-orthoplex) | 4 | **1.00** |
-| **S5 = W(A4)** | 120 | A4 root system | 4 | **1.00**\* |
-| **2O** (binary octahedral) | 48 | 24-cell + dual | 4 | **0.99** |
-| **W(A3) = S4** | 24 | cuboctahedron | 3 | **0.96** |
-| **2I** (binary icosahedral) | 120 | 600-cell | 4 | **0.92** |
-| **W(D4)** | 192 | 24-cell | 4 | **0.91**\* |
-| **PSL(2,7) = GL(3,2)** | 168 | Fano plane / 6-simplex | 6 | **0.99** |
-| **A5** | 60 | icosahedron | 3 | 0.78† |
-
-\* sharpest right after grok; the geometry can drift under continued weight decay
-(`shadow3d.py` auto-picks the peak-decode frame). † capped by the two
-Galois-conjugate 3-dim irreps over ℚ(√5) — architecture-independent.
-
-Negative controls that *don't* cleanly recover geometry are just as informative:
-**W(B3) = O_h** groks but spreads across its many 3-dim irreps (no clean
-octahedron); **A6** and **2T** don't grok at the data budget used; **W(G2)** is
-too small for a reliable held-out decode. Recovery requires the model to
-concentrate in the *specific* geometric irrep — grokking alone is not enough.
-
-Full write-up: **[RESULTS.md](RESULTS.md)**.
-
-## Repository layout
-
-```
-core/             library: group builders, rep theory, quaternion/Weyl geometry, models
-experiments/      training + analysis + figure/GIF scripts (run as `python -m experiments.X`)
-gallery/          all curated visuals  ──────────────────────────────┐
-  grokking_gifs/    embedding → polytope convergence animations       │ see
-  shadows_3d/       3-D shadows of the 4-polytopes (gif + png/svg)    │ gallery/
-  polytopes/        static decoded-polytope figures (transformer/mlp/weyl) │ README.md
-  interactive_3d/   rotatable plotly HTML                              ┘
-RESULTS.md        detailed cross-group findings
-data/             checkpoints (.pt) + snapshots (.npz)  — NOT in git; see "Data" below
+```sh
+uv sync --frozen --group dev
+uv run python -m pytest tests -q
 ```
 
-`core/` and `experiments/` stay at the repo root so `from core import …` and
-`python -m experiments.<script>` work unchanged.
+The lockfile is the full experiment environment, with PyTorch 2.11. The paper-specific test selection covers signed Haar estimation, group conventions, SO(5) observations, polynomial composition, provenance, and analysis envelopes. A checkpoint-dependent provenance test skips when historical weights are absent. Unrelated legacy modular-table tests are outside this compact release.
 
-## Setup
+Group self-tests are also available as `python -m core.su2`, `core.su3`, `core.spin4`, and `core.spin5`.
 
-Requires Python 3.11+ and [uv](https://docs.astral.sh/uv/).
+## Reproduce the figures and tables
 
-```bash
-uv sync
+```sh
+uv run python analysis/build_tables.py
+uv run python figures/make_figures.py
 ```
 
-## Data (checkpoints & snapshots)
+These commands require no GPU or checkpoints. They read archived training logs and uniform-checkpoint analysis results, and regenerate the numerical paper figures: `figure1`, `figure2`, `figure_seeds`, `figureA1`, and `figure_spectral`, as PDF and PNG. Full-precision tables are written to `analysis/verified_*.json` and CSV files.
 
-Trained checkpoints (381 MB) and embedding time-series snapshots (173 MB) ship
-**separately** (`data.zip`) to keep the repo lean. Unzip it at the repo root so
-it lands in `data/{transformer,mlp,weyl}/` — every script's default paths point
-there. Without it you can still browse `gallery/`, and you can regenerate
-everything from scratch by training (below).
+The geometry figures are included as PDFs. Their checkpoint-based source is `experiments/embedding_viz.py`; regenerating those illustrations requires the relevant trained weights in the original `data/` run directories. Create `paper/` before running that script.
 
-## Reproducing the work
+## Layout
 
-```bash
-# 1. Train + snapshot all groups (sequential; CUDA strongly recommended).
-#    transformer driver: experiments/aws_train.py   MLP driver: experiments/mlp_train.py
-bash experiments/run_gif2.sh           # all groups, dense early snapshots -> data/
+- `core/`: group operations, exact coefficients, frozen observations, scorer, and provenance helpers.
+- `experiments/`: training, causal interventions, patching, translation tests, Haar coefficients, cost analyses, polynomial controls, and SO(5) diagnostics.
+- `data/`: archived configurations and logs for the reported runs. No weights are included.
+- `analysis/selected_checkpoints/`: rerun diagnostics with explicit checkpoint steps.
+- `analysis/`: verified aggregates, spectral target scales, matched controls, table builder, and supporting analyses.
+- `figures/`: figure generator and paper figure files.
+- `preregistration/`: the relevant cost, polynomial, and SO(5) decision rules.
+- `summary/config_corrections.json`: the original correction ledger for historical explicit-feature widths.
 
-# 2. Decode geometry + render the static polytope figures
-uv run python -m experiments.polytope_figures --task 2O --ckpt data/transformer/2O_s1/2O_P48_d128_h4_mlp512_s1_grok10k.pt
+## Fresh training
 
-# 3. Rebuild every gallery GIF (convergence + 3-D shadows) from data/
-bash experiments/build_gifs2.sh
+Use a new output directory to preserve the archived results:
 
-# 4. Cross-group rep-theory / decode summary
-uv run python -m experiments.summary_groups
+```sh
+uv run python -m experiments.su2_train --variant su2 --N 2048 --frac 0.01 \
+  --seed 0 --steps 100000 --save_dir runs/su2_s0
+uv run python -m experiments.su2_train --variant so3 --N 2048 --frac 0.01 \
+  --seed 0 --steps 100000 --save_dir runs/so3_s0
 ```
 
-Key method notes (the *why* behind the numbers) live in
-[RESULTS.md](RESULTS.md) — e.g. why raw PCA is unconvincing and the held-out
-decode is the real evidence, the Galois-conjugate (√5↔−√5) relabeling needed for
-A5/2I, and the W(D4) triality caveat.
+Other families use `experiments.su3_train` (`su3` or `psu3`), `experiments.spin4_train` (`spin4`, `so4`, `leftq`, or `pso4`), and `experiments.spin5_train` (`spin5` or `so5`). Intrinsic SO(5) observations use `--variant so5 --encoding so5rf --m 48 --frac 0.03`.
 
-## Also here: modular-multiplication interpretability
+Main SU(2)/SO(3) settings use 32 observations, batch 4096, noise 0.2, and exclusion radius 0.5. SU(3) uses 32 complex probes (64 real observations), batch 2048, noise 0.15, and exclusion radius 0.7. Spin(4) uses 48 observations, batch 2048, noise 0.2, and exclusion radius 0.7. Spin(5) uses 48 observations, batch 2048, noise 0.15, and exclusion radius 0.7. All use 64 candidates and the default learning rate 0.001 and weight decay 1.0.
 
-The same codebase trains the original decoder-only transformer on
-**a·b = c (mod P)** (commutative monoid; J-class / cyclic structure) — the
-project this grew out of. Those scripts (`core.trainer`, `experiments.train_sweep`,
-`attention_embedding`, `embedding_fft`, `pca_fve`, `ov_principal_angles`, `fve`,
-`character_fitting`, `mlp_frequencies`) take `--P` instead of `--task`; P=165 is
-the reference modulus.
+SO(3)'s landmark observation is `exp(alpha * abs(dot(q,h)))`; the alternative random-MLP and function-value quotient maps use antipodal averaging.
 
-```bash
-uv run python -m experiments.train_sweep --Ps 165 --num_runs 5
-uv run python -m experiments.attention_embedding --P 165 --seed 1
+## Mechanistic analyses from trained weights
+
+```sh
+uv run python -m experiments.su2_causal --run_dir runs/su2_s0
+uv run python -m experiments.su2_mechanism --run_dir runs/su2_s0
+uv run python -m experiments.twosided --run_dir runs/so3_s0
+uv run python -m experiments.hk_haar --run runs/heatkernel_s0
 ```
 
-## Turning this into a git repo
+The archived five-seed table diagnostics use step 100k, exact positives for causal ranking, and noisy positives for T2. The figure generator reads the verified aggregates rather than selecting diagnostic files by filename order. The rank-matched random control removes four neural directions on SU(2) and nine on SO(3).
 
-```bash
-unzip icosahedral-grokking.zip && cd icosahedral-grokking
-git init && git add . && git commit -m "Grokking finite groups: geometry recovery"
-# optional, for the trained models:
-unzip ../icosahedral-grokking-data.zip   # -> data/
-```
+`analysis/check_translation_controls.py --work . --out new_controls.json --device cpu --include-exact-controls` reproduces the matched initialization comparison when the corresponding 100k checkpoint weights are supplied in the matching `analysis/selected_checkpoints/` folders. The shipped results are in `analysis/translation_controls_matched.json`.
 
-`.gitignore` already excludes `.venv/`, `data/`, `logs/`, and caches.
+## Interpretation of the cost and spectral results
+
+The extra-layer cost cell fails its preregistered accuracy floor and is excluded from supporting cost evidence. The four weight-decay cells and doubled-width cell remain eligible. The measured norm reduction in the base comparison is 14.3%, with a 31.2% gain in margin per norm.
+
+The spectral plot uses signed Haar coefficients divided by the corresponding standardized target coefficients, restoring the actual training-target standard deviation. It uses no per-seed median rescaling and displays all seed points. The older sequential QR variance profile is a different diagnostic.
+
+MIT license; see `LICENSE`.

@@ -1,0 +1,53 @@
+{
+  "variant": "so3",
+  "N": 2048,
+  "frac": 0.01,
+  "sigma": 0.2,
+  "excl_radius": 0.5,
+  "K": 64,
+  "m": 9,
+  "alpha": 3.0,
+  "enc_seed": 0,
+  "encoding": "so3block",
+  "loss": "infonce",
+  "hk_t": 0.05,
+  "bl_js": [
+    1.0,
+    2.0
+  ],
+  "bl_coefs": [
+    1.0,
+    0.5
+  ],
+  "spec_jmax": 2.0,
+  "activation": "gelu",
+  "d_enc": 128,
+  "enc_hidden": 256,
+  "mlp_hidden": 512,
+  "mlp_depth": 2,
+  "steps": 60000,
+  "batch": 4096,
+  "lr": 0.001,
+  "wd": 1.0,
+  "seed": 3,
+  "n_eval": 8192,
+  "t3_radii": [
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.5
+  ],
+  "eval_every": 1000,
+  "spec_every": 5000,
+  "ckpt_every": 25000,
+  "save_dir": "data/su2/so3_so3block_cap512x2_f0.01_s3",
+  "resume": true,
+  "device": "cuda",
+  "requested_overrides": {
+    "m": 32
+  },
+  "ckpt_selection_rule": "training saves ckpt_<step>.pt every ckpt_every steps and at the final step; unless an analysis states otherwise it uses the final checkpoint at the configured step budget",
+  "launch_command": "experiments/su2_train.py --variant so3 --encoding so3block --N 2048 --frac 0.01 --seed 3 --wd 1.0 --mlp_depth 2 --steps 60000 --save_dir data/su2/so3_so3block_cap512x2_f0.01_s3 --resume",
+  "code_commit": "71a460747e832acdbc9fe499991c3e5ce6975995+dirty"
+}

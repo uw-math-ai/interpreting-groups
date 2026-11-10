@@ -1,0 +1,83 @@
+{
+  "run_dir": "selected_checkpoints/data/su2/so3_N2048_f0.01_s1/step_100000",
+  "variant": "so3",
+  "step": 100000,
+  "interventions": {
+    "none": {
+      "task_acc": 1.0,
+      "fine_acc_r0.2": 0.633544921875,
+      "center_disc": 0.5
+    },
+    "even_projection": {
+      "task_acc": 1.0,
+      "fine_acc_r0.2": 0.633544921875,
+      "center_disc": 0.5
+    },
+    "odd_projection": {
+      "task_acc": 0.028564453125,
+      "fine_acc_r0.2": 0.0006103515625,
+      "center_disc": 0.5
+    },
+    "fablate_spin_half": {
+      "task_acc": 1.0,
+      "fine_acc_r0.2": 0.628662109375,
+      "center_disc": 0.5
+    },
+    "fablate_spin_one": {
+      "task_acc": 0.025146484375,
+      "fine_acc_r0.2": 0.0006103515625,
+      "center_disc": 0.5
+    },
+    "ablate_spin_half_k4": {
+      "task_acc": 0.5323486328125,
+      "fine_acc_r0.2": 0.024658203125,
+      "center_disc": 0.5
+    },
+    "ablate_spin_one_k9": {
+      "task_acc": 0.0233154296875,
+      "fine_acc_r0.2": 0.0009765625,
+      "center_disc": 0.5
+    },
+    "ablate_top_pca_k4": {
+      "task_acc": 0.282958984375,
+      "fine_acc_r0.2": 0.0064697265625,
+      "center_disc": 0.5
+    },
+    "ablate_random_k4": {
+      "task_acc": 1.0,
+      "fine_acc_r0.2": 0.595458984375,
+      "center_disc": 0.5
+    }
+  },
+  "character_fit": {
+    "js": [
+      0.0,
+      0.5,
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0
+    ],
+    "r2_upto_j0.0": 4.23461528065161e-08,
+    "r2_upto_j0.5": 0.0003654237486112599,
+    "r2_upto_j1.0": 0.8804403812392689,
+    "r2_upto_j1.5": 0.8804404292402291,
+    "r2_upto_j2.0": 0.8804545067700821,
+    "r2_upto_j2.5": 0.880482177155938,
+    "r2_upto_j3.0": 0.8805033235223365,
+    "coeffs": {
+      "0.0": 0.0,
+      "0.5": -0.0032481389261220794,
+      "1.0": 15.125000649375156,
+      "1.5": -0.06119081947685495,
+      "2.0": 0.00969374430873765,
+      "2.5": 0.08385633815026905,
+      "3.0": 0.07167341963275778
+    }
+  },
+  "composition": {
+    "r2_h_to_product": 0.9317987091122836,
+    "r2_h_to_product_shuffled": -0.9193452341502149
+  }
+}
