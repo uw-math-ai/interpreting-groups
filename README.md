@@ -4,6 +4,8 @@ Code and lightweight results for *To Infinite and Beyond: How Neural Networks Le
 
 Camera-ready release for the Interp4Discovery workshop at NeurIPS 2026.
 
+Paper: [OpenReview](https://openreview.net/forum?id=fosUuKztgI).
+
 Authors: Junaid Hasan and Michael Ruofan Zeng. This work was supported by the UW Math AI Lab.
 
 Branches: `main` is the current paper release; `nips_2026_workshop` is its submission snapshot; `exploratory` preserves the earlier finite-group work and galleries.
@@ -79,7 +81,7 @@ The archived five-seed table diagnostics use step 100k, exact positives for caus
 
 ## SO(5) camera-ready follow-up
 
-[Preprocessing and sector intervention instructions](analysis/so5_followup/README.md) reproduce the new three-seed comparison and its diagnostic interventions. Fixed invertible whitening improves frozen T2 by about 4.2 percentage points in each paired seed. Removing adjoint content improves ranking further, while removing vector content collapses it. The release includes source code, configurations, logs, checkpoint hashes, and all verified results; checkpoints remain separate.
+[Preprocessing and sector intervention instructions](analysis/so5_followup/README.md) reproduce the camera-ready three-seed comparison, the completed five-seed extension, and their diagnostic interventions. Fixed invertible whitening improves frozen T2 by about 4.2 percentage points in each paired seed. Removing adjoint content improves ranking further, while removing vector content collapses it. The completed extension includes five paired baseline/whitened seeds and three rotation controls. Its source code, configurations, logs, checkpoint hashes, and verified results are included separately from the original camera-ready results; checkpoints remain separate.
 
 The numerical figures use a consistent muted palette with legends outside the data, and their coordinates and bar values are checked against the prior version. Geometry annotations and titles have been repositioned for legibility.
 

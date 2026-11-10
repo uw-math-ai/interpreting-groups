@@ -1,0 +1,149 @@
+{
+  "cohorts": {
+    "identity": {
+      "n": 5,
+      "frozen_noisy_T2": {
+        "mean": 0.73193359375,
+        "population_sd": 0.005942204268193867
+      },
+      "independent_noisy_T2": {
+        "mean": 0.7287109375,
+        "population_sd": 0.0032005709258034936
+      },
+      "projection_FVE": {
+        "vector": {
+          "mean": 0.7135093822392812,
+          "population_sd": 0.0017370827270592531
+        },
+        "adjoint": {
+          "mean": 0.17615735786960585,
+          "population_sd": 0.0009600186416894289
+        }
+      },
+      "intervention_accuracy": {
+        "none": {
+          "mean": 0.7320068359375,
+          "population_sd": 0.0043718217477016095
+        },
+        "both_no_adjoint": {
+          "mean": 0.87666015625,
+          "population_sd": 0.0011096990407581553
+        },
+        "both_no_vector": {
+          "mean": 0.017626953125,
+          "population_sd": 0.0014942523191503276
+        },
+        "sham_both": {
+          "mean": 0.7168212890625,
+          "population_sd": 0.004081166737102903
+        }
+      }
+    },
+    "whiten": {
+      "n": 5,
+      "frozen_noisy_T2": {
+        "mean": 0.7736328125,
+        "population_sd": 0.005784432849563843
+      },
+      "independent_noisy_T2": {
+        "mean": 0.7771484375,
+        "population_sd": 0.007201776009968229
+      },
+      "projection_FVE": {
+        "vector": {
+          "mean": 0.7285631216378057,
+          "population_sd": 0.0014875110954859403
+        },
+        "adjoint": {
+          "mean": 0.16449459673202327,
+          "population_sd": 0.0008612680501011399
+        }
+      },
+      "intervention_accuracy": {
+        "none": {
+          "mean": 0.7778564453125,
+          "population_sd": 0.003129764739143774
+        },
+        "both_no_adjoint": {
+          "mean": 0.8968017578125,
+          "population_sd": 0.0012510867163397419
+        },
+        "both_no_vector": {
+          "mean": 0.01689453125,
+          "population_sd": 0.0023233158697988903
+        },
+        "sham_both": {
+          "mean": 0.763330078125,
+          "population_sd": 0.004602164107730982
+        }
+      }
+    },
+    "rotate": {
+      "n": 3,
+      "frozen_noisy_T2": {
+        "mean": 0.7355143229166666,
+        "population_sd": 0.007934465978213609
+      },
+      "independent_noisy_T2": {
+        "mean": 0.7305908203125,
+        "population_sd": 0.0048532225164051425
+      },
+      "projection_FVE": {
+        "vector": {
+          "mean": 0.7010661982170004,
+          "population_sd": 0.0022765611419723894
+        },
+        "adjoint": {
+          "mean": 0.1923360206737366,
+          "population_sd": 0.0010812441785491972
+        }
+      },
+      "intervention_accuracy": {
+        "none": {
+          "mean": 0.7318115234375,
+          "population_sd": 0.005133730329710085
+        },
+        "both_no_adjoint": {
+          "mean": 0.8675537109375,
+          "population_sd": 0.002253070996078634
+        },
+        "both_no_vector": {
+          "mean": 0.016520182291666668,
+          "population_sd": 0.0011334951397448014
+        },
+        "sham_both": {
+          "mean": 0.7139892578125,
+          "population_sd": 0.006896702583899187
+        }
+      }
+    }
+  },
+  "paired_changes": [
+    {
+      "seed": 0,
+      "primary_frozen_T2_change": 0.04150390625,
+      "independent_T2_change": 0.056884765625
+    },
+    {
+      "seed": 1,
+      "primary_frozen_T2_change": 0.041748046875,
+      "independent_T2_change": 0.041748046875
+    },
+    {
+      "seed": 2,
+      "primary_frozen_T2_change": 0.04248046875,
+      "independent_T2_change": 0.0506591796875
+    },
+    {
+      "seed": 3,
+      "primary_frozen_T2_change": 0.040771484375,
+      "independent_T2_change": 0.0472412109375
+    },
+    {
+      "seed": 4,
+      "primary_frozen_T2_change": 0.0419921875,
+      "independent_T2_change": 0.045654296875
+    }
+  ],
+  "scope": "Completed extension: five paired untreated/whitened seeds and three rotation seeds. The earlier three-seed camera-ready files remain separate."
+}

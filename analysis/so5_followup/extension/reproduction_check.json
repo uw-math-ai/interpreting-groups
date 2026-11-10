@@ -1,0 +1,14 @@
+{
+  "verified_extension_checkpoints": 13,
+  "total_checkpoints_evaluated": 14,
+  "all_checkpoint_hashes_match": true,
+  "all_frozen_accuracies_match": true,
+  "all_independent_accuracies_match_exactly": true,
+  "maximum_FVE_difference": 0.0,
+  "tests": {
+    "passed": 30,
+    "skipped": 1,
+    "skip_reason": "Historical checkpoint not bundled"
+  },
+  "portable_verifier_sha256": "987a5f625ef3d3ac33abf9dfdeb90fcccd8b575d8cfd2988b143b70fcb1031cb"
+}
