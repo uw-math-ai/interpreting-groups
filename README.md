@@ -1,57 +1,36 @@
 # Compact Lie group composition
 
-Code and lightweight results for *To Infinite and Beyond: How Neural Networks Learn Compact Lie Groups, a Mechanistic Study*.
+Code and results for *To Infinite and Beyond: How Neural Networks Learn Compact Lie Groups, a Mechanistic Study*, presented at the Interp4Discovery workshop at NeurIPS 2026.
 
-Camera-ready release for the Interp4Discovery workshop at NeurIPS 2026.
+[Read the paper on OpenReview](https://openreview.net/forum?id=fosUuKztgI).
 
-Paper: [OpenReview](https://openreview.net/forum?id=fosUuKztgI).
+**Authors:** Junaid Hasan and Michael Ruofan Zeng. Supported by the UW Math AI Lab.
 
-Authors: Junaid Hasan and Michael Ruofan Zeng. This work was supported by the UW Math AI Lab.
+## Get started
 
-Branches: `main` is the current paper release; `nips_2026_workshop` is its submission snapshot; `exploratory` preserves the earlier finite-group work and galleries.
-
-This camera-ready update includes the group-family trainers, mechanistic analyses, corrected figure generation, and verified statistics. Checkpoints and Python environments are not included.
-
-## Setup and checks
-
-From this directory:
+Install [uv](https://docs.astral.sh/uv/), then run these commands from the repository root:
 
 ```sh
 uv sync --frozen --group dev
 uv run python -m pytest tests -q
 ```
 
-The lockfile is the full experiment environment, with PyTorch 2.11. The paper-specific test selection covers signed Haar estimation, group conventions, SO(5) observations, polynomial composition, provenance, and analysis envelopes. A checkpoint-dependent provenance test skips when historical weights are absent. Unrelated legacy modular-table tests are outside this compact release.
+The environment uses Python 3.11 or later and PyTorch 2.11. Training uses a CUDA GPU. Logs and analysis results are included; trained weights are not. One test skips when historical weights are absent.
 
-Group self-tests are also available as `python -m core.su2`, `core.su3`, `core.spin4`, and `core.spin5`.
-
-## Reproduce the figures and tables
+## Reproduce figures and tables
 
 ```sh
 uv run python analysis/build_tables.py
 uv run python figures/make_figures.py
 ```
 
-These commands require no GPU or checkpoints. They read archived training logs and uniform-checkpoint analysis results, and regenerate the numerical paper figures: `figure1`, `figure2`, `figure_seeds`, `figureA1`, and `figure_spectral`, as PDF and PNG. Full-precision tables are written to `analysis/verified_*.json` and CSV files.
+These commands use the included results and need no GPU or checkpoints. Tables are written to `analysis/verified_*.json` and CSV files; figures are written to `figures/` as PDF and PNG.
 
-The geometry figures are included as PDFs. Their checkpoint-based source is `experiments/embedding_viz.py`; regenerating those illustrations requires the relevant trained weights in the original `data/` run directories. The script writes to `figures/` and uses `figures/publication_style.py` for layout and coordinate-integrity checks.
+Geometry figures are included. To regenerate them from trained weights, use `experiments/embedding_viz.py`. The architecture diagram is editable in `figures/figure_architecture.tikz`.
 
-The detailed architecture diagram is included as `figures/figure_architecture.pdf` and editable `figures/figure_architecture.tikz`. From `figures/`, `latexmk -pdf -outdir=build architecture.tex` rebuilds it.
+## Train a model
 
-## Layout
-
-- `core/`: group operations, exact coefficients, frozen observations, scorer, and provenance helpers.
-- `experiments/`: training, causal interventions, patching, translation tests, Haar coefficients, cost analyses, polynomial controls, and SO(5) diagnostics.
-- `data/`: archived configurations and logs for the reported runs. No weights are included.
-- `analysis/selected_checkpoints/`: rerun diagnostics with explicit checkpoint steps.
-- `analysis/`: verified aggregates, spectral target scales, matched controls, table builder, and supporting analyses.
-- `figures/`: figure generator and paper figure files.
-- `preregistration/`: the relevant cost, polynomial, and SO(5) decision rules.
-- `summary/config_corrections.json`: the original correction ledger for historical explicit-feature widths.
-
-## Fresh training
-
-Use a new output directory to preserve the archived results:
+Use a new output directory to keep the archived results intact:
 
 ```sh
 uv run python -m experiments.su2_train --variant su2 --N 2048 --frac 0.01 \
@@ -60,35 +39,31 @@ uv run python -m experiments.su2_train --variant so3 --N 2048 --frac 0.01 \
   --seed 0 --steps 100000 --save_dir runs/so3_s0
 ```
 
-Other families use `experiments.su3_train` (`su3` or `psu3`), `experiments.spin4_train` (`spin4`, `so4`, `leftq`, or `pso4`), and `experiments.spin5_train` (`spin5` or `so5`). Intrinsic SO(5) observations use `--variant so5 --encoding so5rf --m 48 --frac 0.03`.
+Other groups use `experiments.su3_train`, `experiments.spin4_train`, or `experiments.spin5_train`. Each trainer provides `--help`; the archived `data/` configurations record the settings used in the paper.
 
-Main SU(2)/SO(3) settings use 32 observations, batch 4096, noise 0.2, and exclusion radius 0.5. SU(3) uses 32 complex probes (64 real observations), batch 2048, noise 0.15, and exclusion radius 0.7. Spin(4) uses 48 observations, batch 2048, noise 0.2, and exclusion radius 0.7. Spin(5) uses 48 observations, batch 2048, noise 0.15, and exclusion radius 0.7. All use 64 candidates and the default learning rate 0.001 and weight decay 1.0.
-
-SO(3)'s landmark observation is `exp(alpha * abs(dot(q,h)))`; the alternative random-MLP and function-value quotient maps use antipodal averaging.
-
-## Mechanistic analyses from trained weights
+Analyze the resulting checkpoints with:
 
 ```sh
 uv run python -m experiments.su2_causal --run_dir runs/su2_s0
 uv run python -m experiments.su2_mechanism --run_dir runs/su2_s0
 uv run python -m experiments.twosided --run_dir runs/so3_s0
-uv run python -m experiments.hk_haar --run runs/heatkernel_s0
 ```
 
-The archived five-seed table diagnostics use step 100k, exact positives for causal ranking, and noisy positives for T2. The figure generator reads the verified aggregates rather than selecting diagnostic files by filename order. The rank-matched random control removes four neural directions on SU(2) and nine on SO(3).
+## SO(5) follow-up
 
-`analysis/check_translation_controls.py --work . --out new_controls.json --device cpu --include-exact-controls` reproduces the matched initialization comparison when the corresponding 100k checkpoint weights are supplied in the matching `analysis/selected_checkpoints/` folders. The shipped results are in `analysis/translation_controls_matched.json`.
+The paper reports a three-seed preprocessing comparison. A completed extension includes five paired baseline/whitened seeds and three rotation controls, with the original results preserved. Whitening improves frozen test accuracy by about 4.2 percentage points. See the [results and reproduction instructions](analysis/so5_followup/README.md).
 
-## SO(5) camera-ready follow-up
+## Find your way around
 
-[Preprocessing and sector intervention instructions](analysis/so5_followup/README.md) reproduce the camera-ready three-seed comparison, the completed five-seed extension, and their diagnostic interventions. Fixed invertible whitening improves frozen T2 by about 4.2 percentage points in each paired seed. Removing adjoint content improves ranking further, while removing vector content collapses it. The completed extension includes five paired baseline/whitened seeds and three rotation controls. Its source code, configurations, logs, checkpoint hashes, and verified results are included separately from the original camera-ready results; checkpoints remain separate.
+- `core/`: group operations, observations, and model components.
+- `experiments/`: trainers and mechanistic analyses.
+- `data/`: archived training configurations and logs.
+- `analysis/`: verified results, checkpoint diagnostics, and table generation.
+- `figures/`: paper figures and their source code.
+- `preregistration/`: experiment plans and decision rules.
 
-The numerical figures use a consistent muted palette with legends outside the data, and their coordinates and bar values are checked against the prior version. Geometry annotations and titles have been repositioned for legibility.
+See [VALIDATION.md](VALIDATION.md) for verification details and [RELEASE_NOTES.md](RELEASE_NOTES.md) for changes. `main` and `nips_2026_workshop` contain the paper code; `exploratory` preserves the earlier finite-group work.
 
-## Interpretation of the cost and spectral results
+## License
 
-The extra-layer cost cell fails its preregistered accuracy floor and is excluded from supporting cost evidence. The four weight-decay cells and doubled-width cell remain eligible. The measured norm reduction in the base comparison is 14.3%, with a 31.2% gain in margin per norm.
-
-The spectral plot uses signed Haar coefficients divided by the corresponding standardized target coefficients, restoring the actual training-target standard deviation. It uses no per-seed median rescaling and displays all seed points. The older sequential QR variance profile is a different diagnostic.
-
-MIT license; see `LICENSE`.
+[Apache License 2.0](LICENSE). Copyright (c) 2026 Junaid Hasan and Michael Ruofan Zeng. The MIT notice for code from earlier releases is preserved in [LICENSES/MIT.txt](LICENSES/MIT.txt); see [NOTICE](NOTICE).

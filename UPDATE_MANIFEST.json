@@ -1,8 +1,10 @@
 {
   "files": {
     ".gitignore": "c1307d367d6d8f368d67413a41dc5828d4f6332e823bd31e0c79db9140fe9dff",
-    "LICENSE": "1d2fb8f328c764e6bc736f0102a2247072dd1aa71e8f725be84bc6109b358efc",
-    "README.md": "bb9e8bd6ae736b6c2e89a09020731fd88ba823be8c7b3264736db20e287987d4",
+    "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "LICENSES/MIT.txt": "1d2fb8f328c764e6bc736f0102a2247072dd1aa71e8f725be84bc6109b358efc",
+    "NOTICE": "32d4cb9709e65998ec78c04b5b2ab08dbfa4d6542d1e42c73bc29a75a38fc0df",
+    "README.md": "9c14e6389049a6e36037c8e5c54ab590ce3776e2dec6d83e7a0fd98befdc813a",
     "RELEASE_NOTES.md": "cc1003110a27ea61de9e17aa8d816c6acfdbde613deb38926a15e408e0d3da51",
     "VALIDATION.md": "511c7fb9991feac0a481fee204bc5c11ae2edafd22b8373b70b3acbbbd831453",
     "analysis/build_tables.py": "56fb699a87e9df4b8c73d9f960055340550411ac1d8733706b65f775e848c1d8",
@@ -753,7 +755,7 @@
     "preregistration/p1b_wd_sweep_2026-09-01.md": "258aa9ac4fded5c12cc49b3ad551d99a645ca19cc1f8f455be05ccc9d33a61ab",
     "preregistration/poly_compose_2026-09-01.md": "54dce0e8116dc529ede8d90a81d85fcd9afce19db7e5fe38b9d904bf99e2bbca",
     "preregistration/so5_observations_2026-09-01.md": "ebe65f530b8ddb739abcde5816c9a864eced809685a59de1c0a8b8ef923fc496",
-    "pyproject.toml": "8e0505d280a39418d1bb08823b26230829aedfa76332f50d26404ca8dcc21eee",
+    "pyproject.toml": "57089b55d20c5e6caaaa27f33e8352597f216b8da99fdba0e1af49101637da4f",
     "summary/config_corrections.json": "156db1250335fa1d7150add047b8b538058d930ed0889ec207174c3f26ef8a1d",
     "tests/test_envelope.py": "a26e5a277c714be41230ca6426c2ebda793495afb4d5fbffc5daa140533e3216",
     "tests/test_hk_haar.py": "eac992b85bbce513f3acf1bce4142c59477201643b66861fc10d71751ea92e33",
