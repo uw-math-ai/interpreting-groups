@@ -1,0 +1,18 @@
+{
+  "figure_geometry": {
+    "numeric_coordinates_unchanged": true,
+    "sha256": "4404cdafd6b48425a572e2acac2ab9d4871bdf0c04e0ada821647838e93f020b"
+  },
+  "figure_geometry_app": {
+    "numeric_coordinates_unchanged": true,
+    "sha256": "c26fe8480a15a146f6294568a6a80c86d0cf2fadd4a6cecbccb3faaa28da9c4b"
+  },
+  "figure_tori": {
+    "numeric_coordinates_unchanged": true,
+    "sha256": "5fa9c99809beff3328b1d73c55c221f4568900e1cb36bc7098f65ed472f1407c"
+  },
+  "figure_covers": {
+    "numeric_coordinates_unchanged": true,
+    "sha256": "b73a9acce85d5fcf32a262cf44dd28cbdee22b4023c6f667eccdf75a577eca34"
+  }
+}

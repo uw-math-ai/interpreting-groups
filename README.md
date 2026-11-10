@@ -32,7 +32,7 @@ uv run python figures/make_figures.py
 
 These commands require no GPU or checkpoints. They read archived training logs and uniform-checkpoint analysis results, and regenerate the numerical paper figures: `figure1`, `figure2`, `figure_seeds`, `figureA1`, and `figure_spectral`, as PDF and PNG. Full-precision tables are written to `analysis/verified_*.json` and CSV files.
 
-The geometry figures are included as PDFs. Their checkpoint-based source is `experiments/embedding_viz.py`; regenerating those illustrations requires the relevant trained weights in the original `data/` run directories. Create `paper/` before running that script.
+The geometry figures are included as PDFs. Their checkpoint-based source is `experiments/embedding_viz.py`; regenerating those illustrations requires the relevant trained weights in the original `data/` run directories. The script writes to `figures/` and uses `figures/publication_style.py` for layout and coordinate-integrity checks.
 
 ## Layout
 
@@ -74,6 +74,12 @@ uv run python -m experiments.hk_haar --run runs/heatkernel_s0
 The archived five-seed table diagnostics use step 100k, exact positives for causal ranking, and noisy positives for T2. The figure generator reads the verified aggregates rather than selecting diagnostic files by filename order. The rank-matched random control removes four neural directions on SU(2) and nine on SO(3).
 
 `analysis/check_translation_controls.py --work . --out new_controls.json --device cpu --include-exact-controls` reproduces the matched initialization comparison when the corresponding 100k checkpoint weights are supplied in the matching `analysis/selected_checkpoints/` folders. The shipped results are in `analysis/translation_controls_matched.json`.
+
+## SO(5) camera-ready follow-up
+
+[Preprocessing and sector intervention instructions](analysis/so5_followup/README.md) reproduce the new three-seed comparison and its diagnostic interventions. Fixed invertible whitening improves frozen T2 by about 4.2 percentage points in each paired seed. Removing adjoint content improves ranking further, while removing vector content collapses it. The release includes source code, configurations, logs, checkpoint hashes, and all verified results; checkpoints remain separate.
+
+The numerical figures use a consistent muted palette with legends outside the data, and their coordinates and bar values are checked against the prior version. Geometry annotations and titles have been repositioned for legibility.
 
 ## Interpretation of the cost and spectral results
 

@@ -1,0 +1,34 @@
+[
+  {
+    "condition": "fresh_identity",
+    "run": "runs/so5_followup/identity_f0.03_s0"
+  },
+  {
+    "condition": "fresh_identity",
+    "run": "runs/so5_followup/identity_f0.03_s1"
+  },
+  {
+    "condition": "fresh_identity",
+    "run": "runs/so5_followup/identity_f0.03_s2"
+  },
+  {
+    "condition": "fresh_whiten",
+    "run": "runs/so5_followup/whiten_f0.03_s0"
+  },
+  {
+    "condition": "fresh_whiten",
+    "run": "runs/so5_followup/whiten_f0.03_s1"
+  },
+  {
+    "condition": "fresh_whiten",
+    "run": "runs/so5_followup/whiten_f0.03_s2"
+  },
+  {
+    "condition": "fresh_rotate",
+    "run": "runs/so5_followup/rotate_f0.03_s0"
+  },
+  {
+    "condition": "fresh_intrinsic",
+    "run": "runs/so5_followup/intrinsic_f0.03_s0"
+  }
+]

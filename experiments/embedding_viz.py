@@ -32,8 +32,11 @@ from core.su2_model import TripleScorer
 from core.su3 import SU3LandmarkEncoding, haar_su3
 
 ROOT = Path(__file__).resolve().parent.parent
-BLUE, ORANGE, AQUA, YELLOW = "#2a78d6", "#eb6834", "#1baf7a", "#eda100"
-INK, INK2, GRID = "#1a1a19", "#5f5e56", "#e4e3db"
+OUTPUT = ROOT / 'figures'
+OUTPUT.mkdir(exist_ok=True)
+from figures.publication_style import polish_geometry
+BLUE, ORANGE, AQUA, YELLOW = "#2C6E7F", "#C77D58", "#7A9E7E", "#C4A04A"
+INK, INK2, GRID = "#24313A", "#62707B", "#E5E9EC"
 plt.rcParams.update({
     "font.size": 9, "text.color": INK, "axes.edgecolor": INK2,
     "axes.labelcolor": INK, "xtick.color": INK2, "ytick.color": INK2,
@@ -171,8 +174,9 @@ def main():
     for ax in (axA, axB):
         ax.spines["top"].set_visible(False)
         ax.spines["right"].set_visible(False)
-    fig.savefig(ROOT / "paper/figure_geometry.pdf", bbox_inches="tight")
-    fig.savefig(ROOT / "paper/figure_geometry.png", dpi=220,
+    polish_geometry(fig, "figure_geometry", OUTPUT)
+    fig.savefig(OUTPUT / "figure_geometry.pdf", bbox_inches="tight")
+    fig.savefig(OUTPUT / "figure_geometry.png", dpi=220,
                 bbox_inches="tight")
     print("saved paper/figure_geometry.{pdf,png}")
 
@@ -217,8 +221,9 @@ def main():
         ax.spines["top"].set_visible(False)
         ax.spines["right"].set_visible(False)
     fig2.tight_layout(pad=0.4)
-    fig2.savefig(ROOT / "paper/figure_geometry_app.pdf")
-    fig2.savefig(ROOT / "paper/figure_geometry_app.png", dpi=220)
+    polish_geometry(fig2, "figure_geometry_app", OUTPUT)
+    fig2.savefig(OUTPUT / "figure_geometry_app.pdf")
+    fig2.savefig(OUTPUT / "figure_geometry_app.png", dpi=220)
     print("saved paper/figure_geometry_app.{pdf,png}")
 
 
@@ -339,8 +344,9 @@ def appendix_zoo():
         ax.set_xticklabels([]); ax.set_yticklabels([])
         ax.set_zticklabels([]); ax.grid(False)
         ax.view_init(elev=26, azim=38)
-    fig.savefig(ROOT / "paper/figure_tori.pdf", bbox_inches="tight")
-    fig.savefig(ROOT / "paper/figure_tori.png", dpi=200,
+    polish_geometry(fig, "figure_tori", OUTPUT)
+    fig.savefig(OUTPUT / "figure_tori.pdf", bbox_inches="tight")
+    fig.savefig(OUTPUT / "figure_tori.png", dpi=200,
                 bbox_inches="tight")
     print("saved paper/figure_tori.{pdf,png}")
 
@@ -413,8 +419,9 @@ def appendix_zoo():
             ax.spines["top"].set_visible(False)
             ax.spines["right"].set_visible(False)
     fig2.tight_layout(pad=0.4)
-    fig2.savefig(ROOT / "paper/figure_covers.pdf")
-    fig2.savefig(ROOT / "paper/figure_covers.png", dpi=200)
+    polish_geometry(fig2, "figure_covers", OUTPUT)
+    fig2.savefig(OUTPUT / "figure_covers.pdf")
+    fig2.savefig(OUTPUT / "figure_covers.png", dpi=200)
     print("saved paper/figure_covers.{pdf,png}")
 
 

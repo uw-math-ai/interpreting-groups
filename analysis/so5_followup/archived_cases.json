@@ -1,0 +1,42 @@
+[
+  {
+    "condition": "archived_averaged_f0.01",
+    "run": "data/spin5/so5_N2048_f0.01_s0"
+  },
+  {
+    "condition": "archived_intrinsic_f0.03",
+    "run": "data/spin5/so5rf_f0.03_s0"
+  },
+  {
+    "condition": "archived_averaged_f0.01",
+    "run": "data/spin5/so5_N2048_f0.01_s1"
+  },
+  {
+    "condition": "archived_intrinsic_f0.03",
+    "run": "data/spin5/so5rf_f0.03_s1"
+  },
+  {
+    "condition": "archived_averaged_f0.01",
+    "run": "data/spin5/so5_N2048_f0.01_s2"
+  },
+  {
+    "condition": "archived_intrinsic_f0.03",
+    "run": "data/spin5/so5rf_f0.03_s2"
+  },
+  {
+    "condition": "archived_averaged_f0.01",
+    "run": "data/spin5/so5_N2048_f0.01_s3"
+  },
+  {
+    "condition": "archived_intrinsic_f0.03",
+    "run": "data/spin5/so5rf_f0.03_s3"
+  },
+  {
+    "condition": "archived_averaged_f0.01",
+    "run": "data/spin5/so5_N2048_f0.01_s4"
+  },
+  {
+    "condition": "archived_intrinsic_f0.03",
+    "run": "data/spin5/so5rf_f0.03_s4"
+  }
+]

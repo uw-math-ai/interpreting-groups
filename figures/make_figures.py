@@ -17,18 +17,19 @@ OUTPUT.mkdir(exist_ok=True)
 VER = ROOT / 'analysis'
 STATS = json.loads((VER / 'verified_summary.json').read_text())
 DIAGNOSTICS = json.loads((VER / 'verified_diagnostics_100k.json').read_text())
-BLUE, ORANGE, AQUA, YELLOW = "#2a78d6", "#eb6834", "#1baf7a", "#eda100"
-INK, INK2, GRID = "#1a1a19", "#5f5e56", "#e4e3db"
+BLUE, ORANGE, AQUA, YELLOW = "#2C6E7F", "#C77D58", "#7A9E7E", "#C4A04A"
+INK, INK2, GRID = "#24313A", "#62707B", "#E5E9EC"
 
 plt.rcParams.update({
     "font.size": 9, "text.color": INK, "axes.edgecolor": INK2,
     "axes.labelcolor": INK, "xtick.color": INK2, "ytick.color": INK2,
     "axes.grid": True, "grid.color": GRID, "grid.linewidth": 0.5,
-    "axes.axisbelow": True, "pdf.fonttype": 42,
+    "axes.axisbelow": True, "axes.grid.axis": "y", "axes.titlepad": 9,
+    "axes.spines.top": False, "axes.spines.right": False, "pdf.fonttype": 42,
 })
 
-figA_, axA = plt.subplots(figsize=(4.6, 2.6), facecolor="white")
-figB_, axB = plt.subplots(figsize=(4.6, 2.6), facecolor="white")
+figA_, axA = plt.subplots(figsize=(3.6, 2.05), facecolor="white")
+figB_, axB = plt.subplots(figsize=(4.2, 2.85), facecolor="white")
 
 # --- A: SU(2) vs SO(3) spin spectra, mean +- sd over 5 seeds ---------------
 js = [0.0, 0.5, 1.0, 1.5, 2.0]
@@ -83,26 +84,26 @@ cells = [
 ]
 rng = np.random.default_rng(0)
 profile_values = []
-for glob, lab, color in cells:
+for (glob, lab, color), marker in zip(cells, ["s", "^", "o"]):
     profs = load_profiles(glob)
     js_cell = sorted(profs[0])
     first = True
     for prof in profs:
         profile_values.extend(prof.values())
         xs = np.array(js_cell) + rng.uniform(-0.03, 0.03, len(js_cell))
-        axB.plot(xs, [prof[j] for j in js_cell], "o", color=color,
+        axB.plot(xs, [prof[j] for j in js_cell], marker, color=color,
                  markersize=4, alpha=0.65, label=lab if first else None)
         first = False
 axB.axhline(1.0, color=INK2, linewidth=0.7, linestyle=":")
 axB.axhline(0.0, color=INK2, linewidth=0.5, linestyle="-", alpha=0.4)
 axB.set_xlabel(r"spin $j$")
-axB.set_ylabel("coefficient / standardized target")
+axB.set_ylabel("coefficient / target")
 assert len(profile_values) == 50 and np.all(np.isfinite(profile_values))
 profile_pad = 0.07 * (max(profile_values) - min(profile_values))
 axB.set_ylim(min(profile_values) - profile_pad, max(profile_values) + profile_pad)
-axB.legend(frameon=False, fontsize=7.5, loc="lower left")
-axB.set_title("Signed Haar coefficients, 5 seeds", loc="left",
-              fontsize=9.5)
+axB.legend(frameon=False, fontsize=7.3, loc="lower left",
+           bbox_to_anchor=(0, 1.03), borderaxespad=0, labelspacing=0.25)
+figB_.suptitle("Signed Haar coefficients, 5 seeds", x=0.15, ha="left", y=0.99, fontsize=9.5)
 
 for ax in (axA, axB):
     ax.spines["top"].set_visible(False)
@@ -111,14 +112,14 @@ for ax in (axA, axB):
 figA_.tight_layout(pad=0.4)
 figA_.savefig(OUTPUT / "figure1.pdf")
 figA_.savefig(OUTPUT / "figure1.png", dpi=220)
-figB_.tight_layout(pad=0.4)
+figB_.subplots_adjust(left=0.15, right=0.98, bottom=0.18, top=0.69)
 figB_.savefig(OUTPUT / "figure_spectral.pdf")
 figB_.savefig(OUTPUT / "figure_spectral.png", dpi=220)
 print("saved paper/figure1 and paper/figure_spectral")
 
 
 # --- figure 2: interventions (a) and activation patching (b) ---------------
-fig2, (axC, axD) = plt.subplots(1, 2, figsize=(9.0, 2.3), facecolor="white",
+fig2, (axC, axD) = plt.subplots(1, 2, figsize=(7.2, 2.2), facecolor="white",
                                 gridspec_kw={"width_ratios": [1.55, 1]})
 labs = ["none", "remove\nspin 1/2", "remove\nspin 1", "center\naverage",
         "random\nsubspace"]
@@ -136,12 +137,13 @@ axC.bar(x - w / 2, su2, w, yerr=su2e, color=BLUE, label="SU(2) model",
 axC.bar(x + w / 2, so3, w, yerr=so3e, color=ORANGE, label="SO(3) model",
         error_kw=dict(ecolor=INK, lw=0.8), edgecolor="white", linewidth=0.5)
 axC.axhline(1 / 64, color=INK2, linewidth=0.8, linestyle=":")
-axC.text(4.45, 1 / 64 + 0.03, "chance", fontsize=7.5, color=INK2, ha="right")
+axC.text(0.98, 0.045, "chance", transform=axC.transAxes, fontsize=7, color=INK2, ha="right", bbox=dict(facecolor="white", edgecolor="none", pad=0.4))
 axC.set_xticks(x, labs, fontsize=7.5)
 axC.set_ylabel("ranking accuracy")
 axC.set_ylim(0, 1.1)
-axC.legend(frameon=False, fontsize=8, loc="center left")
-axC.set_title("(a) Encoder interventions, 5 seeds", loc="left", fontsize=9.5)
+axC.legend(frameon=False, fontsize=8, loc="lower left", ncol=2,
+           bbox_to_anchor=(0, 1.01), borderaxespad=0, handlelength=1.2, columnspacing=1.1)
+axC.set_title("(a) Encoder interventions", loc="left", fontsize=9.5, pad=27)
 
 plabs = ["patch spinor\ncoefficients", "patch full\nactivation",
          "wrong\nsubspace"]
@@ -154,13 +156,13 @@ axD.bar(np.arange(3), pvals, 0.55, yerr=perr, color=[AQUA, BLUE, INK2],
         error_kw=dict(ecolor=INK, lw=0.8), edgecolor="white", linewidth=0.5)
 axD.axhline(1 / 64, color=INK2, linewidth=0.8, linestyle=":")
 axD.set_xticks(np.arange(3), plabs, fontsize=7.5)
-axD.set_ylabel("counterfactual selected")
+axD.set_ylabel("counterfactual selected", labelpad=4)
 axD.set_ylim(0, 1.1)
-axD.set_title("(b) Activation patching, SU(2)", loc="left", fontsize=9.5)
+axD.set_title("(b) Product-state patching", loc="left", fontsize=9.5, pad=27)
 for ax in (axC, axD):
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
-fig2.tight_layout(pad=0.4)
+fig2.subplots_adjust(left=0.075, right=0.99, bottom=0.24, top=0.70, wspace=0.43)
 fig2.savefig(OUTPUT / "figure2.pdf")
 fig2.savefig(OUTPUT / "figure2.png", dpi=220)
 print("saved paper/figure2.{pdf,png}")
@@ -169,8 +171,8 @@ print("saved paper/figure2.{pdf,png}")
 # ---------------- appendix figure: dynamics and per-group spectra -------------
 def appendix_figure():
     fig = plt.figure(figsize=(9.0, 5.2), facecolor="white")
-    gs = fig.add_gridspec(2, 3, hspace=0.52, wspace=0.34,
-                          left=0.07, right=0.98, top=0.93, bottom=0.09)
+    gs = fig.add_gridspec(2, 3, hspace=0.78, wspace=0.40,
+                          left=0.075, right=0.98, top=0.87, bottom=0.18)
 
     spin_colors = {0.5: BLUE, 1.0: ORANGE, 1.5: AQUA, 2.0: YELLOW}
     spin_names = {0.5: "j=1/2", 1.0: "j=1", 1.5: "j=3/2", 2.0: "j=2"}
@@ -188,9 +190,12 @@ def appendix_figure():
         ax.set_yscale("log")
         ax.set_ylim(1.5e-4, 2)
         ax.set_xlabel("training step")
+        ax.set_xticks([0, 100000, 200000], ["0", "100k", "200k"])
         if col == 0:
             ax.set_ylabel("variance fraction (log)")
-            ax.legend(frameon=False, fontsize=7, loc="center right")
+            fig.legend(*ax.get_legend_handles_labels(), frameon=False, fontsize=7.5,
+                       loc="upper left", bbox_to_anchor=(0.07, 0.995), ncol=4,
+                       handlelength=1.8, columnspacing=1.0)
         ax.set_title(f"({chr(97+col)}) {tag} spin content", loc="left",
                      fontsize=9.5)
 
@@ -213,7 +218,7 @@ def appendix_figure():
     ax.set_xticks(x, lab, fontsize=8)
     ax.set_ylim(0, 1.05)
     ax.legend(frameon=False, fontsize=8)
-    ax.set_title("(c) SU(3) vs PSU(3) components", loc="left", fontsize=9.5)
+    ax.set_title("(c) SU(3) / PSU(3)", loc="left", fontsize=9.5)
 
     # (d) Spin(4) conditions: carrier vs rejected alternative
     ax = fig.add_subplot(gs[1, 0:2])
@@ -240,8 +245,9 @@ def appendix_figure():
            label="rejected faithful irreducible")
     ax.set_xticks(x, cond_lab, fontsize=8.5)
     ax.set_ylim(0, 1.05)
-    ax.legend(frameon=False, fontsize=8)
-    ax.set_title("(d) Spin(4) family: learned vs rejected",
+    ax.legend(frameon=False, fontsize=7.3, loc="upper center",
+              bbox_to_anchor=(0.5, -0.22), ncol=2, columnspacing=1.0)
+    ax.set_title("(d) Spin(4) family",
                  loc="left", fontsize=9.5)
 
     # (e) Spin(5)/SO(5)
@@ -266,8 +272,9 @@ def appendix_figure():
            label=r"SO(5), intrinsic $\Psi$")
     ax.set_xticks(x, lab5, fontsize=8.5)
     ax.set_ylim(0, 1.05)
-    ax.legend(frameon=False, fontsize=8)
-    ax.set_title("(e) Spin(5) vs SO(5) components", loc="left", fontsize=9.5)
+    ax.legend(frameon=False, fontsize=7, loc="upper center",
+              bbox_to_anchor=(0.5, -0.22), labelspacing=0.2)
+    ax.set_title("(e) Spin(5) / SO(5)", loc="left", fontsize=9.5)
 
     for ax in fig.axes:
         ax.spines["top"].set_visible(False)
@@ -284,7 +291,7 @@ appendix_figure()
 def seeds_figure():
     fig = plt.figure(figsize=(9.6, 4.6), facecolor="white")
     gs = fig.add_gridspec(3, 5, hspace=0.62, wspace=0.3,
-                          left=0.06, right=0.99, top=0.93, bottom=0.08,
+                          left=0.085, right=0.99, top=0.93, bottom=0.17,
                           height_ratios=[1, 1, 1.15])
     js = [0.0, 0.5, 1.0, 1.5, 2.0]
     jlab = ["0", "½", "1", "3/2", "2"]
@@ -328,7 +335,8 @@ def seeds_figure():
     axd.set_xticks(range(4), [l for _, l in keys], fontsize=8)
     axd.set_ylim(-0.05, 1.1)
     axd.set_ylabel("ranking accuracy")
-    axd.legend(frameon=False, fontsize=8, loc="center left")
+    axd.legend(frameon=False, fontsize=8, loc="upper center",
+               bbox_to_anchor=(0.5, -0.31), ncol=2, borderaxespad=0)
     axd.set_title("interventions, one marker per seed", fontsize=8.5,
                   loc="left")
     for ax in fig.axes:

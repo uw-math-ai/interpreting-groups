@@ -1,0 +1,11 @@
+{
+  "all_numeric_series_and_bar_values_identical": true,
+  "files": [
+    "figure1.pdf",
+    "figure_spectral.pdf",
+    "figure2.pdf",
+    "figureA1.pdf",
+    "figure_seeds.pdf"
+  ],
+  "content_sha256": "5ba31cb9e2ca984e30cc3bd25238f526590646aea0247ab0adf2f5e4610bea35"
+}
