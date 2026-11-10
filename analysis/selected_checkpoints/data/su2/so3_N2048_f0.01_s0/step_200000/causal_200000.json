@@ -1,0 +1,83 @@
+{
+  "run_dir": "selected_checkpoints/data/su2/so3_N2048_f0.01_s0/step_200000",
+  "variant": "so3",
+  "step": 200000,
+  "interventions": {
+    "none": {
+      "task_acc": 1.0,
+      "fine_acc_r0.2": 0.611572265625,
+      "center_disc": 0.5
+    },
+    "even_projection": {
+      "task_acc": 1.0,
+      "fine_acc_r0.2": 0.611572265625,
+      "center_disc": 0.5
+    },
+    "odd_projection": {
+      "task_acc": 0.029541015625,
+      "fine_acc_r0.2": 0.0003662109375,
+      "center_disc": 0.5
+    },
+    "fablate_spin_half": {
+      "task_acc": 1.0,
+      "fine_acc_r0.2": 0.6033935546875,
+      "center_disc": 0.5
+    },
+    "fablate_spin_one": {
+      "task_acc": 0.025146484375,
+      "fine_acc_r0.2": 0.000244140625,
+      "center_disc": 0.5
+    },
+    "ablate_spin_half_k4": {
+      "task_acc": 0.465087890625,
+      "fine_acc_r0.2": 0.01611328125,
+      "center_disc": 0.5
+    },
+    "ablate_spin_one_k9": {
+      "task_acc": 0.0264892578125,
+      "fine_acc_r0.2": 0.000244140625,
+      "center_disc": 0.5
+    },
+    "ablate_top_pca_k4": {
+      "task_acc": 0.319091796875,
+      "fine_acc_r0.2": 0.0111083984375,
+      "center_disc": 0.5
+    },
+    "ablate_random_k4": {
+      "task_acc": 0.9998779296875,
+      "fine_acc_r0.2": 0.5775146484375,
+      "center_disc": 0.5
+    }
+  },
+  "character_fit": {
+    "js": [
+      0.0,
+      0.5,
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0
+    ],
+    "r2_upto_j0.0": -6.634297555763169e-10,
+    "r2_upto_j0.5": 0.00040006780976598044,
+    "r2_upto_j1.0": 0.8489815775253424,
+    "r2_upto_j1.5": 0.8489817470526733,
+    "r2_upto_j2.0": 0.8490399478028003,
+    "r2_upto_j2.5": 0.8490418743222339,
+    "r2_upto_j3.0": 0.8490508073742264,
+    "coeffs": {
+      "0.0": 0.0,
+      "0.5": -0.006522245120835546,
+      "1.0": 16.484810203239306,
+      "1.5": 0.013671584095246159,
+      "2.0": 0.16877204494393572,
+      "2.5": -0.025332392183669894,
+      "3.0": -0.051771166849747106
+    }
+  },
+  "composition": {
+    "r2_h_to_product": 0.9220760324658479,
+    "r2_h_to_product_shuffled": -0.9047297097936131
+  }
+}

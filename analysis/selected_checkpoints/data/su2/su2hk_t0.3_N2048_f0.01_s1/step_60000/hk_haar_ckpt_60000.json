@@ -1,0 +1,149 @@
+{
+  "envelope": {
+    "schema_name": "hk-haar-coefficients",
+    "schema_version": 1,
+    "generated_at_utc": "2026-11-10T02:51:43.659486+00:00",
+    "code_commit": "unknown",
+    "analysis_source_sha256": "8c774a22774a20592febe25eeca41bed63e63d68bd2e4f80c5b03a358ecc93c0",
+    "source_checkpoint": {
+      "path": "selected_checkpoints/data/su2/su2hk_t0.3_N2048_f0.01_s1/step_60000/ckpt_60000.pt",
+      "sha256": "4f1ad1713b79f87109b674ad8e52e5b34956dda1883302f0b85127cf46e528e2"
+    },
+    "run_config_sha256": "a0c602c1d8c6424904fa9d910e7e193e944a8fbee1daac368c2ae1e057cce3ee",
+    "training_seed": 1,
+    "analysis_seed": 0,
+    "analysis_args": {
+      "run": "selected_checkpoints/data/su2/su2hk_t0.3_N2048_f0.01_s1/step_60000",
+      "ckpt": "ckpt_60000.pt",
+      "jmax": 3.0,
+      "n_r": 8192,
+      "n_f": 16,
+      "analysis_seed": 0,
+      "device": "cuda",
+      "out": "selected_checkpoints/data/su2/su2hk_t0.3_N2048_f0.01_s1/step_60000/hk_haar_ckpt_60000.json"
+    },
+    "environment": {
+      "python": "3.11.16",
+      "platform": "Linux-7.0.0-34-generic-x86_64-with-glibc2.43",
+      "torch": "2.11.0+cu130",
+      "cuda": "13.0",
+      "device": "NVIDIA GeForce RTX 3080",
+      "numpy": "2.4.4"
+    }
+  },
+  "results": {
+    "run": "selected_checkpoints/data/su2/su2hk_t0.3_N2048_f0.01_s1/step_60000",
+    "checkpoint": "ckpt_60000.pt",
+    "j_grid": [
+      0.0,
+      0.5,
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0
+    ],
+    "estimate": {
+      "0.0": {
+        "a_hat": -0.4316073891108809,
+        "fold_sd": 0.016184901287241153,
+        "ci95": [
+          -0.4431845656418596,
+          -0.42003021257990225
+        ]
+      },
+      "0.5": {
+        "a_hat": 0.24278335218634176,
+        "fold_sd": 0.02293009563504516,
+        "ci95": [
+          0.22638128952758382,
+          0.25918541484509966
+        ]
+      },
+      "1.0": {
+        "a_hat": 0.2707879469813804,
+        "fold_sd": 0.02571610180311806,
+        "ci95": [
+          0.2523930340326055,
+          0.28918285993015536
+        ]
+      },
+      "1.5": {
+        "a_hat": 0.2986513934030717,
+        "fold_sd": 0.0205904906302865,
+        "ci95": [
+          0.2839228670651194,
+          0.31337991974102397
+        ]
+      },
+      "2.0": {
+        "a_hat": 0.061160368872620566,
+        "fold_sd": 0.029715293084371045,
+        "ci95": [
+          0.03990480557927323,
+          0.0824159321659679
+        ]
+      },
+      "2.5": {
+        "a_hat": 0.015001801192853778,
+        "fold_sd": 0.03056928266600187,
+        "ci95": [
+          -0.006864627002706498,
+          0.03686822938841405
+        ]
+      },
+      "3.0": {
+        "a_hat": -0.003580720764724378,
+        "fold_sd": 0.03393405747824395,
+        "ci95": [
+          -0.027853996632505287,
+          0.020692555103056533
+        ]
+      }
+    },
+    "gram_diag": {
+      "0.0": 1.0,
+      "0.5": 1.0016051691046233,
+      "1.0": 0.9931421494324859,
+      "1.5": 1.0178975827255075,
+      "2.0": 1.0168468834204256,
+      "2.5": 1.017349335460436,
+      "3.0": 0.9972800757625979
+    },
+    "nuisance_variance": 0.012064527720212936,
+    "nuisance_fraction": 0.050044587480965255,
+    "mc_noise_floor_on_sbar": 0.0007540329825133085,
+    "reconstruction_r2_haar": 0.9840045766545924,
+    "reconstruction_r2_task_geometry": 0.9847508250925812,
+    "target_coefficients": {
+      "0.0": 1.0,
+      "0.5": 1.5970324375187541,
+      "1.0": 1.646434908282079,
+      "1.5": 1.298609869433399,
+      "2.0": 0.8264944411079328,
+      "2.5": 0.43463854220550874,
+      "3.0": 0.191266057131048
+    },
+    "target_comparison": {
+      "per_j_ratio": {
+        "0.5": 0.15202155352808275,
+        "1.0": 0.16446926970464057,
+        "1.5": 0.22997776347824717,
+        "2.0": 0.07399973409456188,
+        "2.5": 0.03451557958189664,
+        "3.0": -0.01872115114638981
+      },
+      "median_scale": 0.11301064381132231,
+      "normalized_profile": {
+        "0.5": 1.345196774401988,
+        "1.0": 1.4553431797028904,
+        "1.5": 2.035009762993724,
+        "2.0": 0.6548032255980122,
+        "2.5": 0.3054188385964986,
+        "3.0": -0.16565830009468696
+      },
+      "out_of_support_abs": {}
+    },
+    "notes": "signed Haar projection; ratio reported only where the target coefficient is nonzero; j=0 excluded from ratios because target standardization shifts the constant"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "variant": "su3",
+  "N": 2048,
+  "frac": 0.01,
+  "sigma": 0.15,
+  "excl_radius": 0.7,
+  "K": 64,
+  "m": 32,
+  "alpha": 1.5,
+  "enc_seed": 0,
+  "steps": 100000,
+  "batch": 2048,
+  "lr": 0.001,
+  "wd": 1.0,
+  "seed": 4,
+  "n_eval": 4096,
+  "t3_radii": [
+    0.1,
+    0.2,
+    0.4,
+    0.6,
+    1.0
+  ],
+  "eval_every": 1000,
+  "spec_every": 5000,
+  "ckpt_every": 25000,
+  "save_dir": "data/su3/su3_N2048_f0.01_s4",
+  "resume": true,
+  "device": "cuda"
+}

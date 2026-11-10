@@ -1,0 +1,87 @@
+{
+  "run_dir": "selected_checkpoints/data/su2/su2_N2048_f0.002_s4/step_100000",
+  "variant": "su2",
+  "step": 100000,
+  "interventions": {
+    "none": {
+      "task_acc": 1.0,
+      "fine_acc_r0.2": 0.479248046875,
+      "center_disc": 1.0
+    },
+    "even_projection": {
+      "task_acc": 0.0224609375,
+      "fine_acc_r0.2": 0.000244140625,
+      "center_disc": 0.49755859375
+    },
+    "odd_projection": {
+      "task_acc": 0.518310546875,
+      "fine_acc_r0.2": 0.01416015625,
+      "center_disc": 1.0
+    },
+    "fablate_spin_half": {
+      "task_acc": 0.02099609375,
+      "fine_acc_r0.2": 0.0,
+      "center_disc": 0.502197265625
+    },
+    "fablate_spin_one": {
+      "task_acc": 0.999267578125,
+      "fine_acc_r0.2": 0.32958984375,
+      "center_disc": 1.0
+    },
+    "ablate_spin_half_k4": {
+      "task_acc": 0.019775390625,
+      "fine_acc_r0.2": 0.00048828125,
+      "center_disc": 0.496337890625
+    },
+    "ablate_spin_one_k8": {
+      "task_acc": 0.06591796875,
+      "fine_acc_r0.2": 0.0009765625,
+      "center_disc": 0.78564453125
+    },
+    "ablate_top_pca_k4": {
+      "task_acc": 0.019775390625,
+      "fine_acc_r0.2": 0.00048828125,
+      "center_disc": 0.49609375
+    },
+    "ablate_random_k4": {
+      "task_acc": 0.998779296875,
+      "fine_acc_r0.2": 0.3662109375,
+      "center_disc": 1.0
+    }
+  },
+  "character_fit": {
+    "js": [
+      0.0,
+      0.5,
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0
+    ],
+    "r2_upto_j0.0": 2.7865887708422576e-08,
+    "r2_upto_j0.5": 0.8650610987375572,
+    "r2_upto_j1.0": 0.8650623987994365,
+    "r2_upto_j1.5": 0.8650724533088878,
+    "r2_upto_j2.0": 0.8651231424541991,
+    "r2_upto_j2.5": 0.8651244814671877,
+    "r2_upto_j3.0": 0.8651376419673114,
+    "coeffs": {
+      "0.0": 0.0,
+      "0.5": 32.392962030290796,
+      "1.0": -0.09682047754962664,
+      "1.5": -0.06794233597800492,
+      "2.0": 0.3015339057927626,
+      "2.5": -0.03875667742470412,
+      "3.0": -0.1127800424112241
+    }
+  },
+  "composition": {
+    "r2_h_to_product": 0.9805081564731458,
+    "r2_h_to_product_shuffled": -1.01255874502794,
+    "r2_element_probe": 0.9990991085224008,
+    "compose_vs_truth_cos_med": 0.9993042593333052,
+    "compose_vs_hprobe_cos_med": 0.995413867927248,
+    "compose_vs_truth_cos_med_shuffled": -0.018076188085518058
+  }
+}

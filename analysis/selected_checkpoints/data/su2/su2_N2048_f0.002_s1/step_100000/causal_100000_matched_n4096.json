@@ -1,0 +1,87 @@
+{
+  "run_dir": "selected_checkpoints/data/su2/su2_N2048_f0.002_s1/step_100000",
+  "variant": "su2",
+  "step": 100000,
+  "interventions": {
+    "none": {
+      "task_acc": 0.998779296875,
+      "fine_acc_r0.2": 0.34912109375,
+      "center_disc": 1.0
+    },
+    "even_projection": {
+      "task_acc": 0.0244140625,
+      "fine_acc_r0.2": 0.0,
+      "center_disc": 0.506103515625
+    },
+    "odd_projection": {
+      "task_acc": 0.26904296875,
+      "fine_acc_r0.2": 0.001953125,
+      "center_disc": 0.999755859375
+    },
+    "fablate_spin_half": {
+      "task_acc": 0.02490234375,
+      "fine_acc_r0.2": 0.000244140625,
+      "center_disc": 0.504638671875
+    },
+    "fablate_spin_one": {
+      "task_acc": 0.99755859375,
+      "fine_acc_r0.2": 0.236328125,
+      "center_disc": 1.0
+    },
+    "ablate_spin_half_k4": {
+      "task_acc": 0.022216796875,
+      "fine_acc_r0.2": 0.0,
+      "center_disc": 0.505859375
+    },
+    "ablate_spin_one_k8": {
+      "task_acc": 0.2822265625,
+      "fine_acc_r0.2": 0.0048828125,
+      "center_disc": 0.981201171875
+    },
+    "ablate_top_pca_k4": {
+      "task_acc": 0.022216796875,
+      "fine_acc_r0.2": 0.0,
+      "center_disc": 0.504638671875
+    },
+    "ablate_random_k4": {
+      "task_acc": 0.998779296875,
+      "fine_acc_r0.2": 0.343505859375,
+      "center_disc": 1.0
+    }
+  },
+  "character_fit": {
+    "js": [
+      0.0,
+      0.5,
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0
+    ],
+    "r2_upto_j0.0": 1.8420148628628397e-08,
+    "r2_upto_j0.5": 0.9366534758559921,
+    "r2_upto_j1.0": 0.9366537813161766,
+    "r2_upto_j1.5": 0.9366558562457615,
+    "r2_upto_j2.0": 0.9366561378334908,
+    "r2_upto_j2.5": 0.9366629315657693,
+    "r2_upto_j3.0": 0.9366734820823506,
+    "coeffs": {
+      "0.0": 0.0,
+      "0.5": 37.28390630163327,
+      "1.0": -0.01104928199330013,
+      "1.5": -0.013361572752573991,
+      "2.0": 0.10163617432020544,
+      "2.5": 0.08738463506313465,
+      "3.0": -0.11207778577363892
+    }
+  },
+  "composition": {
+    "r2_h_to_product": 0.9798750379255664,
+    "r2_h_to_product_shuffled": -1.0182715643357323,
+    "r2_element_probe": 0.9989982865559411,
+    "compose_vs_truth_cos_med": 0.9992146863145974,
+    "compose_vs_hprobe_cos_med": 0.99440529481233,
+    "compose_vs_truth_cos_med_shuffled": -0.02121868606356663
+  }
+}

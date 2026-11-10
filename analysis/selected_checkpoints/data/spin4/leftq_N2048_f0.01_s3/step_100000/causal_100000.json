@@ -1,0 +1,66 @@
+{
+  "variant": "leftq",
+  "step": 100000,
+  "interventions": {
+    "none": {
+      "task_acc": 1.0,
+      "D_L": 0.5,
+      "D_R": 1.0,
+      "D_LR": 1.0
+    },
+    "remove_char_-+": {
+      "task_acc": 1.0,
+      "D_L": 0.5,
+      "D_R": 1.0,
+      "D_LR": 1.0
+    },
+    "remove_char_+-": {
+      "task_acc": 0.6484375,
+      "D_L": 0.5,
+      "D_R": 0.49658203125,
+      "D_LR": 0.49658203125
+    },
+    "remove_char_--": {
+      "task_acc": 1.0,
+      "D_L": 0.5,
+      "D_R": 1.0,
+      "D_LR": 1.0
+    },
+    "fablate_0.5_0": {
+      "task_acc": 1.0,
+      "D_L": 0.5,
+      "D_R": 1.0,
+      "D_LR": 1.0
+    },
+    "fablate_0_0.5": {
+      "task_acc": 0.621826171875,
+      "D_L": 0.5,
+      "D_R": 0.4990234375,
+      "D_LR": 0.4990234375
+    },
+    "fablate_0.5_0.5": {
+      "task_acc": 1.0,
+      "D_L": 0.5,
+      "D_R": 1.0,
+      "D_LR": 1.0
+    },
+    "fablate_1_0": {
+      "task_acc": 0.892333984375,
+      "D_L": 0.5,
+      "D_R": 1.0,
+      "D_LR": 1.0
+    },
+    "fablate_0_1": {
+      "task_acc": 1.0,
+      "D_L": 0.5,
+      "D_R": 1.0,
+      "D_LR": 1.0
+    },
+    "ablate_random_k8": {
+      "task_acc": 1.0,
+      "D_L": 0.5,
+      "D_R": 1.0,
+      "D_LR": 1.0
+    }
+  }
+}

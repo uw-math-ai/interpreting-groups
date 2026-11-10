@@ -1,0 +1,83 @@
+{
+  "run_dir": "selected_checkpoints/data/su2/so3_N2048_f0.01_K256_s0/step_60000",
+  "variant": "so3",
+  "step": 60000,
+  "interventions": {
+    "none": {
+      "task_acc": 1.0,
+      "fine_acc_r0.2": 0.8212890625,
+      "center_disc": 0.5
+    },
+    "even_projection": {
+      "task_acc": 1.0,
+      "fine_acc_r0.2": 0.8212890625,
+      "center_disc": 0.5
+    },
+    "odd_projection": {
+      "task_acc": 0.029296875,
+      "fine_acc_r0.2": 0.00048828125,
+      "center_disc": 0.5
+    },
+    "fablate_spin_half": {
+      "task_acc": 1.0,
+      "fine_acc_r0.2": 0.8133544921875,
+      "center_disc": 0.5
+    },
+    "fablate_spin_one": {
+      "task_acc": 0.0247802734375,
+      "fine_acc_r0.2": 0.000732421875,
+      "center_disc": 0.5
+    },
+    "ablate_spin_half_k4": {
+      "task_acc": 0.3988037109375,
+      "fine_acc_r0.2": 0.012939453125,
+      "center_disc": 0.5
+    },
+    "ablate_spin_one_k9": {
+      "task_acc": 0.02392578125,
+      "fine_acc_r0.2": 0.00048828125,
+      "center_disc": 0.5
+    },
+    "ablate_top_pca_k4": {
+      "task_acc": 0.305908203125,
+      "fine_acc_r0.2": 0.00830078125,
+      "center_disc": 0.5
+    },
+    "ablate_random_k4": {
+      "task_acc": 1.0,
+      "fine_acc_r0.2": 0.764892578125,
+      "center_disc": 0.5
+    }
+  },
+  "character_fit": {
+    "js": [
+      0.0,
+      0.5,
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0
+    ],
+    "r2_upto_j0.0": -3.2893654688948004e-08,
+    "r2_upto_j0.5": 0.0005501582882562195,
+    "r2_upto_j1.0": 0.9068690559050666,
+    "r2_upto_j1.5": 0.906869096195922,
+    "r2_upto_j2.0": 0.9068899839239298,
+    "r2_upto_j2.5": 0.9068914464637713,
+    "r2_upto_j3.0": 0.906891884780897,
+    "coeffs": {
+      "0.0": 0.0,
+      "0.5": -0.049726721139317975,
+      "1.0": 12.05332446475669,
+      "1.5": -0.011719138663835449,
+      "2.0": 0.0506614180896075,
+      "2.5": 0.01501817992639265,
+      "3.0": 0.008100854755859964
+    }
+  },
+  "composition": {
+    "r2_h_to_product": 0.9565896152502236,
+    "r2_h_to_product_shuffled": -0.9445845567236806
+  }
+}

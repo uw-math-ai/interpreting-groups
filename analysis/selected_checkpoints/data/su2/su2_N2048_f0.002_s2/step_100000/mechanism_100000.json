@@ -1,0 +1,31 @@
+{
+  "action": {
+    "equi_r2": 0.9725026809331773,
+    "hom_defect": 0.0952072967296231,
+    "identity_defect": 1.8301236951077557e-06,
+    "inv_defect": 0.12141938848653988,
+    "equi_r2_min": 0.9619213669164762,
+    "pca_dims": 11,
+    "block_dims": 4,
+    "trace_vs_char_corr": 0.9999953890979905,
+    "trace_vs_char_relerr": 0.010536669034133476,
+    "block_eigphase_mae": 0.0014692568909350943
+  },
+  "product": {
+    "h_fve_0.5": 0.888105244947389,
+    "h_fve_1.0": 0.0007203598020010571,
+    "h_fve_1.5": 0.0002474943786947297,
+    "h_fve_2.0": 0.0003209194840452258,
+    "h_residual": 0.11060598138787003,
+    "task_intact": 0.96484375,
+    "Dc_intact": 1.0,
+    "task_h_no_half": 0.022705078125,
+    "Dc_h_no_half": 0.487548828125,
+    "h_fit_r2_half": 0.8881462415523669,
+    "h_fit_r2_one": 0.0019291679845804266,
+    "redirect_unpatched_picks_ab": 0.9644775390625,
+    "redirect_fullpatch_picks_a2b2": 0.9615478515625,
+    "redirect_fitpatch_half": 0.99462890625,
+    "redirect_fitpatch_one": 0.01025390625
+  }
+}

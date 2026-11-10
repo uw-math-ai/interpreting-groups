@@ -1,0 +1,570 @@
+{
+  "seeds": {
+    "0": {
+      "feature_information": {
+        "trained": {
+          "selected_dim": 9,
+          "PCA999_dim": 14,
+          "vector_FVE": 0.9140455738685161
+        },
+        "default_initialization": {
+          "selected_dim": 9,
+          "PCA999_dim": 46,
+          "vector_FVE": 0.8724233450070646
+        },
+        "normal_std02_initialization": {
+          "selected_dim": 9,
+          "PCA999_dim": 68,
+          "vector_FVE": 0.8281960355170346
+        }
+      },
+      "translation": {
+        "trained_selected_block": {
+          "dim": 9,
+          "left_r2": 0.9906492554108578,
+          "right_r2": 0.9909728038296345,
+          "hom_left": 0.010488813582160238,
+          "hom_right": 0.010625151476308353,
+          "commutator": 0.011517691770979983
+        },
+        "trained_full_PCA999": {
+          "dim": 14,
+          "left_r2": 0.9329595156154268,
+          "right_r2": 0.9324553825632306,
+          "hom_left": 0.12325299144618224,
+          "hom_right": 0.12288436490615158,
+          "commutator": 0.07349487648377918
+        },
+        "default_initialization_selected_block": {
+          "dim": 9,
+          "left_r2": 0.9462478279365404,
+          "right_r2": 0.9453469321727795,
+          "hom_left": 0.05407522011154614,
+          "hom_right": 0.052964745030953365,
+          "commutator": 0.05300298256946501
+        },
+        "default_initialization_full_PCA999": {
+          "dim": 46,
+          "left_r2": 0.9936930086865967,
+          "right_r2": 0.9934328770372717,
+          "hom_left": 0.037235847025560244,
+          "hom_right": 0.03672608965762073,
+          "commutator": 0.03873493109825152
+        },
+        "normal_std02_initialization_selected_block": {
+          "dim": 9,
+          "left_r2": 0.9392850459214627,
+          "right_r2": 0.9340466335206217,
+          "hom_left": 0.06096465231977658,
+          "hom_right": 0.0628881092832584,
+          "commutator": 0.06600533027944626
+        },
+        "normal_std02_initialization_full_PCA999": {
+          "dim": 68,
+          "left_r2": 0.9876068601322684,
+          "right_r2": 0.987091208702226,
+          "hom_left": 0.062114627116599264,
+          "hom_right": 0.06216983189294009,
+          "commutator": 0.06779155462590243
+        },
+        "native_normal_std02_cap16": {
+          "dim": 16,
+          "left_r2": 0.8923958361138223,
+          "right_r2": 0.885941376541381,
+          "hom_left": 0.1864123660458267,
+          "hom_right": 0.18661132826961943,
+          "commutator": 0.17144664122778178
+        },
+        "raw_observation": {
+          "dim": 32,
+          "left_r2": 0.9916506119207366,
+          "right_r2": 0.9912435920320631,
+          "hom_left": 0.06514706956180327,
+          "hom_right": 0.06526753822721759,
+          "commutator": 0.07567697501450728
+        },
+        "true_block": {
+          "dim": 9,
+          "left_r2": 0.9999999999652281,
+          "right_r2": 0.9999999999652281,
+          "hom_left": 5.891297900610087e-06,
+          "hom_right": 5.890447492270526e-06,
+          "commutator": 4.616370767357025e-07
+        },
+        "frame": {
+          "dim": 6,
+          "left_r2": 0.9999999999653554,
+          "right_r2": 0.63797083114388,
+          "hom_left": 5.885813121079745e-06,
+          "hom_right": 0.4792225666710656,
+          "commutator": 0.03475199545535152
+        },
+        "rand_trunc": {
+          "dim": 6,
+          "left_r2": 0.6735062692657604,
+          "right_r2": 0.6752684709918032,
+          "hom_left": 0.48159525987040736,
+          "hom_right": 0.4749473176853301,
+          "commutator": 0.4966463481834295
+        }
+      }
+    },
+    "1": {
+      "feature_information": {
+        "trained": {
+          "selected_dim": 9,
+          "PCA999_dim": 14,
+          "vector_FVE": 0.9174623247006534
+        },
+        "default_initialization": {
+          "selected_dim": 9,
+          "PCA999_dim": 46,
+          "vector_FVE": 0.8756385992961195
+        },
+        "normal_std02_initialization": {
+          "selected_dim": 9,
+          "PCA999_dim": 69,
+          "vector_FVE": 0.8166857191621487
+        }
+      },
+      "translation": {
+        "trained_selected_block": {
+          "dim": 9,
+          "left_r2": 0.9899558027387271,
+          "right_r2": 0.9898741212714247,
+          "hom_left": 0.010954986326281405,
+          "hom_right": 0.011023274849687329,
+          "commutator": 0.010378375295308035
+        },
+        "trained_full_PCA999": {
+          "dim": 14,
+          "left_r2": 0.9340191636611701,
+          "right_r2": 0.9302594230281924,
+          "hom_left": 0.13310422174876801,
+          "hom_right": 0.12309941064365448,
+          "commutator": 0.06410578002790943
+        },
+        "default_initialization_selected_block": {
+          "dim": 9,
+          "left_r2": 0.9536553353594691,
+          "right_r2": 0.950445836538488,
+          "hom_left": 0.04055749544241787,
+          "hom_right": 0.044895176964710924,
+          "commutator": 0.041814784471140516
+        },
+        "default_initialization_full_PCA999": {
+          "dim": 46,
+          "left_r2": 0.9935885949424427,
+          "right_r2": 0.9932576869830458,
+          "hom_left": 0.0394903236423401,
+          "hom_right": 0.0391309417961026,
+          "commutator": 0.04042554680425881
+        },
+        "normal_std02_initialization_selected_block": {
+          "dim": 9,
+          "left_r2": 0.9154230264358559,
+          "right_r2": 0.9171601766373857,
+          "hom_left": 0.0737316725272337,
+          "hom_right": 0.07305146712783174,
+          "commutator": 0.07181214107091254
+        },
+        "normal_std02_initialization_full_PCA999": {
+          "dim": 69,
+          "left_r2": 0.9866026262463411,
+          "right_r2": 0.9863665569117432,
+          "hom_left": 0.0636829882703789,
+          "hom_right": 0.06427757158046732,
+          "commutator": 0.06833931899783752
+        },
+        "native_normal_std02_cap16": {
+          "dim": 16,
+          "left_r2": 0.8898328413124142,
+          "right_r2": 0.8862013548356572,
+          "hom_left": 0.18622549774645067,
+          "hom_right": 0.17935683647999523,
+          "commutator": 0.1655852425144276
+        },
+        "raw_observation": {
+          "dim": 32,
+          "left_r2": 0.9916506119207366,
+          "right_r2": 0.9912435920320631,
+          "hom_left": 0.06514706956180327,
+          "hom_right": 0.06526753822721759,
+          "commutator": 0.07567697501450728
+        },
+        "true_block": {
+          "dim": 9,
+          "left_r2": 0.9999999999652281,
+          "right_r2": 0.9999999999652281,
+          "hom_left": 5.891297900610087e-06,
+          "hom_right": 5.890447492270526e-06,
+          "commutator": 4.616370767357025e-07
+        },
+        "frame": {
+          "dim": 6,
+          "left_r2": 0.9999999999653554,
+          "right_r2": 0.63797083114388,
+          "hom_left": 5.885813121079745e-06,
+          "hom_right": 0.4792225666710656,
+          "commutator": 0.03475199545535152
+        },
+        "rand_trunc": {
+          "dim": 6,
+          "left_r2": 0.6735062692657604,
+          "right_r2": 0.6752684709918032,
+          "hom_left": 0.48159525987040736,
+          "hom_right": 0.4749473176853301,
+          "commutator": 0.4966463481834295
+        }
+      }
+    },
+    "2": {
+      "feature_information": {
+        "trained": {
+          "selected_dim": 9,
+          "PCA999_dim": 13,
+          "vector_FVE": 0.9248250564622282
+        },
+        "default_initialization": {
+          "selected_dim": 9,
+          "PCA999_dim": 46,
+          "vector_FVE": 0.8818910635273102
+        },
+        "normal_std02_initialization": {
+          "selected_dim": 9,
+          "PCA999_dim": 68,
+          "vector_FVE": 0.8222033569703654
+        }
+      },
+      "translation": {
+        "trained_selected_block": {
+          "dim": 9,
+          "left_r2": 0.9864289860680381,
+          "right_r2": 0.9866615463164731,
+          "hom_left": 0.013883690594154058,
+          "hom_right": 0.01406222342810877,
+          "commutator": 0.013326076851326474
+        },
+        "trained_full_PCA999": {
+          "dim": 13,
+          "left_r2": 0.933974312883425,
+          "right_r2": 0.9333436243541414,
+          "hom_left": 0.11199552556976448,
+          "hom_right": 0.1016884681643857,
+          "commutator": 0.054475966205060296
+        },
+        "default_initialization_selected_block": {
+          "dim": 9,
+          "left_r2": 0.94957365754862,
+          "right_r2": 0.949136670004993,
+          "hom_left": 0.05383203972618834,
+          "hom_right": 0.05297547923209919,
+          "commutator": 0.04656713365289004
+        },
+        "default_initialization_full_PCA999": {
+          "dim": 46,
+          "left_r2": 0.9938215789363106,
+          "right_r2": 0.9937619283974429,
+          "hom_left": 0.037035573338659984,
+          "hom_right": 0.035840279657944944,
+          "commutator": 0.037956489111416115
+        },
+        "normal_std02_initialization_selected_block": {
+          "dim": 9,
+          "left_r2": 0.9228549470837027,
+          "right_r2": 0.9203523929928803,
+          "hom_left": 0.07364795555684935,
+          "hom_right": 0.07670219866285825,
+          "commutator": 0.07848775939893464
+        },
+        "normal_std02_initialization_full_PCA999": {
+          "dim": 68,
+          "left_r2": 0.9870627252155703,
+          "right_r2": 0.9866072484457863,
+          "hom_left": 0.06365945923721227,
+          "hom_right": 0.06544729442710912,
+          "commutator": 0.07012934284297576
+        },
+        "native_normal_std02_cap16": {
+          "dim": 16,
+          "left_r2": 0.8912169290367258,
+          "right_r2": 0.8856824391654435,
+          "hom_left": 0.1832114635503613,
+          "hom_right": 0.1825420626811279,
+          "commutator": 0.16134662803547406
+        },
+        "raw_observation": {
+          "dim": 32,
+          "left_r2": 0.9916506119207366,
+          "right_r2": 0.9912435920320631,
+          "hom_left": 0.06514706956180327,
+          "hom_right": 0.06526753822721759,
+          "commutator": 0.07567697501450728
+        },
+        "true_block": {
+          "dim": 9,
+          "left_r2": 0.9999999999652281,
+          "right_r2": 0.9999999999652281,
+          "hom_left": 5.891297900610087e-06,
+          "hom_right": 5.890447492270526e-06,
+          "commutator": 4.616370767357025e-07
+        },
+        "frame": {
+          "dim": 6,
+          "left_r2": 0.9999999999653554,
+          "right_r2": 0.63797083114388,
+          "hom_left": 5.885813121079745e-06,
+          "hom_right": 0.4792225666710656,
+          "commutator": 0.03475199545535152
+        },
+        "rand_trunc": {
+          "dim": 6,
+          "left_r2": 0.6735062692657604,
+          "right_r2": 0.6752684709918032,
+          "hom_left": 0.48159525987040736,
+          "hom_right": 0.4749473176853301,
+          "commutator": 0.4966463481834295
+        }
+      }
+    },
+    "3": {
+      "feature_information": {
+        "trained": {
+          "selected_dim": 9,
+          "PCA999_dim": 14,
+          "vector_FVE": 0.9048526355303346
+        },
+        "default_initialization": {
+          "selected_dim": 9,
+          "PCA999_dim": 45,
+          "vector_FVE": 0.8818477531811869
+        },
+        "normal_std02_initialization": {
+          "selected_dim": 9,
+          "PCA999_dim": 67,
+          "vector_FVE": 0.8261063893670992
+        }
+      },
+      "translation": {
+        "trained_selected_block": {
+          "dim": 9,
+          "left_r2": 0.9887162195382045,
+          "right_r2": 0.9884405274772498,
+          "hom_left": 0.012187261208432247,
+          "hom_right": 0.012676274274974945,
+          "commutator": 0.012140646359471255
+        },
+        "trained_full_PCA999": {
+          "dim": 14,
+          "left_r2": 0.9248108726539708,
+          "right_r2": 0.9216403782753652,
+          "hom_left": 0.13385560108638572,
+          "hom_right": 0.11706205114000688,
+          "commutator": 0.07065915079671532
+        },
+        "default_initialization_selected_block": {
+          "dim": 9,
+          "left_r2": 0.9347482642674612,
+          "right_r2": 0.9335504909027517,
+          "hom_left": 0.06668689375966269,
+          "hom_right": 0.06614784354435307,
+          "commutator": 0.06644582972944067
+        },
+        "default_initialization_full_PCA999": {
+          "dim": 45,
+          "left_r2": 0.9935057284042458,
+          "right_r2": 0.9933342551540433,
+          "hom_left": 0.03660398583780991,
+          "hom_right": 0.036033940156228635,
+          "commutator": 0.039451805475342216
+        },
+        "normal_std02_initialization_selected_block": {
+          "dim": 9,
+          "left_r2": 0.9326409306833807,
+          "right_r2": 0.9289618940306871,
+          "hom_left": 0.06405476323930408,
+          "hom_right": 0.06599160171994378,
+          "commutator": 0.05825640616846931
+        },
+        "normal_std02_initialization_full_PCA999": {
+          "dim": 67,
+          "left_r2": 0.9870303019244497,
+          "right_r2": 0.986821405871578,
+          "hom_left": 0.06416889331475677,
+          "hom_right": 0.0631285725933295,
+          "commutator": 0.06844223716320187
+        },
+        "native_normal_std02_cap16": {
+          "dim": 16,
+          "left_r2": 0.8957949249965109,
+          "right_r2": 0.8917790784269332,
+          "hom_left": 0.1779309225706509,
+          "hom_right": 0.17273602417218994,
+          "commutator": 0.15256797801981947
+        },
+        "raw_observation": {
+          "dim": 32,
+          "left_r2": 0.9916506119207366,
+          "right_r2": 0.9912435920320631,
+          "hom_left": 0.06514706956180327,
+          "hom_right": 0.06526753822721759,
+          "commutator": 0.07567697501450728
+        },
+        "true_block": {
+          "dim": 9,
+          "left_r2": 0.9999999999652281,
+          "right_r2": 0.9999999999652281,
+          "hom_left": 5.891297900610087e-06,
+          "hom_right": 5.890447492270526e-06,
+          "commutator": 4.616370767357025e-07
+        },
+        "frame": {
+          "dim": 6,
+          "left_r2": 0.9999999999653554,
+          "right_r2": 0.63797083114388,
+          "hom_left": 5.885813121079745e-06,
+          "hom_right": 0.4792225666710656,
+          "commutator": 0.03475199545535152
+        },
+        "rand_trunc": {
+          "dim": 6,
+          "left_r2": 0.6735062692657604,
+          "right_r2": 0.6752684709918032,
+          "hom_left": 0.48159525987040736,
+          "hom_right": 0.4749473176853301,
+          "commutator": 0.4966463481834295
+        }
+      }
+    },
+    "4": {
+      "feature_information": {
+        "trained": {
+          "selected_dim": 9,
+          "PCA999_dim": 14,
+          "vector_FVE": 0.9283731989734401
+        },
+        "default_initialization": {
+          "selected_dim": 9,
+          "PCA999_dim": 45,
+          "vector_FVE": 0.8683040029559979
+        },
+        "normal_std02_initialization": {
+          "selected_dim": 9,
+          "PCA999_dim": 67,
+          "vector_FVE": 0.8351453045811063
+        }
+      },
+      "translation": {
+        "trained_selected_block": {
+          "dim": 9,
+          "left_r2": 0.9892009725328763,
+          "right_r2": 0.9893133310526364,
+          "hom_left": 0.011223062829076905,
+          "hom_right": 0.011267079812820662,
+          "commutator": 0.011875688187980016
+        },
+        "trained_full_PCA999": {
+          "dim": 14,
+          "left_r2": 0.940917449691756,
+          "right_r2": 0.9397613164033721,
+          "hom_left": 0.12035030962116938,
+          "hom_right": 0.10711774355497712,
+          "commutator": 0.061981430435074314
+        },
+        "default_initialization_selected_block": {
+          "dim": 9,
+          "left_r2": 0.9482043091827913,
+          "right_r2": 0.9497273316389783,
+          "hom_left": 0.051179512787335006,
+          "hom_right": 0.047344817535575734,
+          "commutator": 0.04649074212056071
+        },
+        "default_initialization_full_PCA999": {
+          "dim": 45,
+          "left_r2": 0.9929593444260644,
+          "right_r2": 0.9927895724391985,
+          "hom_left": 0.03838533681489411,
+          "hom_right": 0.036551471253098204,
+          "commutator": 0.039356717358025074
+        },
+        "normal_std02_initialization_selected_block": {
+          "dim": 9,
+          "left_r2": 0.9434218658381927,
+          "right_r2": 0.9402461871652422,
+          "hom_left": 0.0568004549037591,
+          "hom_right": 0.06173359387874903,
+          "commutator": 0.05776477246256643
+        },
+        "normal_std02_initialization_full_PCA999": {
+          "dim": 67,
+          "left_r2": 0.988361704295346,
+          "right_r2": 0.9880408358374743,
+          "hom_left": 0.05898404915709272,
+          "hom_right": 0.06005153490902051,
+          "commutator": 0.06429468991860735
+        },
+        "native_normal_std02_cap16": {
+          "dim": 16,
+          "left_r2": 0.9014768987961658,
+          "right_r2": 0.8945773405818539,
+          "hom_left": 0.175967544009057,
+          "hom_right": 0.1714380247849265,
+          "commutator": 0.156898196022109
+        },
+        "raw_observation": {
+          "dim": 32,
+          "left_r2": 0.9916506119207366,
+          "right_r2": 0.9912435920320631,
+          "hom_left": 0.06514706956180327,
+          "hom_right": 0.06526753822721759,
+          "commutator": 0.07567697501450728
+        },
+        "true_block": {
+          "dim": 9,
+          "left_r2": 0.9999999999652281,
+          "right_r2": 0.9999999999652281,
+          "hom_left": 5.891297900610087e-06,
+          "hom_right": 5.890447492270526e-06,
+          "commutator": 4.616370767357025e-07
+        },
+        "frame": {
+          "dim": 6,
+          "left_r2": 0.9999999999653554,
+          "right_r2": 0.63797083114388,
+          "hom_left": 5.885813121079745e-06,
+          "hom_right": 0.4792225666710656,
+          "commutator": 0.03475199545535152
+        },
+        "rand_trunc": {
+          "dim": 6,
+          "left_r2": 0.6735062692657604,
+          "right_r2": 0.6752684709918032,
+          "hom_left": 0.48159525987040736,
+          "hom_right": 0.4749473176853301,
+          "commutator": 0.4966463481834295
+        }
+      }
+    }
+  },
+  "protocol": {
+    "training_fraction": 0.01,
+    "checkpoint_step": 100000,
+    "n_train": 5120,
+    "n_test": 1024,
+    "n_reference": 4096,
+    "n_translations": 12,
+    "probe_seed": 29,
+    "commutator_pair_seed": 123,
+    "ridge": 0.01,
+    "selected_block_energy_retained": 0.99,
+    "global_PCA_variance_retained": 0.999,
+    "device": "cpu",
+    "include_exact_controls": true,
+    "purpose": "test sensitivity of the initialization comparison to PCA cap and initialization distribution, holding data and affine-fit protocol fixed",
+    "dependency_sha256": {
+      "experiments/twosided.py": "a6b7a14389cf9cd6715993fce9ce46ff15ce1c592ed380435d6b92e50d621582",
+      "experiments/su2_mechanism.py": "0e01aa2961d6e24740fe3c7a8b5f25b72d66f8895c8a240db69d53c5101040dd",
+      "core/su2_model.py": "5b15f2d6a97eb76d8822aaa103916bf3613949d6eee4c13e0018d1e6abeedc3b"
+    }
+  }
+}

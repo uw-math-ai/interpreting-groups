@@ -1,0 +1,87 @@
+{
+  "run_dir": "selected_checkpoints/data/su2/su2_N2048_f0.01_s3/step_100000",
+  "variant": "su2",
+  "step": 100000,
+  "interventions": {
+    "none": {
+      "task_acc": 0.9998779296875,
+      "fine_acc_r0.2": 0.551025390625,
+      "center_disc": 1.0
+    },
+    "even_projection": {
+      "task_acc": 0.02001953125,
+      "fine_acc_r0.2": 0.0003662109375,
+      "center_disc": 0.4945068359375
+    },
+    "odd_projection": {
+      "task_acc": 0.9517822265625,
+      "fine_acc_r0.2": 0.106689453125,
+      "center_disc": 1.0
+    },
+    "fablate_spin_half": {
+      "task_acc": 0.024658203125,
+      "fine_acc_r0.2": 0.0001220703125,
+      "center_disc": 0.5096435546875
+    },
+    "fablate_spin_one": {
+      "task_acc": 0.9993896484375,
+      "fine_acc_r0.2": 0.3447265625,
+      "center_disc": 1.0
+    },
+    "ablate_spin_half_k4": {
+      "task_acc": 0.0220947265625,
+      "fine_acc_r0.2": 0.00048828125,
+      "center_disc": 0.4930419921875
+    },
+    "ablate_spin_one_k5": {
+      "task_acc": 0.9984130859375,
+      "fine_acc_r0.2": 0.26904296875,
+      "center_disc": 1.0
+    },
+    "ablate_top_pca_k4": {
+      "task_acc": 0.022705078125,
+      "fine_acc_r0.2": 0.00048828125,
+      "center_disc": 0.492431640625
+    },
+    "ablate_random_k4": {
+      "task_acc": 0.9998779296875,
+      "fine_acc_r0.2": 0.5201416015625,
+      "center_disc": 1.0
+    }
+  },
+  "character_fit": {
+    "js": [
+      0.0,
+      0.5,
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0
+    ],
+    "r2_upto_j0.0": -1.7049691658499455e-08,
+    "r2_upto_j0.5": 0.9731553774262204,
+    "r2_upto_j1.0": 0.9731624447570689,
+    "r2_upto_j1.5": 0.9731666722920534,
+    "r2_upto_j2.0": 0.9731674024121362,
+    "r2_upto_j2.5": 0.9731684614838725,
+    "r2_upto_j3.0": 0.9731708899207842,
+    "coeffs": {
+      "0.0": 0.0,
+      "0.5": 37.61511730717322,
+      "1.0": -0.1061589452562961,
+      "1.5": -0.0953074492821635,
+      "2.0": 0.0683893130458344,
+      "2.5": 0.03384459014831975,
+      "3.0": -0.05309982607262202
+    }
+  },
+  "composition": {
+    "r2_h_to_product": 0.9856865393544997,
+    "r2_h_to_product_shuffled": -1.0216670935704744,
+    "r2_element_probe": 0.9971954731858819,
+    "compose_vs_truth_cos_med": 0.9977795911466911,
+    "compose_vs_hprobe_cos_med": 0.9945345400905117,
+    "compose_vs_truth_cos_med_shuffled": -0.02501872361845279
+  }
+}

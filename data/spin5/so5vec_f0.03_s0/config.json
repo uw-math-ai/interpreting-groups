@@ -1,0 +1,30 @@
+{
+  "variant": "so5",
+  "N": 2048,
+  "frac": 0.03,
+  "sigma": 0.15,
+  "excl_radius": 0.7,
+  "K": 64,
+  "m": 25,
+  "encoding": "so5vec",
+  "alpha": 2.0,
+  "enc_seed": 0,
+  "steps": 100000,
+  "batch": 2048,
+  "lr": 0.001,
+  "wd": 1.0,
+  "seed": 0,
+  "n_eval": 4096,
+  "eval_every": 1000,
+  "spec_every": 5000,
+  "ckpt_every": 25000,
+  "save_dir": "data/spin5/so5vec_f0.03_s0",
+  "resume": true,
+  "device": "cuda",
+  "requested_overrides": {
+    "m": 48
+  },
+  "ckpt_selection_rule": "training saves ckpt_<step>.pt every ckpt_every steps and at the final step; unless an analysis states otherwise it uses the final checkpoint at the configured step budget",
+  "launch_command": "experiments/spin5_train.py --variant so5 --encoding so5vec --N 2048 --frac 0.03 --seed 0 --steps 100000 --save_dir data/spin5/so5vec_f0.03_s0 --resume",
+  "code_commit": "43a9b724a142746f8a62e32cc79621a8046d5058+dirty"
+}

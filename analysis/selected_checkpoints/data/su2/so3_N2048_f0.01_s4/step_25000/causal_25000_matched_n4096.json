@@ -1,0 +1,83 @@
+{
+  "run_dir": "selected_checkpoints/data/su2/so3_N2048_f0.01_s4/step_25000",
+  "variant": "so3",
+  "step": 25000,
+  "interventions": {
+    "none": {
+      "task_acc": 1.0,
+      "fine_acc_r0.2": 0.6044921875,
+      "center_disc": 0.5
+    },
+    "even_projection": {
+      "task_acc": 1.0,
+      "fine_acc_r0.2": 0.6044921875,
+      "center_disc": 0.5
+    },
+    "odd_projection": {
+      "task_acc": 0.02197265625,
+      "fine_acc_r0.2": 0.0,
+      "center_disc": 0.5
+    },
+    "fablate_spin_half": {
+      "task_acc": 1.0,
+      "fine_acc_r0.2": 0.59521484375,
+      "center_disc": 0.5
+    },
+    "fablate_spin_one": {
+      "task_acc": 0.03076171875,
+      "fine_acc_r0.2": 0.0,
+      "center_disc": 0.5
+    },
+    "ablate_spin_half_k4": {
+      "task_acc": 0.40576171875,
+      "fine_acc_r0.2": 0.01025390625,
+      "center_disc": 0.5
+    },
+    "ablate_spin_one_k9": {
+      "task_acc": 0.0283203125,
+      "fine_acc_r0.2": 0.000244140625,
+      "center_disc": 0.5
+    },
+    "ablate_top_pca_k4": {
+      "task_acc": 0.284423828125,
+      "fine_acc_r0.2": 0.009765625,
+      "center_disc": 0.5
+    },
+    "ablate_random_k4": {
+      "task_acc": 1.0,
+      "fine_acc_r0.2": 0.572509765625,
+      "center_disc": 0.5
+    }
+  },
+  "character_fit": {
+    "js": [
+      0.0,
+      0.5,
+      1.0,
+      1.5,
+      2.0,
+      2.5,
+      3.0
+    ],
+    "r2_upto_j0.0": 4.5220498678943954e-08,
+    "r2_upto_j0.5": 0.00036729252064915396,
+    "r2_upto_j1.0": 0.8897668966781197,
+    "r2_upto_j1.5": 0.8897987694615451,
+    "r2_upto_j2.0": 0.8898166119597182,
+    "r2_upto_j2.5": 0.889819993305688,
+    "r2_upto_j3.0": 0.8898201355258487,
+    "coeffs": {
+      "0.0": 0.0,
+      "0.5": 0.07375455858189994,
+      "1.0": 15.626469007122665,
+      "1.5": -0.06871169012328313,
+      "2.0": 0.07113576817072204,
+      "2.5": -0.0296318369051152,
+      "3.0": -0.006036947441612146
+    }
+  },
+  "composition": {
+    "r2_h_to_product": 0.9369972977992831,
+    "r2_h_to_product_shuffled": -0.9144903989209803
+  }
+}
