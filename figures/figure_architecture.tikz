@@ -1,0 +1,80 @@
+% Vector architecture figure. Input directly from main.tex; also used by the
+% standalone preview wrapper in comparison_v2/architecture_standalone.tex.
+\definecolor{modelteal}{HTML}{2C6E7F}
+\begin{tikzpicture}[
+  x=1cm,y=1cm,>=Stealth,
+  font=\fontsize{8.5}{10}\selectfont,
+  learned/.style={draw=modelteal!85!black,fill=modelteal!6,rounded corners=2pt,
+                  minimum height=8mm,minimum width=17mm,align=center},
+  frozen/.style={draw=black!45,fill=black!5,rounded corners=2pt,
+                 minimum height=8mm,minimum width=10mm,align=center},
+  operation/.style={draw=black!65,fill=white,rounded corners=2pt,
+                   minimum height=8mm,align=center},
+  flow/.style={->,line width=0.55pt,draw=black!75},
+  detail/.style={draw=modelteal!65!black,fill=modelteal!3,rounded corners=2pt,
+                 text width=42mm,minimum height=22mm,align=left,inner sep=3mm},
+  annot/.style={font=\fontsize{7.5}{9}\selectfont,text=black!70}]
+
+\node[anchor=west,font=\bfseries] at (-0.25,3.15) {(a) Candidate ranking};
+\node (a) at (0,2.3) {$a$};
+\node (b) at (0,0.85) {$b$};
+\node (c) at (-0.3,-1.3) {$c_1,\ldots,c_K$};
+\node[frozen] (pa) at (1.3,2.3) {$\Psi$};
+\node[frozen] (pb) at (1.3,0.85) {$\Psi$};
+\node[frozen] (pc) at (1.3,-1.3) {$\Psi$};
+\node[learned] (ea) at (3.3,2.3) {argument\\encoder $E_\theta$};
+\node[learned] (eb) at (3.3,0.85) {argument\\encoder $E_\theta$};
+\draw[dashed,rounded corners=3pt,draw=modelteal!60!black]
+  (2.25,0.28) rectangle (4.35,2.88);
+\node[annot,anchor=north] at (3.3,0.2) {shared parameters};
+\node[learned] (ec) at (3.3,-1.3) {candidate\\encoder $E_\eta$};
+\node[annot,anchor=north,align=center] at (3.3,-1.86)
+  {independent of $E_\theta$;\\shared across candidates};
+
+\node[operation,minimum width=18mm] (cat) at (5.85,1.575)
+  {ordered concat\\$[z(a);z(b)]$};
+\node[learned,minimum width=20mm] (interaction) at (8.25,1.575)
+  {interaction\\MLP $F_\phi$};
+\node (h) at (10.2,1.575) {$h(a,b)$};
+\node[operation,minimum width=20mm] (dot) at (11.95,0.2)
+  {dot products\\$\langle h,z_c(c_k)\rangle$};
+\node[align=center] (scores) at (14,0.2) {$K$ scores\\$s\in\mathbb{R}^{K}$};
+\node[operation,draw=black!45,dashed,minimum width=20mm] (loss) at (14,-1.3)
+  {softmax +\\cross-entropy};
+\node[annot,anchor=north,align=center] at (14,-1.86)
+  {training only\\positive candidate label};
+\node (zc) at (9.3,-1.3) {$z_c(c_k)\in\mathbb{R}^{128}$};
+
+\draw[flow] (a) -- (pa);
+\draw[flow] (b) -- (pb);
+\draw[flow] (c) -- (pc);
+\draw[flow] (pa) -- node[above,annot,pos=0.25] {$p$} (ea);
+\draw[flow] (pb) -- node[above,annot,pos=0.25] {$p$} (eb);
+\draw[flow] (pc) -- node[above,annot,pos=0.25] {$p$} (ec);
+\draw[flow] (ea.east) -- node[above,annot,pos=0.48] {$z(a)$} (cat.150);
+\draw[flow] (eb.east) -- node[below,annot,pos=0.48] {$z(b)$} (cat.210);
+\draw[flow] (cat) -- (interaction);
+\draw[flow] (interaction) -- (h);
+\draw[flow] (h.east) -| (dot.north);
+\draw[flow] (ec.east) -- (zc.west);
+\draw[flow] (zc.east) -| (dot.south);
+\draw[flow] (dot) -- (scores);
+\draw[flow] (scores) -- (loss);
+
+\node[anchor=west,font=\bfseries] at (-0.25,-2.8) {(b) Layers inside each learned module};
+\node[detail,anchor=north west] at (-0.25,-3.2) {%
+  \textbf{Argument encoder $E_\theta$}\\[3pt]
+  affine: $p\to256$\\
+  GELU\\
+  affine: $256\to128$};
+\node[detail,anchor=north west] at (4.95,-3.2) {%
+  \textbf{Interaction MLP $F_\phi$}\\[3pt]
+  affine: $256\to512$\\
+  GELU\\
+  affine: $512\to128$};
+\node[detail,anchor=north west] at (10.15,-3.2) {%
+  \textbf{Candidate encoder $E_\eta$}\\[3pt]
+  affine: $p\to256$\\
+  GELU\\
+  affine: $256\to128$};
+\end{tikzpicture}

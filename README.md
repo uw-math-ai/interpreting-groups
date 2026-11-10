@@ -34,6 +34,8 @@ These commands require no GPU or checkpoints. They read archived training logs a
 
 The geometry figures are included as PDFs. Their checkpoint-based source is `experiments/embedding_viz.py`; regenerating those illustrations requires the relevant trained weights in the original `data/` run directories. The script writes to `figures/` and uses `figures/publication_style.py` for layout and coordinate-integrity checks.
 
+The detailed architecture diagram is included as `figures/figure_architecture.pdf` and editable `figures/figure_architecture.tikz`. From `figures/`, `latexmk -pdf -outdir=build architecture.tex` rebuilds it.
+
 ## Layout
 
 - `core/`: group operations, exact coefficients, frozen observations, scorer, and provenance helpers.
