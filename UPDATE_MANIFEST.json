@@ -3,8 +3,8 @@
   "branch": "nips_2026_workshop",
   "files": {
     ".gitignore": "c1307d367d6d8f368d67413a41dc5828d4f6332e823bd31e0c79db9140fe9dff",
-    "LICENSE": "cd81430aa2008afc895f9eb7d0dfbcb5fb94239a461976a3bf87a2616c2820bd",
-    "README.md": "17d126de6e2e14176ef1a27b31c77b3c149882dacd8dd68d8f456d36851ff27d",
+    "LICENSE": "1d2fb8f328c764e6bc736f0102a2247072dd1aa71e8f725be84bc6109b358efc",
+    "README.md": "dffd349ec08e5deddc921c3a0cb98e33e18802e4ba6807926d17adf7a333d7cc",
     "RELEASE_NOTES.md": "d41f374fd69cf7b4bb23799686926f6d7086b55bcd1fd446227358ef2370a9f6",
     "VALIDATION.md": "511c7fb9991feac0a481fee204bc5c11ae2edafd22b8373b70b3acbbbd831453",
     "analysis/build_tables.py": "56fb699a87e9df4b8c73d9f960055340550411ac1d8733706b65f775e848c1d8",

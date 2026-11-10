@@ -4,6 +4,8 @@ Code and lightweight results for *To Infinite and Beyond: How Neural Networks Le
 
 Camera-ready release for the Interp4Discovery workshop at NeurIPS 2026.
 
+Authors: Junaid Hasan and Michael Ruofan Zeng. This work was supported by the UW Math AI Lab.
+
 This camera-ready update includes the group-family trainers, mechanistic analyses, corrected figure generation, and verified statistics. Checkpoints and Python environments are not included.
 
 ## Setup and checks
