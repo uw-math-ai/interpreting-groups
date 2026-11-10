@@ -4,8 +4,8 @@
   "files": {
     ".gitignore": "c1307d367d6d8f368d67413a41dc5828d4f6332e823bd31e0c79db9140fe9dff",
     "LICENSE": "1d2fb8f328c764e6bc736f0102a2247072dd1aa71e8f725be84bc6109b358efc",
-    "README.md": "dffd349ec08e5deddc921c3a0cb98e33e18802e4ba6807926d17adf7a333d7cc",
-    "RELEASE_NOTES.md": "d41f374fd69cf7b4bb23799686926f6d7086b55bcd1fd446227358ef2370a9f6",
+    "README.md": "a5ddbb82df9c3f7466aca295ac649835b2d6c8a4127ecab3c81a08636f20678f",
+    "RELEASE_NOTES.md": "cc1003110a27ea61de9e17aa8d816c6acfdbde613deb38926a15e408e0d3da51",
     "VALIDATION.md": "511c7fb9991feac0a481fee204bc5c11ae2edafd22b8373b70b3acbbbd831453",
     "analysis/build_tables.py": "56fb699a87e9df4b8c73d9f960055340550411ac1d8733706b65f775e848c1d8",
     "analysis/calibrate_spectral_targets.py": "1f57429abdcdb99b379605daa47dba04779758182b40bcc208d0cdbe412957ac",

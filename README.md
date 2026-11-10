@@ -6,6 +6,8 @@ Camera-ready release for the Interp4Discovery workshop at NeurIPS 2026.
 
 Authors: Junaid Hasan and Michael Ruofan Zeng. This work was supported by the UW Math AI Lab.
 
+Branches: `main` is the current paper release; `nips_2026_workshop` is its submission snapshot; `exploratory` preserves the earlier finite-group work and galleries.
+
 This camera-ready update includes the group-family trainers, mechanistic analyses, corrected figure generation, and verified statistics. Checkpoints and Python environments are not included.
 
 ## Setup and checks

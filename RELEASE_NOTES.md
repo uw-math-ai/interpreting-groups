@@ -1,6 +1,6 @@
 # Interp4Discovery — NeurIPS 2026 workshop release
 
-This branch contains the compact-group composition paper's code and lightweight evidence. The repository's default branch retains the earlier finite-group work. Future submission releases can use separate branches.
+This release contains the compact-group composition paper's code and lightweight evidence. `main` opens on the current paper release, `nips_2026_workshop` preserves the named submission snapshot, and `exploratory` retains the earlier finite-group code and galleries. Future submission releases can use separate branches.
 
 The release includes the four group-family trainers, mechanistic analysis entrypoints, five-seed logs, uniform-checkpoint diagnostics, preregistered controls, corrected figure generation, and full-precision summary tables. Checkpoints and Python environments are excluded.
 
